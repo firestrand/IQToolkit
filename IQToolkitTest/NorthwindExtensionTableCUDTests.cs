@@ -195,7 +195,7 @@ namespace IQToolkitTest
                 OrderDate = DateTime.Today,
             };
             var result = db.Orders.Insert(order);
-            Assert.AreEqual(2, result);
+            Assert.AreEqual(1, result);
         }
         [TestMethod]
         public void Extension_Table_InsertOrderWithGeneratedIDResult()
@@ -672,7 +672,7 @@ namespace IQToolkitTest
             Assert.AreEqual(0, result);
         }
         [TestMethod]
-        public void TestDeleteCustomerWithDeleteCheckThatSucceeds()
+        public void Extension_Table_DeleteCustomerWithDeleteCheckThatSucceeds()
         {
             Extension_Table_InsertCustomerNoResult();
 
@@ -687,7 +687,7 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.Delete(cust, d => d.City == "Seattle");
-            Assert.AreEqual(1, result);
+            Assert.AreEqual(2, result);
         }
         [TestMethod]
         public void Extension_Table_DeleteCustomerWithDeleteCheckThatDoesNotSucceed()
@@ -705,7 +705,29 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.Delete(cust, d => d.City == "Portland");
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(-1, result); //Expected result due to Exists Check
+            var check = db.CustomersWithComments.Single(c => c.CustomerID == "XX1");
+            Assert.IsNotNull(check); //Verify that the customer has not been deleted
+        }
+        [TestMethod]
+        public void Extension_Table_DeleteCustomerWithDeleteCheckOnExtensionDataThatDoesNotSucceed()
+        {
+            Extension_Table_InsertCustomerNoResult();
+
+            var cust = new CustomerWithComments
+            {
+                CustomerID = "XX1",
+                CompanyName = "Company1",
+                ContactName = "Contact1",
+                City = "Seattle",
+                Country = "USA",
+                Comment = "Custom comment"
+            };
+
+            var result = db.CustomersWithComments.Delete(cust, d => d.Comment == "Comment does not exist");
+            Assert.AreEqual(-1, result); //Expected result due to Exists Check
+            var check = db.CustomersWithComments.Single(c => c.CustomerID == "XX1");
+            Assert.IsNotNull(check); //Verify that the customer has not been deleted
         }
         [TestMethod]
         public void Extension_Table_BatchDeleteCustomers()
@@ -768,7 +790,9 @@ namespace IQToolkitTest
 
             var results = db.CustomersWithComments.Batch(custs, (u, c) => u.Delete(c, d => d.City == c.City));
             Assert.AreEqual(n, results.Count());
-            Assert.IsTrue(results.All(r => Equals(r, 0)));
+            Assert.IsTrue(results.All(r => Equals(r, 1))); //Each batch command will complete with a 1 result due to the existance check
+            var customers = db.CustomersWithComments.Count(c => c.CustomerID.Substring(0,2) == "XX");//Get all customers with XX and count
+            Assert.AreEqual(n,customers); //Ensure no customers were deleted
         }
         [TestMethod]
         public void Extension_Table_DeleteWhere()
@@ -977,28 +1001,28 @@ namespace IQToolkitTest
             db.CustomersWithComments.Insert(cust);
 
             NorthwindSession ns = new NorthwindSession(provider);
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust2));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust2));
 
-            ns.Customers.DeleteOnSubmit(cust);
-            Assert.AreEqual(SubmitAction.Delete, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust2));
+            ns.CustomersWithComments.DeleteOnSubmit(cust);
+            Assert.AreEqual(SubmitAction.Delete, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust2));
 
-            ns.Customers.InsertOnSubmit(cust2);
-            Assert.AreEqual(SubmitAction.Delete, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.Insert, ns.Customers.GetSubmitAction(cust2));
+            ns.CustomersWithComments.InsertOnSubmit(cust2);
+            Assert.AreEqual(SubmitAction.Delete, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Insert, ns.CustomersWithComments.GetSubmitAction(cust2));
 
             ns.SubmitChanges();
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust2));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust2));
 
             // modifications after delete don't trigger updates
             cust.City = "SeattleX";
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
             // modifications after insert do trigger updates
             cust2.City = "ChicagoX";
-            Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust2));
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust2));
         }
         [TestMethod]
         public void Extension_Table_InsertThenDeleteSamePK()

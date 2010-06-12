@@ -231,6 +231,7 @@ namespace IQToolkitTest
     {
         void SubmitChanges();
         ISessionTable<Customer> Customers { get; }
+        ISessionTable<CustomerWithComments> CustomersWithComments { get; } 
         ISessionTable<Order> Orders { get; }
         ISessionTable<OrderDetail> OrderDetails { get; }
     }
@@ -263,7 +264,10 @@ namespace IQToolkitTest
         {
             get { return this.session.GetTable<Customer>("Customers"); }
         }
-
+        public ISessionTable<CustomerWithComments> CustomersWithComments
+        {
+            get { return this.session.GetTable<CustomerWithComments>("Customers"); }
+        }
         public ISessionTable<Order> Orders
         {
             get { return this.session.GetTable<Order>("Orders"); }
