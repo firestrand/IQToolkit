@@ -261,7 +261,9 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.Update(cust, d => d.City == "Detroit");
-            Assert.AreEqual(0, result); // 0 for failure
+            Assert.AreEqual(-1, result); //Returns -1 due to existance check
+            var customer = db.CustomersWithComments.Single(c => c.CustomerID == "XX1");
+            Assert.AreEqual("Seattle",customer.City); //City should be unchanged
         }
         [TestMethod]
         public void Extension_Table_UpdateCustomerWithUpdateCheckThatSucceeds()
@@ -279,7 +281,7 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.Update(cust, d => d.City == "Seattle");
-            Assert.AreEqual(1, result);
+            Assert.AreEqual(2, result);
         }
         [TestMethod]
         public void Extension_Table_BatchUpdateCustomer()
@@ -403,7 +405,7 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.InsertOrUpdate(cust);
-            Assert.AreEqual(1, result);
+            Assert.AreEqual(2, result);
         }
         [TestMethod]
         public void Extension_Table_UpsertExistingCustomerNoResult()
@@ -421,7 +423,7 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.InsertOrUpdate(cust);
-            Assert.AreEqual(1, result);
+            Assert.AreEqual(2, result);
         }
         [TestMethod]
         public void Extension_Table_UpsertNewCustomerWithResult()
@@ -471,7 +473,7 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.InsertOrUpdate(cust, d => d.City == "Portland");
-            Assert.AreEqual(1, result);
+            Assert.AreEqual(2, result);
         }
         [TestMethod]
         public void Extension_Table_UpsertExistingCustomerWithUpdateCheck()
@@ -489,7 +491,7 @@ namespace IQToolkitTest
             };
 
             var result = db.CustomersWithComments.InsertOrUpdate(cust, d => d.City == "Seattle");
-            Assert.AreEqual(1, result);
+            Assert.AreEqual(2, result);
         }
         [TestMethod]
         public void Extension_Table_BatchUpsertNewCustomersNoResult()
@@ -808,8 +810,8 @@ namespace IQToolkitTest
             NorthwindSession ns = new NorthwindSession(provider);
 
             // both objects should be the same instance
-            var cust = ns.Customers.Single(c => c.CustomerID == "ALFKI");
-            var cust2 = ns.Customers.Single(c => c.CustomerID == "ALFKI");
+            var cust = ns.CustomersWithComments.Single(c => c.CustomerID == "ALFKI");
+            var cust2 = ns.CustomersWithComments.Single(c => c.CustomerID == "ALFKI");
 
             Assert.IsNotNull(cust);
             Assert.IsNotNull(cust2);
@@ -822,50 +824,50 @@ namespace IQToolkitTest
             Northwind db2 = new Northwind(ns.Session.Provider);
 
             // both objects should be different instances
-            var cust = ns.Customers.Single(c => c.CustomerID == "ALFKI");
-            var cust2 = ns.Customers.ProviderTable.Single(c => c.CustomerID == "ALFKI");
+            var cust = ns.CustomersWithComments.Single(c => c.CustomerID == "ALFKI");
+            var cust2 = ns.CustomersWithComments.ProviderTable.Single(c => c.CustomerID == "ALFKI");
 
             Assert.AreNotEqual(null, cust);
             Assert.AreNotEqual(null, cust2);
             Assert.AreEqual(cust.CustomerID, cust2.CustomerID);
             Assert.IsFalse(Assert.ReferenceEquals(cust, cust2));
         }
-        //[TestMethod]
-        //public void Extension_Table_SessionSubmitActionOnModify()
-        //{
-        //    var cust = new CustomerWithComments
-        //    {
-        //        CustomerID = "XX1",
-        //        CompanyName = "Company1",
-        //        ContactName = "Contact1",
-        //        City = "Seattle",
-        //        Country = "USA",
-        //        Comment = "New Comment"
-        //    };
+        [TestMethod]
+        public void Extension_Table_SessionSubmitActionOnModify()
+        {
+            var cust = new CustomerWithComments
+            {
+                CustomerID = "XX1",
+                CompanyName = "Company1",
+                ContactName = "Contact1",
+                City = "Seattle",
+                Country = "USA",
+                Comment = "New Comment"
+            };
 
-        //    this.db.CustomersWithComments.Insert(cust);
+            this.db.CustomersWithComments.Insert(cust);
 
-        //    var ns = new NorthwindSession(this.provider);
-        //    Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            var ns = new NorthwindSession(this.provider);
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-        //    // fetch the previously inserted customer
-        //    cust = ns.CustomersWithComments.Single(c => c.CustomerID == "XX1");
-        //    Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            // fetch the previously inserted customer
+            cust = ns.CustomersWithComments.Single(c => c.CustomerID == "XX1");
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-        //    cust.ContactName = "Contact Modified";
-        //    Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust));
+            cust.ContactName = "Contact Modified";
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust));
 
-        //    ns.SubmitChanges();
-        //    Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            ns.SubmitChanges();
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-        //    // prove actually modified by fetching through provider
-        //    var cust2 = this.db.CustomersWithComments.Single(c => c.CustomerID == "XX1");
-        //    Assert.AreEqual("Contact Modified", cust2.ContactName);
+            // prove actually modified by fetching through provider
+            var cust2 = this.db.CustomersWithComments.Single(c => c.CustomerID == "XX1");
+            Assert.AreEqual("Contact Modified", cust2.ContactName);
 
-        //    // ready to be submitted again!
-        //    cust.City = "SeattleX";
-        //    Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust));
-        //}
+            // ready to be submitted again!
+            cust.City = "SeattleX";
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust));
+        }
         [TestMethod]
         public void Extension_Table_SessionSubmitActionOnInsert()
         {
@@ -879,16 +881,16 @@ namespace IQToolkitTest
                 Country = "USA",
 				Comment = "New Comment"
             };
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-            ns.Customers.InsertOnSubmit(cust);
-            Assert.AreEqual(SubmitAction.Insert, ns.Customers.GetSubmitAction(cust));
+            ns.CustomersWithComments.InsertOnSubmit(cust);
+            Assert.AreEqual(SubmitAction.Insert, ns.CustomersWithComments.GetSubmitAction(cust));
 
             ns.SubmitChanges();
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
             cust.City = "SeattleX";
-            Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust));
         }
         [TestMethod]
         public void Extension_Table_SessionSubmitActionOnInsertOrUpdate()
@@ -903,16 +905,16 @@ namespace IQToolkitTest
                 Country = "USA",
 				Comment = "New Comment"
             };
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-            ns.Customers.InsertOrUpdateOnSubmit(cust);
-            Assert.AreEqual(SubmitAction.InsertOrUpdate, ns.Customers.GetSubmitAction(cust));
+            ns.CustomersWithComments.InsertOrUpdateOnSubmit(cust);
+            Assert.AreEqual(SubmitAction.InsertOrUpdate, ns.CustomersWithComments.GetSubmitAction(cust));
 
             ns.SubmitChanges();
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
             cust.City = "SeattleX";
-            Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust));
         }
         [TestMethod]
         public void Extension_Table_SessionSubmitActionOnUpdate()
@@ -929,16 +931,16 @@ namespace IQToolkitTest
             db.CustomersWithComments.Insert(cust);
 
             NorthwindSession ns = new NorthwindSession(provider);
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-            ns.Customers.UpdateOnSubmit(cust);
-            Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust));
+            ns.CustomersWithComments.UpdateOnSubmit(cust);
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust));
 
             ns.SubmitChanges();
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
             cust.City = "SeattleX";
-            Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust));
         }
         [TestMethod]
         public void Extension_Table_SessionSubmitActionOnDelete()
@@ -955,25 +957,25 @@ namespace IQToolkitTest
             db.CustomersWithComments.Insert(cust);
 
             NorthwindSession ns = new NorthwindSession(provider);
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
-            ns.Customers.DeleteOnSubmit(cust);
+            ns.CustomersWithComments.DeleteOnSubmit(cust);
             var custHash1 = cust.GetHashCode();
             var custHash2 = cust.GetHashCode();
-            var custSessTable1 = ns.Customers.GetHashCode();
-            var custSessTable2 = ns.Customers.GetHashCode();
-            var custSessionTable = ns.Customers;
+            var custSessTable1 = ns.CustomersWithComments.GetHashCode();
+            var custSessTable2 = ns.CustomersWithComments.GetHashCode();
+            var custSessionTable = ns.CustomersWithComments;
             custSessionTable.DeleteOnSubmit(cust);
 
-            Assert.AreEqual(SubmitAction.Delete, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.Delete, custSessionTable.GetSubmitAction(cust));//ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Delete, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Delete, custSessionTable.GetSubmitAction(cust));//ns.CustomersWithComments.GetSubmitAction(cust));
 
             ns.SubmitChanges();
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
             // modifications after delete don't trigger updates
             cust.City = "SeattleX";
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
         }
         [TestMethod]
         public void Extension_Table_DeleteThenInsertSamePK()
@@ -1050,28 +1052,28 @@ namespace IQToolkitTest
             db.CustomersWithComments.Insert(cust);
 
             NorthwindSession ns = new NorthwindSession(provider);
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust2));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust2));
+            
+            ns.CustomersWithComments.InsertOnSubmit(cust2);
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Insert, ns.CustomersWithComments.GetSubmitAction(cust2));
 
-            ns.Customers.InsertOnSubmit(cust2);
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.Insert, ns.Customers.GetSubmitAction(cust2));
-
-            ns.Customers.DeleteOnSubmit(cust);
-            Assert.AreEqual(SubmitAction.Delete, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.Insert, ns.Customers.GetSubmitAction(cust2));
+            ns.CustomersWithComments.DeleteOnSubmit(cust);
+            Assert.AreEqual(SubmitAction.Delete, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.Insert, ns.CustomersWithComments.GetSubmitAction(cust2));
 
             ns.SubmitChanges();
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust2));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust2));
 
             // modifications after delete don't trigger updates
             cust.City = "SeattleX";
-            Assert.AreEqual(SubmitAction.None, ns.Customers.GetSubmitAction(cust));
+            Assert.AreEqual(SubmitAction.None, ns.CustomersWithComments.GetSubmitAction(cust));
 
             // modifications after insert do trigger updates
             cust2.City = "ChicagoX";
-            Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust2));
+            Assert.AreEqual(SubmitAction.Update, ns.CustomersWithComments.GetSubmitAction(cust2));
         }
     }
 }
