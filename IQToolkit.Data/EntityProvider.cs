@@ -21,13 +21,14 @@ namespace IQToolkit.Data
     /// </summary>
     public abstract class EntityProvider : QueryProvider, IEntityProvider, ICreateExecutor
     {
-        readonly QueryLanguage language;
-        readonly QueryMapping mapping;
+        QueryLanguage language;
+        QueryMapping mapping;
         QueryPolicy policy;
-        readonly Dictionary<MappingEntity, IEntityTable> tables;
+        TextWriter log;
+        Dictionary<MappingEntity, IEntityTable> tables;
         QueryCache cache;
 
-        protected EntityProvider(QueryLanguage language, QueryMapping mapping, QueryPolicy policy)
+        public EntityProvider(QueryLanguage language, QueryMapping mapping, QueryPolicy policy)
         {
             if (language == null)
                 throw new InvalidOperationException("Language not specified");
@@ -55,12 +56,24 @@ namespace IQToolkit.Data
         {
             get { return this.policy; }
 
-            set {
-                this.policy = value ?? QueryPolicy.Default;
+            set
+            {
+                if (value == null)
+                {
+                    this.policy = QueryPolicy.Default;
+                }
+                else
+                {
+                    this.policy = value;
+                }
             }
         }
 
-        public TextWriter Log { get; set; }
+        public TextWriter Log
+        {
+            get { return this.log; }
+            set { this.log = value; }
+        }
 
         public QueryCache Cache
         {
@@ -136,8 +149,8 @@ namespace IQToolkit.Data
 
         public class EntityTable<T> : Query<T>, IEntityTable<T>, IHaveMappingEntity
         {
-            readonly MappingEntity entity;
-            readonly EntityProvider provider;
+            MappingEntity entity;
+            EntityProvider provider;
 
             public EntityTable(EntityProvider provider, MappingEntity entity)
                 : base(provider, typeof(IEntityTable<T>))
@@ -233,11 +246,11 @@ namespace IQToolkit.Data
             return string.Join("\n\n", commands);
         }
 
-        sealed class CommandGatherer : DbExpressionVisitor
+        class CommandGatherer : DbExpressionVisitor
         {
-            readonly List<QueryCommand> commands = new List<QueryCommand>();
+            List<QueryCommand> commands = new List<QueryCommand>();
 
-            public static IEnumerable<QueryCommand> Gather(Expression expression)
+            public static ReadOnlyCollection<QueryCommand> Gather(Expression expression)
             {
                 var gatherer = new CommandGatherer();
                 gatherer.Visit(expression);
@@ -337,7 +350,7 @@ namespace IQToolkit.Data
             return translator.Police.BuildExecutionPlan(translation, provider);
         }
 
-        private Expression Find(Expression expression, IEnumerable<ParameterExpression> parameters, Type type)
+        private Expression Find(Expression expression, IList<ParameterExpression> parameters, Type type)
         {
             if (parameters != null)
             {
@@ -347,11 +360,7 @@ namespace IQToolkit.Data
             }
             return TypedSubtreeFinder.Find(expression, type);
         }
-        /// <summary>
-        /// Get Mapping resolves the mapping information and defaults to implicit if Attribute and XML fails or mappingId is null
-        /// </summary>
-        /// <param name="mappingId"></param>
-        /// <returns></returns>
+           
         public static QueryMapping GetMapping(string mappingId)
         {
             if (mappingId != null)

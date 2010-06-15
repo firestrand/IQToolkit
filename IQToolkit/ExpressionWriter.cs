@@ -18,7 +18,7 @@ namespace IQToolkit
     /// </summary>
     public class ExpressionWriter : ExpressionVisitor
     {
-        readonly TextWriter writer;
+        TextWriter writer;
         int indent = 2;
         int depth;
 

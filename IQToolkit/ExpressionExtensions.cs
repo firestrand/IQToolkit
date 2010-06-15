@@ -70,12 +70,14 @@ namespace IQToolkit
 
         private static void ConvertExpressions(ref Expression expression1, ref Expression expression2)
         {
-            if (expression1.Type == expression2.Type || TypeHelper.GetNonNullableType(expression1.Type) != TypeHelper.GetNonNullableType(expression2.Type)) return;
-
+            if (expression1.Type != expression2.Type)
+            {
                 var isNullable1 = TypeHelper.IsNullableType(expression1.Type);
                 var isNullable2 = TypeHelper.IsNullableType(expression2.Type);
-            if (!isNullable1 && !isNullable2) return;
-
+                if (isNullable1 || isNullable2)
+                {
+                    if (TypeHelper.GetNonNullableType(expression1.Type) == TypeHelper.GetNonNullableType(expression2.Type))
+                    {
                         if (!isNullable1)
                         {
                             expression1 = Expression.Convert(expression1, expression2.Type);
@@ -85,6 +87,9 @@ namespace IQToolkit
                             expression2 = Expression.Convert(expression2, expression1.Type);
                         }
                     }
+                }
+            }
+        }
 
         public static Expression[] Split(this Expression expression, params ExpressionType[] binarySeparators)
         {
@@ -93,7 +98,7 @@ namespace IQToolkit
             return list.ToArray();
         }
 
-        private static void Split(Expression expression, List<Expression> list, IEnumerable<ExpressionType> binarySeparators)
+        private static void Split(Expression expression, List<Expression> list, ExpressionType[] binarySeparators)
         {
             if (expression != null)
             {

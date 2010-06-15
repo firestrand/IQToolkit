@@ -68,9 +68,9 @@ namespace IQToolkit.Data.Mapping
 
     public class AttributeMapping : AdvancedMapping
     {
-        readonly Type contextType;
-        readonly Dictionary<string, MappingEntity> entities = new Dictionary<string, MappingEntity>();
-        readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(); //Use the Slim version for better performance
+        Type contextType;
+        Dictionary<string, MappingEntity> entities = new Dictionary<string, MappingEntity>();
+        ReaderWriterLock rwLock = new ReaderWriterLock();
 
         public AttributeMapping(Type contextType)
         {
@@ -91,26 +91,21 @@ namespace IQToolkit.Data.Mapping
         private MappingEntity GetEntity(Type elementType, string tableId, Type entityType)
         {
             MappingEntity entity;
-            rwLock.EnterUpgradeableReadLock();
-            try
-            {
+            rwLock.AcquireReaderLock(Timeout.Infinite);
             if (!entities.TryGetValue(tableId, out entity))
             {
-                    rwLock.EnterWriteLock();
-                    try
+                rwLock.ReleaseReaderLock();
+                rwLock.AcquireWriterLock(Timeout.Infinite);
+                if (!entities.TryGetValue(tableId, out entity))
                 {
                     entity = this.CreateEntity(elementType, tableId, entityType);
                     this.entities.Add(tableId, entity);
                 }
-                    finally
-                    {
-                        rwLock.ExitWriteLock();
+                rwLock.ReleaseWriterLock();
             }
-                }
-            }
-            finally
+            else
             {
-                rwLock.ExitUpgradeableReadLock();
+                rwLock.ReleaseReaderLock();
             }
             return entity;
         }
@@ -320,7 +315,7 @@ namespace IQToolkit.Data.Mapping
                 if (mm.Association != null)
                 {
                     Type elementType = TypeHelper.GetElementType(TypeHelper.GetMemberType(member));
-                    Type entityType = mm.Association.RelatedEntityType ?? elementType;
+                    Type entityType = (mm.Association.RelatedEntityType != null) ? mm.Association.RelatedEntityType : elementType;
                     return this.GetReferencedEntity(elementType, mm.Association.RelatedEntityID, entityType, "Association.RelatedEntityID");
                 }
                 else if (mm.NestedEntity != null)
@@ -452,7 +447,7 @@ namespace IQToolkit.Data.Mapping
             return new AttributeMapper(this, translator);
         }
 
-        sealed class AttributeMapper : AdvancedMapper
+        class AttributeMapper : AdvancedMapper
         {
             AttributeMapping mapping;
 
@@ -463,11 +458,11 @@ namespace IQToolkit.Data.Mapping
             }
         }
 
-        sealed class AttributeMappingMember
+        class AttributeMappingMember
         {
-            readonly MemberInfo member;
-            readonly MemberAttribute attribute;
-            readonly AttributeMappingEntity nested;
+            MemberInfo member;
+            MemberAttribute attribute;
+            AttributeMappingEntity nested;
 
             internal AttributeMappingMember(MemberInfo member, MemberAttribute attribute, AttributeMappingEntity nested)
             {
@@ -497,10 +492,10 @@ namespace IQToolkit.Data.Mapping
             }
         }
 
-        sealed class AttributeMappingTable : MappingTable
+        class AttributeMappingTable : MappingTable
         {
-            readonly AttributeMappingEntity entity;
-            readonly TableBaseAttribute attribute;
+            AttributeMappingEntity entity;
+            TableBaseAttribute attribute;
 
             internal AttributeMappingTable(AttributeMappingEntity entity, TableBaseAttribute attribute)
             {
@@ -519,13 +514,13 @@ namespace IQToolkit.Data.Mapping
             }
         }
 
-        sealed class AttributeMappingEntity : MappingEntity
+        class AttributeMappingEntity : MappingEntity
         {
-            readonly string tableId;
-            readonly Type elementType;
-            readonly Type entityType;
-            readonly ReadOnlyCollection<MappingTable> tables;
-            readonly Dictionary<string, AttributeMappingMember> mappingMembers;
+            string tableId;
+            Type elementType;
+            Type entityType;
+            ReadOnlyCollection<MappingTable> tables;
+            Dictionary<string, AttributeMappingMember> mappingMembers;
 
             internal AttributeMappingEntity(Type elementType, string tableId, Type entityType, IEnumerable<TableBaseAttribute> attrs, IEnumerable<AttributeMappingMember> mappingMembers)
             {

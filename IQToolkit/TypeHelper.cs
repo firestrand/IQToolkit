@@ -130,6 +130,7 @@ namespace IQToolkit
 
         public static bool IsInteger(Type type)
         {
+            Type nnType = GetNonNullableType(type);
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.SByte:
@@ -144,50 +145,6 @@ namespace IQToolkit
                 default:
                     return false;        
             }
-        }
-        public static object Convert(object value, Type type)
-        {
-            //Careful, we may not want to always return the default for a type when a value is null
-            if (value == null)
-            {
-                return GetDefault(type);
-            }
-            type = GetNonNullableType(type);
-            Type vtype = value.GetType();
-            if (type != vtype)
-            {
-                if (type.IsEnum)
-                {
-                    if (vtype == typeof(string))
-                    {
-                        return Enum.Parse(type, (string)value);
-                    }
-
-                    Type utype = Enum.GetUnderlyingType(type);
-                    if (utype != vtype)
-                    {
-                        value = System.Convert.ChangeType(value, utype);
-                    }
-                    return Enum.ToObject(type, value);
-                }
-                //Specifically catch a Guid to String conversion
-                if (type == typeof(String) && vtype == typeof(Guid))
-                {
-                    return value.ToString();
-                }
-                //Specifically catch a String to Guid conversion
-                if (type == typeof(Guid) && vtype == typeof(String))
-                {
-                    string sVal = value as string;
-                    if (sVal == null)
-                        throw new InvalidCastException("Couldn't cast value to string.");
-                    Guid retVal = new Guid(sVal); //Throws FormatException if the string is not a Guid
-                    return retVal;
-                }
-                //Fallback on System.Convert
-                return System.Convert.ChangeType(value, type);
-            }
-            return value;
         }
     }
 }

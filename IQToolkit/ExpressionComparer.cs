@@ -18,7 +18,7 @@ namespace IQToolkit
     public class ExpressionComparer
     {
         ScopedDictionary<ParameterExpression, ParameterExpression> parameterScope;
-        readonly Func<object, object, bool> fnCompare;
+        Func<object, object, bool> fnCompare;
 
         protected ExpressionComparer(
             ScopedDictionary<ParameterExpression, ParameterExpression> parameterScope,
@@ -165,7 +165,14 @@ namespace IQToolkit
 
         protected virtual bool CompareConstant(ConstantExpression a, ConstantExpression b)
         {
-            return this.fnCompare != null ? this.fnCompare(a.Value, b.Value) : object.Equals(a.Value, b.Value);
+            if (this.fnCompare != null)
+            {
+                return this.fnCompare(a.Value, b.Value);
+            }
+            else
+            {
+                return object.Equals(a.Value, b.Value);
+            }
         }
 
         protected virtual bool CompareParameter(ParameterExpression a, ParameterExpression b)

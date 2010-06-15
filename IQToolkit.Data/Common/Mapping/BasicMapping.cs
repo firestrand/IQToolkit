@@ -14,25 +14,15 @@ namespace IQToolkit.Data.Common
 {
     public abstract class BasicMapping : QueryMapping
     {
-        private Dictionary<Type, BasicMappingEntity> _typeTableIds;
-        internal Dictionary<Type, BasicMappingEntity> TypeTableIds
-        {
-            get { return _typeTableIds ?? (_typeTableIds = new Dictionary<Type, BasicMappingEntity>()); }
-        }
         protected BasicMapping()
         {
         }
 
         public override MappingEntity GetEntity(Type elementType, string tableId)
         {
-            BasicMappingEntity returnValue;
-            if (TypeTableIds.TryGetValue(elementType, out returnValue))
-                return returnValue;
-            if (String.IsNullOrEmpty(tableId))
-                tableId = GetTableId(elementType);
-            returnValue = new BasicMappingEntity(elementType, tableId);
-            TypeTableIds.Add(elementType, returnValue);
-            return returnValue;
+            if (tableId == null)
+                tableId = this.GetTableId(elementType);
+            return new BasicMappingEntity(elementType, tableId);
         }
 
         public override MappingEntity GetEntity(MemberInfo contextMember)
@@ -41,10 +31,10 @@ namespace IQToolkit.Data.Common
             return this.GetEntity(elementType);
         }
 
-        internal class BasicMappingEntity : MappingEntity
+        class BasicMappingEntity : MappingEntity
         {
-            readonly string entityID;
-            readonly Type type;
+            string entityID;
+            Type type;
 
             public BasicMappingEntity(Type type, string entityID)
             {

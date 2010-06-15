@@ -19,7 +19,7 @@ namespace IQToolkit
     public class TypedSubtreeFinder : ExpressionVisitor
     {
         Expression root;
-        readonly Type type;
+        Type type;
 
         private TypedSubtreeFinder(Type type)
         {

@@ -13,10 +13,10 @@ namespace IQToolkit
     /// <typeparam name="T"></typeparam>
     public class MostRecentlyUsedCache<T>
     {
-        readonly int maxSize;
-        readonly List<T> list;
-        readonly Func<T, T, bool> fnEquals;
-        readonly ReaderWriterLockSlim rwlock;
+        int maxSize;
+        List<T> list;
+        Func<T, T, bool> fnEquals;
+        ReaderWriterLockSlim rwlock;
         int version;
 
         public MostRecentlyUsedCache(int maxSize)

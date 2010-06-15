@@ -188,6 +188,7 @@ namespace IQToolkit.Data.Common
             var columns = new List<ColumnDeclaration>();
             this.GetColumns(entity, aliases, columns);
             SelectExpression root = new SelectExpression(new TableAlias(), columns, source, null);
+            var existingAliases = aliases.Values.ToArray();
 
             Expression projector = this.GetEntityExpression(root, entity);
             var selectAlias = new TableAlias();
@@ -490,126 +491,6 @@ namespace IQToolkit.Data.Common
             }
 
             return block;
-        }
-        protected override Expression GetInsertResult(MappingEntity entity, Expression instance, LambdaExpression selector, Dictionary<MemberInfo, Expression> map)
-        {
-            var tables = this.mapping.GetTables(entity);
-            if (tables.Count <= 1)
-            {
-                return base.GetInsertResult(entity, instance, selector, map);
-            }
-            var aliases = new Dictionary<string, TableAlias>();
-            MappingTable rootTable = tables.Single(ta => !mapping.IsExtensionTable(ta));
-            var tableExpression = new TableExpression(new TableAlias(), entity, mapping.GetTableName(rootTable));
-            var aggregator = Aggregator.GetAggregator(selector.Body.Type, typeof(IEnumerable<>).MakeGenericType(selector.Body.Type));
-            aliases.Add(mapping.GetAlias(rootTable), tableExpression.Alias);
-            Expression source = tableExpression;
-            foreach(MappingTable table in tables.Where(t => mapping.IsExtensionTable(t)))
-            {
-                TableAlias joinedTableAlias = new TableAlias();
-                string extensionAlias = mapping.GetAlias(table);
-                aliases.Add(extensionAlias,joinedTableAlias);
-                List<string> keyColumns = mapping.GetExtensionKeyColumnNames(table).ToList();
-                List<MemberInfo> relatedMembers = mapping.GetExtensionRelatedMembers(table).ToList();
-                string relatedAlias = mapping.GetExtensionRelatedAlias(table);
-                TableAlias relatedTableAlias;
-                aliases.TryGetValue(relatedAlias, out relatedTableAlias);
-                TableExpression joinedTex = new TableExpression(joinedTableAlias, entity, mapping.GetTableName(table));
-                Expression cond = null;
-                for (int i = 0, n = keyColumns.Count; i < n; i++)
-                {
-                    var memberType = TypeHelper.GetMemberType(relatedMembers[i]);
-                    var colType = this.GetColumnType(entity, relatedMembers[i]);
-                    var relatedColumn = new ColumnExpression(memberType, colType, relatedTableAlias, this.mapping.GetColumnName(entity, relatedMembers[i]));
-                    var joinedColumn = new ColumnExpression(memberType, colType, joinedTableAlias, keyColumns[i]);
-                    var eq = joinedColumn.Equal(relatedColumn);
-                    cond = (cond != null) ? cond.And(eq) : eq;
-                }
-                source = new JoinExpression(JoinType.SingletonLeftOuter, source, joinedTex, cond);
-            }
-            Expression where;
-            DeclarationCommand genIdCommand = null;
-            var generatedIds = this.mapping.GetMappedMembers(entity).Where(m => this.mapping.IsPrimaryKey(entity, m) && this.mapping.IsGenerated(entity, m)).ToList();
-            if (generatedIds.Count > 0)
-            {
-                if (map == null || !generatedIds.Any(m => map.ContainsKey(m)))
-                {
-                    var localMap = new Dictionary<MemberInfo, Expression>();
-                    genIdCommand = this.GetGeneratedIdCommand(entity, generatedIds.ToList(), localMap);
-                    map = localMap;
-                }
-                var mex = selector.Body as MemberExpression;
-                if (mex != null && this.mapping.IsPrimaryKey(entity, mex.Member) && this.mapping.IsGenerated(entity, mex.Member))
-                {
-                    if (genIdCommand != null)
-                    {
-                        return new ProjectionExpression(
-                            genIdCommand.Source,
-                            new ColumnExpression(mex.Type, genIdCommand.Variables[0].QueryType, genIdCommand.Source.Alias, genIdCommand.Source.Columns[0].Name),
-                            aggregator
-                            );
-                    }
-                    else
-                    {
-                        TableAlias alias = new TableAlias();
-                        var colType = this.GetColumnType(entity, mex.Member);
-                        return new ProjectionExpression(
-                            new SelectExpression(alias, new[] { new ColumnDeclaration("", map[mex.Member], colType) }, null, null),
-                            new ColumnExpression(TypeHelper.GetMemberType(mex.Member), colType, alias, ""),
-                            aggregator
-                            );
-                    }
-                }
-                where = generatedIds.Select((m, i) =>
-                    this.GetMemberExpression(source, entity, m).Equal(map[m])
-                    ).Aggregate((x, y) => x.And(y));
-            }
-            else
-            {
-                where = this.GetIdentityCheck(tableExpression, entity, instance);
-            }
-            var columns = new List<ColumnDeclaration>();
-            this.GetColumns(entity, aliases, columns);
-            SelectExpression root = new SelectExpression(new TableAlias(), columns, source, null);
-            Expression typeProjector = this.GetEntityExpression(tableExpression, entity);
-            Expression selection = DbExpressionReplacer.Replace(selector.Body, selector.Parameters[0], typeProjector);
-            TableAlias newAlias = new TableAlias();
-            var pc = ColumnProjector.ProjectColumns(Translator.Linguist.Language, selection, null, newAlias, tableExpression.Alias);
-            var pe = new ProjectionExpression(
-                new SelectExpression(newAlias, pc.Columns, root, where),
-                pc.Projector,
-                aggregator
-                );
-            if (genIdCommand != null)
-            {
-                return new BlockCommand(genIdCommand, pe);
-            }
-            return pe;
-        }
-        protected override Expression GetIdentityCheck(Expression root, MappingEntity entity, Expression instance)
-        {
-            var tables = this.mapping.GetTables(entity);
-            if (tables.Count <= 1) //Default to base if there are no extension tables
-            {
-                base.GetIdentityCheck(root, entity, instance);
-            }
-            var members = mapping.GetMappedMembers(entity);
-            Expression retVal = null;
-            foreach (var memberInfo in members)
-            {
-                if(mapping.IsPrimaryKey(entity,memberInfo))
-                {
-                    if(retVal == null)
-                    {
-                        retVal = GetMemberExpression(root, entity, memberInfo).Equal(Expression.MakeMemberAccess(instance, memberInfo));
-                    }
-                    else
-                    {
-                        retVal.And(GetMemberExpression(root, entity, memberInfo).Equal(Expression.MakeMemberAccess(instance, memberInfo)));
-                    }
-                }
-            }
-            return retVal;
         }
     }
 }

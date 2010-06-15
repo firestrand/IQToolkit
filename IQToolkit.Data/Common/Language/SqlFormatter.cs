@@ -171,7 +171,7 @@ namespace IQToolkit.Data.Common
             string name;
             if (!this.aliases.TryGetValue(alias, out name))
             {
-                name = "t" + this.aliases.Count;
+                name = "A" + alias.GetHashCode() + "?";
                 this.aliases.Add(alias, name);
             }
             return name;

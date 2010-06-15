@@ -16,7 +16,7 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient",@"Data Source=ET1841\ETTSILVERS08;Initial Catalog=Northwind;Integrated Security=True", "Test.NorthwindWithAttributes");
+            var provider = DbEntityProvider.From(@"c:\data\Northwind.mdf", "Test.NorthwindWithAttributes");
             //var provider = DbEntityProvider.From(@"c:\data\Northwind.accdb", "Test.NorthwindWithAttributes");
             //var provider = DbEntityProvider.From(@"c:\data\Northwind.mdb", "Test.NorthwindWithAttributes");
             //var provider = DbEntityProvider.From(@"c:\data\Northwind.sdf", "Test.NorthwindWithAttributes");            
@@ -33,7 +33,7 @@ namespace Test
 
                 //NorthwindTranslationTests.Run(db, true);
                 NorthwindExecutionTests.Run(db);
-                NorthwindCUDTests.Run(db); 
+                //NorthwindCUDTests.Run(db); 
                 //MultiTableTests.Run(new MultiTableContext(provider.New(new AttributeMapping(typeof(MultiTableContext)))));
                 //NorthwindPerfTests.Run(db, "TestStandardQuery");
             }
@@ -41,7 +41,6 @@ namespace Test
             {
                 provider.Connection.Close();
             }
-            Console.ReadKey();
         }
     }
 }

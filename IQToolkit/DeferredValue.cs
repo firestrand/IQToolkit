@@ -30,9 +30,11 @@ namespace IQToolkit
 
         public void Load()
         {
-            if (this.source == null) return;
+            if (this.source != null)
+            {
                 this.value = this.source.SingleOrDefault();
                 this.loaded = true;
+            }
         }
 
         public bool IsLoaded

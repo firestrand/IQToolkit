@@ -15,15 +15,19 @@ namespace IQToolkit
     /// <typeparam name="TElement"></typeparam>
     public class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
     {
+        TKey key;
         IEnumerable<TElement> group;
 
         public Grouping(TKey key, IEnumerable<TElement> group)
         {
-            this.Key = key;
+            this.key = key;
             this.group = group;
         }
 
-        public TKey Key { get; private set; }
+        public TKey Key
+        {
+            get { return this.key; }
+        }
 
         public IEnumerator<TElement> GetEnumerator()
         {

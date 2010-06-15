@@ -9,8 +9,8 @@ namespace IQToolkit
 {
     public class CompoundKey : IEquatable<CompoundKey>, IEnumerable<object>, IEnumerable
     {
-        readonly object[] values;
-        readonly int hc;
+        object[] values;
+        int hc;
 
         public CompoundKey(params object[] values)
         {

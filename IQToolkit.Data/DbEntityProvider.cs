@@ -20,7 +20,7 @@ namespace IQToolkit.Data
 
     public class DbEntityProvider : EntityProvider
     {
-        readonly DbConnection connection;
+        DbConnection connection;
         DbTransaction transaction;
         IsolationLevel isolation = IsolationLevel.ReadCommitted;
 
@@ -323,7 +323,33 @@ namespace IQToolkit.Data
 
             public override object Convert(object value, Type type)
             {
-                return TypeHelper.Convert(value, type);
+                if (value == null)
+                {
+                    return TypeHelper.GetDefault(type);
+                }
+                type = TypeHelper.GetNonNullableType(type);
+                Type vtype = value.GetType();
+                if (type != vtype)
+                {
+                    if (type.IsEnum)
+                    {
+                        if (vtype == typeof(string))
+                        {
+                            return Enum.Parse(type, (string)value);
+                        }
+                        else
+                        {
+                            Type utype = Enum.GetUnderlyingType(type);
+                            if (utype != vtype)
+                            {
+                                value = System.Convert.ChangeType(value, utype);
+                            }
+                            return Enum.ToObject(type, value);
+                        }
+                    }
+                    return System.Convert.ChangeType(value, type);
+                }
+                return value;
             }
 
             public override IEnumerable<T> Execute<T>(QueryCommand command, Func<FieldReader, T> fnProjector, MappingEntity entity, object[] paramValues)
@@ -357,7 +383,6 @@ namespace IQToolkit.Data
                 if (this.BufferResultRows)
                 {
                     // use data table to buffer results
-                    //TODO: Introduce using statement?
                     var ds = new DataSet();
                     ds.EnforceConstraints = false;
                     var table = new DataTable();

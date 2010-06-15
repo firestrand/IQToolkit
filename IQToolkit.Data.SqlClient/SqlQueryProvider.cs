@@ -113,46 +113,44 @@ namespace IQToolkit.Data.SqlClient
             private IEnumerable<int> ExecuteBatch(QueryCommand query, IEnumerable<object[]> paramSets, int batchSize)
             {
                 SqlCommand cmd = (SqlCommand)this.GetCommand(query, null);
-                using (DataTable dataTable = new DataTable())
+                DataTable dataTable = new DataTable();
+                for (int i = 0, n = query.Parameters.Count; i < n; i++)
                 {
-                    for (int i = 0, n = query.Parameters.Count; i < n; i++)
+                    var qp = query.Parameters[i];
+                    cmd.Parameters[i].SourceColumn = qp.Name;
+                    dataTable.Columns.Add(qp.Name, TypeHelper.GetNonNullableType(qp.Type));
+                }
+                SqlDataAdapter dataAdapter = new SqlDataAdapter();
+                dataAdapter.InsertCommand = cmd;
+                dataAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.None;
+                dataAdapter.UpdateBatchSize = batchSize;
+
+                this.LogMessage("-- Start SQL Batching --");
+                this.LogMessage("");
+                this.LogCommand(query, null);
+
+                IEnumerator<object[]> en = paramSets.GetEnumerator();
+                using (en)
+                {
+                    bool hasNext = true;
+                    while (hasNext)
                     {
-                        var qp = query.Parameters[i];
-                        cmd.Parameters[i].SourceColumn = qp.Name;
-                        dataTable.Columns.Add(qp.Name, TypeHelper.GetNonNullableType(qp.Type));
-                    }
-                    using (SqlDataAdapter dataAdapter = new SqlDataAdapter())
-                    {
-                        dataAdapter.InsertCommand = cmd;
-                        dataAdapter.InsertCommand.UpdatedRowSource = UpdateRowSource.None;
-                        dataAdapter.UpdateBatchSize = batchSize;
-                        this.LogMessage("-- Start SQL Batching --");
-                        this.LogMessage("");
-                        this.LogCommand(query, null);
-                        IEnumerator<object[]> en = paramSets.GetEnumerator();
-                        using (en)
+                        int count = 0;
+                        for (; count < dataAdapter.UpdateBatchSize && (hasNext = en.MoveNext()); count++)
                         {
-                            bool hasNext = true;
-                            while (hasNext)
+                            var paramValues = en.Current;
+                            dataTable.Rows.Add(paramValues);
+                            this.LogParameters(query, paramValues);
+                            this.LogMessage("");
+                        }
+                        if (count > 0)
+                        {
+                            int n = dataAdapter.Update(dataTable);
+                            for (int i = 0; i < count; i++)
                             {
-                                int count = 0;
-                                for (; count < dataAdapter.UpdateBatchSize && (hasNext = en.MoveNext()); count++)
-                                {
-                                    var paramValues = en.Current;
-                                    dataTable.Rows.Add(paramValues);
-                                    this.LogParameters(query, paramValues);
-                                    this.LogMessage("");
-                                }
-                                if (count > 0)
-                                {
-                                    int n = dataAdapter.Update(dataTable);
-                                    for (int i = 0; i < count; i++)
-                                    {
-                                        yield return (i < n) ? 1 : 0;
-                                    }
-                                }
-                                dataTable.Rows.Clear();
+                                yield return (i < n) ? 1 : 0;
                             }
+                            dataTable.Rows.Clear();
                         }
                     }
                 }

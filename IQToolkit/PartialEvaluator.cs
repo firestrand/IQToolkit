@@ -50,10 +50,10 @@ namespace IQToolkit
         /// <summary>
         /// Evaluates & replaces sub-trees when first candidate is reached (top-down)
         /// </summary>
-        sealed class SubtreeEvaluator : ExpressionVisitor
+        class SubtreeEvaluator : ExpressionVisitor
         {
-            readonly HashSet<Expression> candidates;
-            readonly Func<ConstantExpression, Expression> onEval;
+            HashSet<Expression> candidates;
+            Func<ConstantExpression, Expression> onEval;
 
             private SubtreeEvaluator(HashSet<Expression> candidates, Func<ConstantExpression, Expression> onEval)
             {
@@ -143,10 +143,10 @@ namespace IQToolkit
         /// Performs bottom-up analysis to determine which nodes can possibly
         /// be part of an evaluated sub-tree.
         /// </summary>
-        sealed class Nominator : ExpressionVisitor
+        class Nominator : ExpressionVisitor
         {
-            readonly Func<Expression, bool> fnCanBeEvaluated;
-            readonly HashSet<Expression> candidates;
+            Func<Expression, bool> fnCanBeEvaluated;
+            HashSet<Expression> candidates;
             bool cannotBeEvaluated;
 
             private Nominator(Func<Expression, bool> fnCanBeEvaluated)

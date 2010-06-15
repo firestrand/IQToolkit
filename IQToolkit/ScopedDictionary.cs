@@ -9,8 +9,8 @@ namespace IQToolkit
 {
     public class ScopedDictionary<TKey, TValue>
     {
-        readonly ScopedDictionary<TKey, TValue> previous;
-        readonly Dictionary<TKey, TValue> map;
+        ScopedDictionary<TKey, TValue> previous;
+        Dictionary<TKey, TValue> map;
 
         public ScopedDictionary(ScopedDictionary<TKey, TValue> previous)
         {

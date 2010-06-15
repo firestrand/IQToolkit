@@ -9,7 +9,7 @@ namespace IQToolkit
 {
     public class QueryCache
     {
-        readonly MostRecentlyUsedCache<QueryCompiler.CompiledQuery> cache;
+        MostRecentlyUsedCache<QueryCompiler.CompiledQuery> cache;
         static readonly Func<QueryCompiler.CompiledQuery, QueryCompiler.CompiledQuery, bool> fnCompareQueries = CompareQueries;
         static readonly Func<object, object, bool> fnCompareValues = CompareConstantValues;
 
@@ -144,10 +144,10 @@ namespace IQToolkit
         }
 
 
-        sealed class ExplicitToObjectArray : ExpressionVisitor
+        class ExplicitToObjectArray : ExpressionVisitor
         {
-            readonly IList<ParameterExpression> parameters;
-            readonly ParameterExpression array = Expression.Parameter(typeof(object[]), "array");
+            IList<ParameterExpression> parameters;
+            ParameterExpression array = Expression.Parameter(typeof(object[]), "array");
 
             private ExplicitToObjectArray(IList<ParameterExpression> parameters)
             {
