@@ -79,6 +79,7 @@ namespace IQToolkitTest
             {
                 //Do nothing
             }
+            provider.Connection.Close();
         }
         //
         #endregion
