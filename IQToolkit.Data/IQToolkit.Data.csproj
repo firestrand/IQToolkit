@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IQToolkit.Data</RootNamespace>
     <AssemblyName>IQToolkit.Data</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -31,6 +31,7 @@
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -63,6 +64,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandGatherer.cs" />
+    <Compile Include="Common\Language\QueryLinguist.cs" />
+    <Compile Include="Common\Mapping\BasicMapper.cs" />
+    <Compile Include="Common\Mapping\EntityInfo.cs" />
+    <Compile Include="Common\Mapping\IHaveMappingEntity.cs" />
+    <Compile Include="Common\Mapping\MappingEntity.cs" />
+    <Compile Include="Common\Mapping\QueryMapper.cs" />
+    <Compile Include="Common\QueryPolice.cs" />
     <Compile Include="DbEntityProvider.cs" />
     <Compile Include="Common\ExecutionBuilder.cs" />
     <Compile Include="Common\Expressions\Aggregator.cs" />
@@ -115,8 +124,20 @@
     <Compile Include="EntityPolicy.cs" />
     <Compile Include="EntityProvider.cs" />
     <Compile Include="EntitySession.cs" />
+    <Compile Include="EntityTable.cs" />
+    <Compile Include="Mapping\AssociationAttribute.cs" />
+    <Compile Include="Mapping\AttributeMapper.cs" />
     <Compile Include="Mapping\AttributeMapping.cs" />
+    <Compile Include="Mapping\AttributeMappingEntity.cs" />
+    <Compile Include="Mapping\AttributeMappingMember.cs" />
+    <Compile Include="Mapping\AttributeMappingTable.cs" />
+    <Compile Include="Mapping\ColumnAttribute.cs" />
+    <Compile Include="Mapping\ExtensionTableAttribute.cs" />
     <Compile Include="Mapping\ImplicitMapping.cs" />
+    <Compile Include="Mapping\MappingAttribute.cs" />
+    <Compile Include="Mapping\MemberAttribute.cs" />
+    <Compile Include="Mapping\TableAttribute.cs" />
+    <Compile Include="Mapping\TableBaseAttribute.cs" />
     <Compile Include="Mapping\XmlMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

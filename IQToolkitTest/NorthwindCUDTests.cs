@@ -14,14 +14,14 @@ namespace IQToolkitTest
     [TestClass]
     public class NorthwindCUDTests
     {
-        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=ET1841\ETTSILVERS08;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=IN2091VM;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
         public NorthwindCUDTests()
         {
             //
             // TODO: Add constructor logic here
             //
-            provider.Connection.Open();
+            
             //db = new Northwind(provider);
         }
 
@@ -59,6 +59,7 @@ namespace IQToolkitTest
         [TestInitialize()]
         public void NorthwidnCUDTestsInit()
         {
+            provider.Connection.Open();
             db = new Northwind(provider);
         }
         //
@@ -72,6 +73,7 @@ namespace IQToolkitTest
             {
                 this.provider.ExecuteCommand("DELETE FROM Orders WHERE CustomerID LIKE 'XX%'");
                 this.provider.ExecuteCommand("DELETE FROM Customers WHERE CustomerID LIKE 'XX%'");
+                provider.Connection.Close();
             }
             catch (Exception)
             {

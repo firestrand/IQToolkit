@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -21,11 +22,11 @@ namespace IQToolkit.Data
     /// </summary>
     public abstract class EntityProvider : QueryProvider, IEntityProvider, ICreateExecutor
     {
-        readonly QueryLanguage language;
-        readonly QueryMapping mapping;
-        QueryPolicy policy;
-        readonly Dictionary<MappingEntity, IEntityTable> tables;
-        QueryCache cache;
+        readonly QueryLanguage _language;
+        readonly QueryMapping _mapping;
+        QueryPolicy _policy;
+        readonly ConcurrentDictionary<MappingEntity, IEntityTable> _tables;
+        QueryCache _cache;
 
         protected EntityProvider(QueryLanguage language, QueryMapping mapping, QueryPolicy policy)
         {
@@ -35,28 +36,28 @@ namespace IQToolkit.Data
                 throw new InvalidOperationException("Mapping not specified");
             if (policy == null)
                 throw new InvalidOperationException("Policy not specified");
-            this.language = language;
-            this.mapping = mapping;
-            this.policy = policy;
-            this.tables = new Dictionary<MappingEntity, IEntityTable>();
+            this._language = language;
+            this._mapping = mapping;
+            this._policy = policy;
+            this._tables = new ConcurrentDictionary<MappingEntity, IEntityTable>();
         }
 
         public QueryMapping Mapping
         {
-            get { return this.mapping; }
+            get { return this._mapping; }
         }
 
         public QueryLanguage Language
         {
-            get { return this.language; }
+            get { return this._language; }
         }
 
         public QueryPolicy Policy
         {
-            get { return this.policy; }
+            get { return this._policy; }
 
             set {
-                this.policy = value ?? QueryPolicy.Default;
+                this._policy = value ?? QueryPolicy.Default;
             }
         }
 
@@ -64,17 +65,17 @@ namespace IQToolkit.Data
 
         public QueryCache Cache
         {
-            get { return this.cache; }
-            set { this.cache = value; }
+            get { return this._cache; }
+            set { this._cache = value; }
         }
 
         public IEntityTable GetTable(MappingEntity entity)
         {
             IEntityTable table;
-            if (!this.tables.TryGetValue(entity, out table))
+            if (!this._tables.TryGetValue(entity, out table))
             {
                 table = this.CreateTable(entity);
-                this.tables.Add(entity, table);
+                this._tables.GetOrAdd(entity, table);
             }
             return table;
         }
@@ -134,125 +135,11 @@ namespace IQToolkit.Data
             return this.CreateExecutor();
         }
 
-        public class EntityTable<T> : Query<T>, IEntityTable<T>, IHaveMappingEntity
-        {
-            readonly MappingEntity entity;
-            readonly EntityProvider provider;
-
-            public EntityTable(EntityProvider provider, MappingEntity entity)
-                : base(provider, typeof(IEntityTable<T>))
-            {
-                this.provider = provider;
-                this.entity = entity;
-            }
-
-            public MappingEntity Entity
-            {
-                get { return this.entity; }
-            }
-
-            new public IEntityProvider Provider
-            {
-                get { return this.provider; }
-            }
-
-            public string TableId
-            {
-                get { return this.entity.TableId; }
-            }
-
-            public Type EntityType
-            {
-                get { return this.entity.EntityType; }
-            }
-
-            public T GetById(object id)
-            {
-                var dbProvider = this.Provider;
-                if (dbProvider != null)
-                {
-                    IEnumerable<object> keys = id as IEnumerable<object>;
-                    if (keys == null)
-                        keys = new object[] { id };
-                    Expression query = ((EntityProvider)dbProvider).Mapping.GetPrimaryKeyQuery(this.entity, this.Expression, keys.Select(v => Expression.Constant(v)).ToArray());
-                    return this.Provider.Execute<T>(query);
-                }
-                return default(T);
-            }
-
-            object IEntityTable.GetById(object id)
-            {
-                return this.GetById(id);
-            }
-
-            public int Insert(T instance)
-            {
-                return Updatable.Insert(this, instance);
-            }
-
-            int IEntityTable.Insert(object instance)
-            {
-                return this.Insert((T)instance);
-            }
-
-            public int Delete(T instance)
-            {
-                return Updatable.Delete(this, instance);
-            }
-
-            int IEntityTable.Delete(object instance)
-            {
-                return this.Delete((T)instance);
-            }
-
-            public int Update(T instance)
-            {
-                return Updatable.Update(this, instance);
-            }
-
-            int IEntityTable.Update(object instance)
-            {
-                return this.Update((T)instance);
-            }
-
-            public int InsertOrUpdate(T instance)
-            {
-                return Updatable.InsertOrUpdate(this, instance);
-            }
-
-            int IEntityTable.InsertOrUpdate(object instance)
-            {
-                return this.InsertOrUpdate((T)instance);
-            }
-        }
-
         public override string GetQueryText(Expression expression)
         {
             Expression plan = this.GetExecutionPlan(expression);
             var commands = CommandGatherer.Gather(plan).Select(c => c.CommandText).ToArray();
             return string.Join("\n\n", commands);
-        }
-
-        sealed class CommandGatherer : DbExpressionVisitor
-        {
-            readonly List<QueryCommand> commands = new List<QueryCommand>();
-
-            public static IEnumerable<QueryCommand> Gather(Expression expression)
-            {
-                var gatherer = new CommandGatherer();
-                gatherer.Visit(expression);
-                return gatherer.commands.AsReadOnly();
-            }
-
-            protected override Expression VisitConstant(ConstantExpression c)
-            {
-                QueryCommand qc = c.Value as QueryCommand;
-                if (qc != null)
-                {
-                    this.commands.Add(qc);
-                }
-                return c;
-            }
         }
 
         public string GetQueryPlan(Expression expression)
@@ -263,7 +150,7 @@ namespace IQToolkit.Data
 
         protected virtual QueryTranslator CreateTranslator()
         {
-            return new QueryTranslator(this.language, this.mapping, this.policy);
+            return new QueryTranslator(this._language, this._mapping, this._policy);
         }
 
         public abstract void DoTransacted(Action action);
@@ -279,9 +166,9 @@ namespace IQToolkit.Data
         {
             LambdaExpression lambda = expression as LambdaExpression;
 
-            if (lambda == null && this.cache != null && expression.NodeType != ExpressionType.Constant)
+            if (lambda == null && this._cache != null && expression.NodeType != ExpressionType.Constant)
             {
-                return this.cache.Execute(expression);
+                return this._cache.Execute(expression);
             }
 
             Expression plan = this.GetExecutionPlan(expression);

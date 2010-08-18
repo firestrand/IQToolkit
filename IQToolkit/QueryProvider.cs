@@ -16,9 +16,6 @@ namespace IQToolkit
     /// </summary>
     public abstract class QueryProvider : IQueryProvider, IQueryText
     {
-        protected QueryProvider()
-        {
-        }
 
         IQueryable<S> IQueryProvider.CreateQuery<S>(Expression expression)
         {

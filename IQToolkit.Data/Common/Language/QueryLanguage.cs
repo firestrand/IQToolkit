@@ -109,21 +109,21 @@ namespace IQToolkit.Data.Common
             return new ProjectionExpression(select, newProjector, proj.Aggregator);
         }
 
-        class JoinColumnGatherer
+        private class JoinColumnGatherer
         {
-            HashSet<TableAlias> aliases;
-            HashSet<ColumnExpression> columns = new HashSet<ColumnExpression>();
+            readonly HashSet<TableAlias> _aliases;
+            readonly HashSet<ColumnExpression> _columns = new HashSet<ColumnExpression>();
 
             private JoinColumnGatherer(HashSet<TableAlias> aliases)
             {
-                this.aliases = aliases;
+                this._aliases = aliases;
             }
 
-            public static HashSet<ColumnExpression> Gather(HashSet<TableAlias> aliases, SelectExpression select)
+            public static IEnumerable<ColumnExpression> Gather(HashSet<TableAlias> aliases, SelectExpression select)
             {
                 var gatherer = new JoinColumnGatherer(aliases);
                 gatherer.Gather(select.Where);
-                return gatherer.columns;
+                return gatherer._columns;
             }
 
             private void Gather(Expression expression)
@@ -137,11 +137,11 @@ namespace IQToolkit.Data.Common
                         case ExpressionType.NotEqual:
                             if (IsExternalColumn(b.Left) && GetColumn(b.Right) != null)
                             {
-                                this.columns.Add(GetColumn(b.Right));
+                                this._columns.Add(GetColumn(b.Right));
                             }
                             else if (IsExternalColumn(b.Right) && GetColumn(b.Left) != null)
                             {
-                                this.columns.Add(GetColumn(b.Left));
+                                this._columns.Add(GetColumn(b.Left));
                             }
                             break;
                         case ExpressionType.And:
@@ -166,7 +166,7 @@ namespace IQToolkit.Data.Common
             private bool IsExternalColumn(Expression exp)
             {
                 var col = GetColumn(exp);
-                if (col != null && !this.aliases.Contains(col.Alias))
+                if (col != null && !this._aliases.Contains(col.Alias))
                     return true;
                 return false;
             }
@@ -260,81 +260,6 @@ namespace IQToolkit.Data.Common
         public virtual QueryLinguist CreateLinguist(QueryTranslator translator)
         {
             return new QueryLinguist(this, translator);
-        }
-    }
-
-    public class QueryLinguist
-    {
-        QueryLanguage language;
-        QueryTranslator translator;
-
-        public QueryLinguist(QueryLanguage language, QueryTranslator translator)
-        {
-            this.language = language;
-            this.translator = translator;
-        }
-
-        public QueryLanguage Language 
-        {
-            get { return this.language; }
-        }
-
-        public QueryTranslator Translator
-        {
-            get { return this.translator; }
-        }
-
-        /// <summary>
-        /// Provides language specific query translation.  Use this to apply language specific rewrites or
-        /// to make assertions/validations about the query.
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public virtual Expression Translate(Expression expression)
-        {
-            // remove redundant layers again before cross apply rewrite
-            expression = UnusedColumnRemover.Remove(expression);
-            expression = RedundantColumnRemover.Remove(expression);
-            expression = RedundantSubqueryRemover.Remove(expression);
-
-            // convert cross-apply and outer-apply joins into inner & left-outer-joins if possible
-            var rewritten = CrossApplyRewriter.Rewrite(this.language, expression);
-
-            // convert cross joins into inner joins
-            rewritten = CrossJoinRewriter.Rewrite(rewritten);
-
-            if (rewritten != expression)
-            {
-                expression = rewritten;
-                // do final reduction
-                expression = UnusedColumnRemover.Remove(expression);
-                expression = RedundantSubqueryRemover.Remove(expression);
-                expression = RedundantJoinRemover.Remove(expression);
-                expression = RedundantColumnRemover.Remove(expression);
-            }
-
-            return expression;
-        }
-
-        /// <summary>
-        /// Converts the query expression into text of this query language
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public virtual string Format(Expression expression)
-        {
-            // use common SQL formatter by default
-            return SqlFormatter.Format(expression);
-        }
-
-        /// <summary>
-        /// Determine which sub-expressions must be parameters
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public virtual Expression Parameterize(Expression expression)
-        {
-            return Parameterizer.Parameterize(this.language, expression);
         }
     }
 }

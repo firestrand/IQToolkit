@@ -15,12 +15,12 @@ namespace IQToolkitTest
     [TestClass]
     public class NorthwindExtensionTableCUDTests
     {
-        readonly DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=ET1841\ETTSILVERS08;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        readonly DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=IN2091VM;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
 
         public NorthwindExtensionTableCUDTests()
         {
-            provider.Connection.Open();
+            
             TSqlLanguage language = new TSqlLanguage(); //Reference to get assembly into test context
         }
 
@@ -33,6 +33,7 @@ namespace IQToolkitTest
         [TestInitialize()]
         public void NorthwindInit()
         {
+            provider.Connection.Open();
             db = new Northwind(provider);
             ClearOutTestData();
         }
@@ -40,6 +41,7 @@ namespace IQToolkitTest
         public void NorthwindTeardown()
         {
             ClearOutTestData();
+            provider.Connection.Close();
         }
         private void SetupTablesToTest()
         {

@@ -15,12 +15,12 @@ namespace IQToolkitTest
     [TestClass]
     public class NorthwindExecutionTests
     {
-        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=ET1841\ETTSILVERS08;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=IN2091VM;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
 
         public NorthwindExecutionTests()
         {
-            provider.Connection.Open();
+            
         }
 
         private TestContext testContextInstance;
@@ -43,6 +43,7 @@ namespace IQToolkitTest
         [TestInitialize()]
         public void NorthwidnCUDTestsInit()
         {
+            provider.Connection.Open();
             db = new Northwind(provider);
             ClearOutTestData();
         }
@@ -50,6 +51,7 @@ namespace IQToolkitTest
         public void NorthwidnCUDTestsTeardown()
         {
             ClearOutTestData();
+            provider.Connection.Close();
         }
         private void ClearOutTestData()
         {

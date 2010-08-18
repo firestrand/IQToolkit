@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,66 +16,14 @@ namespace IQToolkit.Data.Mapping
 {
     using Common;
 
-    public abstract class MappingAttribute : Attribute
-    {
-    }
-
-    public abstract class TableBaseAttribute : MappingAttribute
-    {
-        public string Name { get; set; }
-        public string Alias { get; set; }
-    }
-
-    [AttributeUsage(AttributeTargets.Property|AttributeTargets.Field, AllowMultiple = false)]
-    public class TableAttribute : TableBaseAttribute
-    {
-        public Type EntityType { get; set; }
-    }
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
-    public class ExtensionTableAttribute : TableBaseAttribute
-    {
-        public string KeyColumns { get; set; }
-        public string RelatedAlias { get; set; }
-        public string RelatedKeyColumns { get; set; }
-    }
-
-    public abstract class MemberAttribute : MappingAttribute
-    {
-        public string Member { get; set; }
-    }
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
-    public class ColumnAttribute : MemberAttribute
-    {
-        public string Name { get; set; }
-        public string Alias { get; set; }
-        public string DbType { get; set; }
-        public bool IsComputed { get; set; }
-        public bool IsPrimaryKey { get; set; }
-        public bool IsGenerated { get; set; }
-    }
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
-    public class AssociationAttribute : MemberAttribute
-    {
-        public string Name { get; set; }
-        public string KeyMembers { get; set; }
-        public string RelatedEntityID { get; set; }
-        public Type RelatedEntityType { get; set; }
-        public string RelatedKeyMembers { get; set; }
-        public bool IsForeignKey { get; set; }
-    }
-
     public class AttributeMapping : AdvancedMapping
     {
-        readonly Type contextType;
-        readonly Dictionary<string, MappingEntity> entities = new Dictionary<string, MappingEntity>();
-        readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(); //Use the Slim version for better performance
+        readonly Type _contextType;
+        readonly ConcurrentDictionary<string, MappingEntity> _entities = new ConcurrentDictionary<string, MappingEntity>();
 
         public AttributeMapping(Type contextType)
         {
-            this.contextType = contextType;
+            this._contextType = contextType;
         }
 
         public override MappingEntity GetEntity(MemberInfo contextMember)
@@ -91,41 +40,27 @@ namespace IQToolkit.Data.Mapping
         private MappingEntity GetEntity(Type elementType, string tableId, Type entityType)
         {
             MappingEntity entity;
-            rwLock.EnterUpgradeableReadLock();
-            try
+
+            if (!_entities.TryGetValue(tableId, out entity))
             {
-            if (!entities.TryGetValue(tableId, out entity))
-            {
-                    rwLock.EnterWriteLock();
-                    try
-                {
-                    entity = this.CreateEntity(elementType, tableId, entityType);
-                    this.entities.Add(tableId, entity);
-                }
-                    finally
-                    {
-                        rwLock.ExitWriteLock();
-            }
-                }
-            }
-            finally
-            {
-                rwLock.ExitUpgradeableReadLock();
+
+                entity = this.CreateEntity(elementType, tableId, entityType);
+                this._entities.GetOrAdd(tableId, entity);
             }
             return entity;
         }
 
         protected virtual IEnumerable<MappingAttribute> GetMappingAttributes(string rootEntityId)
         {
-            var contextMember = this.FindMember(this.contextType, rootEntityId);
+            var contextMember = this.FindMember(this._contextType, rootEntityId);
             return (MappingAttribute[])Attribute.GetCustomAttributes(contextMember, typeof(MappingAttribute));
         }
 
         public override string GetTableId(Type entityType)
         {
-            if (contextType != null)
+            if (_contextType != null)
             {
-                foreach (var mi in contextType.GetMembers(BindingFlags.Instance | BindingFlags.Public))
+                foreach (var mi in _contextType.GetMembers(BindingFlags.Instance | BindingFlags.Public))
                 {
                     FieldInfo fi = mi as FieldInfo;
                     if (fi != null && TypeHelper.GetElementType(fi.FieldType) == entityType)
@@ -450,123 +385,6 @@ namespace IQToolkit.Data.Mapping
         public override QueryMapper CreateMapper(QueryTranslator translator)
         {
             return new AttributeMapper(this, translator);
-        }
-
-        sealed class AttributeMapper : AdvancedMapper
-        {
-            AttributeMapping mapping;
-
-            public AttributeMapper(AttributeMapping mapping, QueryTranslator translator)
-                : base(mapping, translator)
-            {
-                this.mapping = mapping;
-            }
-        }
-
-        sealed class AttributeMappingMember
-        {
-            readonly MemberInfo member;
-            readonly MemberAttribute attribute;
-            readonly AttributeMappingEntity nested;
-
-            internal AttributeMappingMember(MemberInfo member, MemberAttribute attribute, AttributeMappingEntity nested)
-            {
-                this.member = member;
-                this.attribute = attribute;
-                this.nested = nested;
-            }
-
-            internal MemberInfo Member
-            {
-                get { return this.member; }
-            }
-
-            internal ColumnAttribute Column
-            {
-                get { return this.attribute as ColumnAttribute; }
-            }
-
-            internal AssociationAttribute Association
-            {
-                get { return this.attribute as AssociationAttribute; }
-            }
-
-            internal AttributeMappingEntity NestedEntity
-            {
-                get { return this.nested; }
-            }
-        }
-
-        sealed class AttributeMappingTable : MappingTable
-        {
-            readonly AttributeMappingEntity entity;
-            readonly TableBaseAttribute attribute;
-
-            internal AttributeMappingTable(AttributeMappingEntity entity, TableBaseAttribute attribute)
-            {
-                this.entity = entity;
-                this.attribute = attribute;
-            }
-
-            public AttributeMappingEntity Entity
-            {
-                get { return this.entity; }
-            }
-
-            public TableBaseAttribute Attribute
-            {
-                get { return this.attribute; }
-            }
-        }
-
-        sealed class AttributeMappingEntity : MappingEntity
-        {
-            readonly string tableId;
-            readonly Type elementType;
-            readonly Type entityType;
-            readonly ReadOnlyCollection<MappingTable> tables;
-            readonly Dictionary<string, AttributeMappingMember> mappingMembers;
-
-            internal AttributeMappingEntity(Type elementType, string tableId, Type entityType, IEnumerable<TableBaseAttribute> attrs, IEnumerable<AttributeMappingMember> mappingMembers)
-            {
-                this.tableId = tableId;
-                this.elementType = elementType;
-                this.entityType = entityType;
-                this.tables = attrs.Select(a => (MappingTable)new AttributeMappingTable(this, a)).ToReadOnly();
-                this.mappingMembers = mappingMembers.ToDictionary(mm => mm.Member.Name);
-            }
-
-            public override string TableId
-            {
-                get { return this.tableId; }
-            }
-
-            public override Type ElementType
-            {
-                get { return this.elementType; }
-            }
-
-            public override Type EntityType
-            {
-                get { return this.entityType; }
-            }
-
-            internal ReadOnlyCollection<MappingTable> Tables
-            {
-                get { return this.tables; }
-            }
-
-            internal AttributeMappingMember GetMappingMember(string name)
-            {
-                AttributeMappingMember mm = null;
-                this.mappingMembers.TryGetValue(name, out mm);
-                return mm;
-            }
-
-            internal IEnumerable<MemberInfo> MappedMembers
-            {
-                get { return this.mappingMembers.Values.Select(mm => mm.Member); }
-            }
         }
     }
 }
