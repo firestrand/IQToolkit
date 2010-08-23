@@ -3,21 +3,23 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data.Common
 {
     public abstract class BasicMapping : QueryMapping
     {
-        private Dictionary<Type, BasicMappingEntity> _typeTableIds;
-        internal Dictionary<Type, BasicMappingEntity> TypeTableIds
+        private ConcurrentDictionary<Type, MappingEntity> _typeTableIds;
+        internal ConcurrentDictionary<Type, MappingEntity> TypeTableIds
         {
-            get { return _typeTableIds ?? (_typeTableIds = new Dictionary<Type, BasicMappingEntity>()); }
+            get { return _typeTableIds ?? (_typeTableIds = new ConcurrentDictionary<Type, MappingEntity>()); }
         }
         protected BasicMapping()
         {
@@ -25,13 +27,13 @@ namespace IQToolkit.Data.Common
 
         public override MappingEntity GetEntity(Type elementType, string tableId)
         {
-            BasicMappingEntity returnValue;
+            MappingEntity returnValue;
             if (TypeTableIds.TryGetValue(elementType, out returnValue))
                 return returnValue;
             if (String.IsNullOrEmpty(tableId))
                 tableId = GetTableId(elementType);
-            returnValue = new BasicMappingEntity(elementType, tableId);
-            TypeTableIds.Add(elementType, returnValue);
+            returnValue = new MappingEntity(elementType, tableId);
+            TypeTableIds.GetOrAdd(elementType, returnValue);
             return returnValue;
         }
 
@@ -39,33 +41,6 @@ namespace IQToolkit.Data.Common
         {
             Type elementType = TypeHelper.GetElementType(TypeHelper.GetMemberType(contextMember));
             return this.GetEntity(elementType);
-        }
-
-        internal class BasicMappingEntity : MappingEntity
-        {
-            readonly string entityID;
-            readonly Type type;
-
-            public BasicMappingEntity(Type type, string entityID)
-            {
-                this.entityID = entityID;
-                this.type = type;
-            }
-
-            public override string TableId
-            {
-                get { return this.entityID; }
-            }
-
-            public override Type ElementType
-            {
-                get { return this.type; }
-            }
-
-            public override Type EntityType
-            {
-                get { return this.type; }
-            }
         }
 
         public override bool IsRelationship(MappingEntity entity, MemberInfo member)
@@ -284,7 +259,7 @@ namespace IQToolkit.Data.Common
         public override Expression GetPrimaryKeyQuery(MappingEntity entity, Expression source, Expression[] keys)
         {
             // make predicate
-            ParameterExpression p = Expression.Parameter(entity.ElementType, "p");
+            ParameterExpression p = Expression.Parameter(entity.EntityType, "p");
             Expression pred = null;
             var idMembers = this.GetPrimaryKeyMembers(entity).ToList();
             if (idMembers.Count != keys.Length)
@@ -304,7 +279,7 @@ namespace IQToolkit.Data.Common
             }
             var predLambda = Expression.Lambda(pred, p);
 
-            return Expression.Call(typeof(Queryable), "SingleOrDefault", new Type[] { entity.ElementType }, source, predLambda);
+            return Expression.Call(typeof(Queryable), "SingleOrDefault", new Type[] { entity.EntityType }, source, predLambda);
         }
 
         public override IEnumerable<EntityInfo> GetDependentEntities(MappingEntity entity, object instance)

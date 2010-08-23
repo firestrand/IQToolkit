@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="IQToolkit.Data.EntityProvider">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IMgA0AAgCQABAQQABAIEDAAAABgIIAAAAwAgggAAAKA=</HashCode>
+      <FileName>EntityProvider.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Mapping" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="IQToolkit.Data.Common.QueryMapping">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAQAADAAIBIAAKABAAIACAAAAAAAACQIA=</HashCode>
+      <FileName>Common\Mapping\QueryMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Common.QueryMapper">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QQAAAAYAAAABAAAAAAAAEAAAABAAAEAAAAgUAAAAIAA=</HashCode>
+      <FileName>Common\Mapping\QueryMapper.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Mapping" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.AttributeMapping">
+    <Position X="3.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AFAAIAAIRDCIQIQADAABIABAQNCIAQAAgkEAAAgDAgI=</HashCode>
+      <FileName>Mapping\AttributeMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

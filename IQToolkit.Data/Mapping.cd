@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="IQToolkit.Data.Common.Mapping.MappingEntity">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAEgAAAAAAAQAAAAIAAAAAAAAACAAA=</HashCode>
+      <FileName>Common\Mapping\MappingEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.MappingAttribute" Collapsed="true">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mapping\MappingAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.MemberAttribute">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mapping\MemberAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.TableAttribute" Collapsed="true">
+    <Position X="6.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mapping\TableAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.TableBaseAttribute" Collapsed="true">
+    <Position X="3.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mapping\TableBaseAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.AssociationAttribute">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAACAAAAQAAQAAAAAAAAgAAAAEAAAAAA=</HashCode>
+      <FileName>Mapping\AssociationAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.MappingMember">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAEAAAAAAABAAQBAAAAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Mapping\MappingMember.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Common.BasicMapping">
+    <Position X="2.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAIRCAAAIQBCgIBIABKAFAAAACBgAEAAAACRoA=</HashCode>
+      <FileName>Common\Mapping\BasicMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Common.QueryMapping">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAQAADAAIBIAAKABAAIACAAAAAAAACQIA=</HashCode>
+      <FileName>Common\Mapping\QueryMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Common.MappingTable" Collapsed="true">
+    <Position X="10.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Mapping\AdvancedMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Common.AdvancedMapping">
+    <Position X="4" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAABBAAAIAACAAAIAAAAAEEAAAgAQAI=</HashCode>
+      <FileName>Common\Mapping\AdvancedMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.AttributeMapping">
+    <Position X="5.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AFAAIAAIRDCIQIQADAABIABAQNCIAQAAgkEAAAgDAgI=</HashCode>
+      <FileName>Mapping\AttributeMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IQToolkit.Data.Mapping.XmlMapping">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAACAAAAABEAAAAAAAAAAACAAAAAAQAAACAAAAAAAAA=</HashCode>
+      <FileName>Mapping\XmlMapping.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

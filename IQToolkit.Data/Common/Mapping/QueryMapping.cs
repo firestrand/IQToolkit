@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data.Common
 {
@@ -18,48 +19,20 @@ namespace IQToolkit.Data.Common
     public abstract class QueryMapping
     {
         /// <summary>
-        /// Determines the entity Id based on the type of the entity alone
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public virtual string GetTableId(Type type)
-        {
-            return type.Name;
-        }
-
-        /// <summary>
-        /// Get the meta entity directly corresponding to the CLR type
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public virtual MappingEntity GetEntity(Type type)
-        {
-            return this.GetEntity(type, this.GetTableId(type));
-        }
-
-        /// <summary>
         /// Get the meta entity that maps between the CLR type 'entityType' and the database table, yet
         /// is represented publicly as 'elementType'.
         /// </summary>
-        /// <param name="elementType"></param>
         /// <param name="entityID"></param>
         /// <returns></returns>
-        public abstract MappingEntity GetEntity(Type elementType, string entityID);
+        public abstract MappingEntity GetEntity(string entityID);
 
-        /// <summary>
-        /// Get the meta entity represented by the IQueryable context member
-        /// </summary>
-        /// <param name="contextMember"></param>
-        /// <returns></returns>
-        public abstract MappingEntity GetEntity(MemberInfo contextMember);
+        public abstract IEnumerable<Property> GetMappedProperties(MappingEntity entity);
 
-        public abstract IEnumerable<MemberInfo> GetMappedMembers(MappingEntity entity);
+        public abstract bool IsPrimaryKey(MappingEntity entity, Property property);
 
-        public abstract bool IsPrimaryKey(MappingEntity entity, MemberInfo member);
-
-        public virtual IEnumerable<MemberInfo> GetPrimaryKeyMembers(MappingEntity entity)
+        public virtual IEnumerable<Property> GetPrimaryKeyMembers(MappingEntity entity)
         {
-            return this.GetMappedMembers(entity).Where(m => this.IsPrimaryKey(entity, m));
+            return this.GetMappedProperties(entity).Where(m => m.IsPrimaryKey);
         }
 
         /// <summary>
@@ -68,18 +41,18 @@ namespace IQToolkit.Data.Common
         /// <param name="entity"></param>
         /// <param name="member"></param>
         /// <returns></returns>
-        public abstract bool IsRelationship(MappingEntity entity, MemberInfo member);
+        public abstract bool IsRelationship(MappingEntity entity, Property property);
 
         /// <summary>
         /// Determines if a relationship property refers to a single entity (as opposed to a collection.)
         /// </summary>
         /// <param name="member"></param>
         /// <returns></returns>
-        public virtual bool IsSingletonRelationship(MappingEntity entity, MemberInfo member)
+        public virtual bool IsSingletonRelationship(MappingEntity entity, Property property)
         {
-            if (!this.IsRelationship(entity, member))
+            if (!this.IsRelationship(entity, property))
                 return false;
-            Type ieType = TypeHelper.FindIEnumerable(TypeHelper.GetMemberType(member));
+            Type ieType = TypeHelper.FindIEnumerable(property.PropertyType);
             return ieType == null;
         }
 

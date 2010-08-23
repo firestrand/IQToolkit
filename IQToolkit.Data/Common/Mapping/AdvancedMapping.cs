@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data.Common
 {

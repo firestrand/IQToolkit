@@ -1,26 +1,29 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
+using System.Collections.Concurrent;
 
-namespace IQToolkit.Data.Common
+namespace IQToolkit.Data.Common.Mapping
 {
-    public abstract class MappingEntity
+    public class MappingEntity
     {
-        public abstract string TableId { get; }
-        public abstract Type ElementType { get; }
-        public abstract Type EntityType { get; }
+        public string EntityId { get; private set; }
+        public ConcurrentDictionary<string, Property> Properties { get; private set; }
+        public MappingEntity()
+        {
+        }
+
+        public MappingEntity(string entityId)
+        {
+            EntityId = entityId;
+            Properties = new ConcurrentDictionary<string, Property>();
+        }
+
         /// <summary>
         /// Override ToString to give MappingEntity information
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return String.Format("TableId:{0}\tElementType:{1}\tEntityType:{2}", TableId, ElementType, EntityType);
+            return String.Format("EntityId:{0}",EntityId);
         }
         /// <summary>
         ///  Override equals to compare elements not object references
@@ -30,11 +33,9 @@ namespace IQToolkit.Data.Common
         public override bool Equals(object obj)
         {
             MappingEntity passedObj = obj as MappingEntity;
-            if (passedObj == null) //Type case failed, wrong type
+            if (passedObj == null) //Type cast failed, wrong type
                 return false;
-            return passedObj.TableId == this.TableId &&
-                passedObj.ElementType == this.ElementType &&
-                passedObj.EntityType == this.EntityType;
+            return passedObj.EntityId == this.EntityId;
         }
         /// <summary>
         /// Override GetHashCode and use ToString which should be equal for equal instance values

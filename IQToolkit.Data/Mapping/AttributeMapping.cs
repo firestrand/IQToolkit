@@ -11,6 +11,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data.Mapping
 {
@@ -78,7 +79,7 @@ namespace IQToolkit.Data.Mapping
             if (tableId == null)
                 tableId = this.GetTableId(elementType);
             var members = new HashSet<string>();
-            var mappingMembers = new List<AttributeMappingMember>();
+            var mappingMembers = new List<MappingMember>();
             int dot = tableId.IndexOf('.');
             var rootTableId = dot > 0 ? tableId.Substring(0, dot) : tableId;
             var path = dot > 0 ? tableId.Substring(dot + 1) : "";
@@ -123,7 +124,7 @@ namespace IQToolkit.Data.Mapping
                     member = this.FindMember(entityType, memberName);
                     attribute = attr;
                 }
-                mappingMembers.Add(new AttributeMappingMember(member, attribute, nested));
+                mappingMembers.Add(new MappingMember(member, attribute, nested));
             }
             return new AttributeMappingEntity(elementType, tableId, entityType, tableAttributes, mappingMembers);
         }
@@ -168,37 +169,37 @@ namespace IQToolkit.Data.Mapping
 
         public override bool IsMapped(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null;
         }
 
         public override bool IsColumn(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null && mm.Column != null;
         }
 
         public override bool IsComputed(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null && mm.Column != null && mm.Column.IsComputed;
         }
 
         public override bool IsGenerated(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null && mm.Column != null && mm.Column.IsGenerated;
         }
 
         public override bool IsPrimaryKey(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null && mm.Column != null && mm.Column.IsPrimaryKey;
         }
 
         public override string GetColumnName(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             if (mm != null && mm.Column != null && !string.IsNullOrEmpty(mm.Column.Name))
                 return mm.Column.Name;
             return base.GetColumnName(entity, member);
@@ -206,7 +207,7 @@ namespace IQToolkit.Data.Mapping
 
         public override string GetColumnDbType(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             if (mm != null && mm.Column != null && !string.IsNullOrEmpty(mm.Column.DbType))
                 return mm.Column.DbType;
             return null;
@@ -214,13 +215,13 @@ namespace IQToolkit.Data.Mapping
 
         public override bool IsAssociationRelationship(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null && mm.Association != null;        
         }
 
         public override bool IsRelationshipSource(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             if (mm != null && mm.Association != null)
             {
                 if (mm.Association.IsForeignKey && !typeof(IEnumerable).IsAssignableFrom(TypeHelper.GetMemberType(member)))
@@ -231,7 +232,7 @@ namespace IQToolkit.Data.Mapping
 
         public override bool IsRelationshipTarget(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             if (mm != null && mm.Association != null)
             {
                 if (!mm.Association.IsForeignKey || typeof(IEnumerable).IsAssignableFrom(TypeHelper.GetMemberType(member)))
@@ -242,14 +243,14 @@ namespace IQToolkit.Data.Mapping
 
         public override bool IsNestedEntity(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return mm != null && mm.NestedEntity != null;
         }
 
         public override MappingEntity GetRelatedEntity(MappingEntity entity, MemberInfo member)
         {
             AttributeMappingEntity thisEntity = (AttributeMappingEntity)entity;
-            AttributeMappingMember mm = thisEntity.GetMappingMember(member.Name);
+            MappingMember mm = thisEntity.GetMappingMember(member.Name);
             if (mm != null)
             {
                 if (mm.Association != null)
@@ -271,7 +272,7 @@ namespace IQToolkit.Data.Mapping
         public override IEnumerable<MemberInfo> GetAssociationKeyMembers(MappingEntity entity, MemberInfo member)
         {
             AttributeMappingEntity thisEntity = (AttributeMappingEntity)entity;
-            AttributeMappingMember mm = thisEntity.GetMappingMember(member.Name);
+            MappingMember mm = thisEntity.GetMappingMember(member.Name);
             if (mm != null && mm.Association != null)
             {
                 return this.GetReferencedMembers(thisEntity, mm.Association.KeyMembers, "Association.KeyMembers", thisEntity.EntityType);
@@ -283,7 +284,7 @@ namespace IQToolkit.Data.Mapping
         {
             AttributeMappingEntity thisEntity = (AttributeMappingEntity)entity;
             AttributeMappingEntity relatedEntity = (AttributeMappingEntity)this.GetRelatedEntity(entity, member);
-            AttributeMappingMember mm = thisEntity.GetMappingMember(member.Name);
+            MappingMember mm = thisEntity.GetMappingMember(member.Name);
             if (mm != null && mm.Association != null)
             {
                 return this.GetReferencedMembers(relatedEntity, mm.Association.RelatedKeyMembers, "Association.RelatedKeyMembers", thisEntity.EntityType);
@@ -328,7 +329,7 @@ namespace IQToolkit.Data.Mapping
 
         public override string GetAlias(MappingEntity entity, MemberInfo member)
         {
-            AttributeMappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
+            MappingMember mm = ((AttributeMappingEntity)entity).GetMappingMember(member.Name);
             return (mm != null && mm.Column != null) ? mm.Column.Alias : null;
         }
 

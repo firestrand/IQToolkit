@@ -11,6 +11,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data
 {
@@ -26,7 +27,6 @@ namespace IQToolkit.Data
         readonly QueryMapping _mapping;
         QueryPolicy _policy;
         readonly ConcurrentDictionary<MappingEntity, IEntityTable> _tables;
-        QueryCache _cache;
 
         protected EntityProvider(QueryLanguage language, QueryMapping mapping, QueryPolicy policy)
         {
@@ -63,11 +63,7 @@ namespace IQToolkit.Data
 
         public TextWriter Log { get; set; }
 
-        public QueryCache Cache
-        {
-            get { return this._cache; }
-            set { this._cache = value; }
-        }
+        public QueryCache Cache { get; set; }
 
         public IEntityTable GetTable(MappingEntity entity)
         {
@@ -83,7 +79,7 @@ namespace IQToolkit.Data
         protected virtual IEntityTable CreateTable(MappingEntity entity)
         {
             return (IEntityTable) Activator.CreateInstance(
-                typeof(EntityTable<>).MakeGenericType(entity.ElementType), 
+                typeof(EntityTable<>).MakeGenericType(entity.EntityType), 
                 new object[] { this, entity }
                 );
         }
@@ -166,9 +162,9 @@ namespace IQToolkit.Data
         {
             LambdaExpression lambda = expression as LambdaExpression;
 
-            if (lambda == null && this._cache != null && expression.NodeType != ExpressionType.Constant)
+            if (lambda == null && this.Cache != null && expression.NodeType != ExpressionType.Constant)
             {
-                return this._cache.Execute(expression);
+                return this.Cache.Execute(expression);
             }
 
             Expression plan = this.GetExecutionPlan(expression);

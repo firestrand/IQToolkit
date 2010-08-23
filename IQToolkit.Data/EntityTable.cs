@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using IQToolkit.Data.Common;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data
 {

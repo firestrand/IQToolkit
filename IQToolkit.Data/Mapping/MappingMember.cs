@@ -7,27 +7,24 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using IQToolkit.Data.Common;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data.Mapping
 {
-    using Common;
-    sealed class AttributeMappingMember
+    sealed class MappingMember
     {
-        readonly MemberInfo _member;
         readonly MemberAttribute _attribute;
-        readonly AttributeMappingEntity _nested;
+        readonly MappingEntity _nested;
 
-        internal AttributeMappingMember(MemberInfo member, MemberAttribute attribute, AttributeMappingEntity nested)
+        internal MappingMember(Type type, MemberAttribute attribute, AttributeMappingEntity nested)
         {
-            this._member = member;
+            MemberType = type;
             this._attribute = attribute;
             this._nested = nested;
         }
 
-        internal MemberInfo Member
-        {
-            get { return this._member; }
-        }
+        internal Type MemberType { get; private set; }
 
         internal ColumnAttribute Column
         {
@@ -39,7 +36,7 @@ namespace IQToolkit.Data.Mapping
             get { return this._attribute as AssociationAttribute; }
         }
 
-        internal AttributeMappingEntity NestedEntity
+        internal MappingEntity NestedEntity
         {
             get { return this._nested; }
         }

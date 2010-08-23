@@ -10,7 +10,6 @@ using System.Threading;
 
 namespace IQToolkit.Data.Mapping
 {
-    using Common;
     public abstract class MappingAttribute : Attribute
     {
     }

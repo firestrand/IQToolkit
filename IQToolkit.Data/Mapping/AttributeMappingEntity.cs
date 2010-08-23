@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,40 +8,20 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using IQToolkit.Data.Common.Mapping;
 
 namespace IQToolkit.Data.Mapping
 {
     using Common;
     sealed class AttributeMappingEntity : MappingEntity
     {
-        readonly string _tableId;
-        readonly Type _elementType;
-        readonly Type _entityType;
         readonly ReadOnlyCollection<MappingTable> _tables;
-        readonly Dictionary<string, AttributeMappingMember> _mappingMembers;
+        readonly ConcurrentDictionary<string, MappingMember> _mappingMembers;
 
-        internal AttributeMappingEntity(Type elementType, string tableId, Type entityType, IEnumerable<TableBaseAttribute> attrs, IEnumerable<AttributeMappingMember> mappingMembers)
+        internal AttributeMappingEntity(string tableId, IEnumerable<TableBaseAttribute> attrs, IEnumerable<MappingMember> mappingMembers):base(tableId)
         {
-            this._tableId = tableId;
-            this._elementType = elementType;
-            this._entityType = entityType;
             this._tables = attrs.Select(a => (MappingTable)new AttributeMappingTable(this, a)).ToReadOnly();
-            this._mappingMembers = mappingMembers.ToDictionary(mm => mm.Member.Name);
-        }
-
-        public override string TableId
-        {
-            get { return this._tableId; }
-        }
-
-        public override Type ElementType
-        {
-            get { return this._elementType; }
-        }
-
-        public override Type EntityType
-        {
-            get { return this._entityType; }
+            this._mappingMembers = new ConcurrentDictionary<string, MappingMember>(mappingMembers.ToDictionary(mm => mm..Member.Name));
         }
 
         internal ReadOnlyCollection<MappingTable> Tables
@@ -48,9 +29,9 @@ namespace IQToolkit.Data.Mapping
             get { return this._tables; }
         }
 
-        internal AttributeMappingMember GetMappingMember(string name)
+        internal MappingMember GetMappingMember(string name)
         {
-            AttributeMappingMember mm = null;
+            MappingMember mm = null;
             this._mappingMembers.TryGetValue(name, out mm);
             return mm;
         }
