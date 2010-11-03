@@ -2,14 +2,10 @@
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 
 namespace IQToolkit.Data.Common
 {
@@ -29,14 +25,10 @@ namespace IQToolkit.Data.Common
         public abstract IEnumerable<string> GetExtensionKeyColumnNames(MappingTable table);
         public abstract IEnumerable<MemberInfo> GetExtensionRelatedMembers(MappingTable table);
 
-        protected AdvancedMapping()
-        {
-        }
-
         public override bool IsRelationship(MappingEntity entity, MemberInfo member)
         {
             return base.IsRelationship(entity, member)
-                || this.IsNestedEntity(entity, member);
+                   || IsNestedEntity(entity, member);
         }
 
         public override object CloneEntity(MappingEntity entity, object instance)
@@ -44,15 +36,15 @@ namespace IQToolkit.Data.Common
             object clone = base.CloneEntity(entity, instance);
 
             // need to clone nested entities too
-            foreach (var mi in this.GetMappedMembers(entity))
+            foreach (var mi in GetMappedMembers(entity))
             {
-                if (this.IsNestedEntity(entity, mi))
+                if (IsNestedEntity(entity, mi))
                 {
-                    MappingEntity nested = this.GetRelatedEntity(entity, mi);
+                    MappingEntity nested = GetRelatedEntity(entity, mi);
                     var nestedValue = mi.GetValue(instance);
                     if (nestedValue != null)
                     {
-                        var nestedClone = this.CloneEntity(nested, mi.GetValue(instance));
+                        var nestedClone = CloneEntity(nested, mi.GetValue(instance));
                         mi.SetValue(clone, nestedClone);
                     }
                 }
@@ -67,12 +59,12 @@ namespace IQToolkit.Data.Common
                 return true;
 
             // need to check nested entities too
-            foreach (var mi in this.GetMappedMembers(entity))
+            foreach (var mi in GetMappedMembers(entity))
             {
-                if (this.IsNestedEntity(entity, mi))
+                if (IsNestedEntity(entity, mi))
                 {
-                    MappingEntity nested = this.GetRelatedEntity(entity, mi);
-                    if (this.IsModified(nested, mi.GetValue(instance), mi.GetValue(original)))
+                    MappingEntity nested = GetRelatedEntity(entity, mi);
+                    if (IsModified(nested, mi.GetValue(instance), mi.GetValue(original)))
                         return true;
                 }
             }
@@ -88,37 +80,31 @@ namespace IQToolkit.Data.Common
 
     public class AdvancedMapper : BasicMapper
     {
-        AdvancedMapping mapping;
+        private readonly AdvancedMapping _mapping;
 
         public AdvancedMapper(AdvancedMapping mapping, QueryTranslator translator)
             : base(mapping, translator)
         {
-            this.mapping = mapping;
+            _mapping = mapping;
         }
 
         public virtual IEnumerable<MappingTable> GetDependencyOrderedTables(MappingEntity entity)
         {
-            var lookup = this.mapping.GetTables(entity).ToLookup(t => this.mapping.GetAlias(t));
-            return this.mapping.GetTables(entity).Sort(t => this.mapping.IsExtensionTable(t) ? lookup[this.mapping.GetExtensionRelatedAlias(t)] : null);
+            var lookup = _mapping.GetTables(entity).ToLookup(t => _mapping.GetAlias(t));
+            return
+                _mapping.GetTables(entity).Sort(
+                    t => _mapping.IsExtensionTable(t) ? lookup[_mapping.GetExtensionRelatedAlias(t)] : null);
         }
 
         public override EntityExpression GetEntityExpression(Expression root, MappingEntity entity)
         {
             // must be some complex type constructed from multiple columns
             var assignments = new List<EntityAssignment>();
-            foreach (MemberInfo mi in this.mapping.GetMappedMembers(entity))
+            foreach (MemberInfo mi in _mapping.GetMappedMembers(entity))
             {
-                if (!this.mapping.IsAssociationRelationship(entity, mi))
+                if (!_mapping.IsAssociationRelationship(entity, mi))
                 {
-                    Expression me;
-                    if (this.mapping.IsNestedEntity(entity, mi))
-                    {
-                        me = this.GetEntityExpression(root, this.mapping.GetRelatedEntity(entity, mi));
-                    }
-                    else
-                    {
-                        me = this.GetMemberExpression(root, entity, mi);
-                    }
+                    Expression me = _mapping.IsNestedEntity(entity, mi) ? GetEntityExpression(root, _mapping.GetRelatedEntity(entity, mi)) : GetMemberExpression(root, entity, mi);
                     if (me != null)
                     {
                         assignments.Add(new EntityAssignment(mi, me));
@@ -126,17 +112,17 @@ namespace IQToolkit.Data.Common
                 }
             }
 
-            return new EntityExpression(entity, this.BuildEntityExpression(entity, assignments));
+            return new EntityExpression(entity, BuildEntityExpression(entity, assignments));
         }
 
         public override Expression GetMemberExpression(Expression root, MappingEntity entity, MemberInfo member)
         {
-            if (this.mapping.IsNestedEntity(entity, member))
+            if (_mapping.IsNestedEntity(entity, member))
             {
-                MappingEntity subEntity = this.mapping.GetRelatedEntity(entity, member);
-                return this.GetEntityExpression(root, subEntity);
+                MappingEntity subEntity = _mapping.GetRelatedEntity(entity, member);
+                return GetEntityExpression(root, subEntity);
             }
-            else 
+            else
             {
                 return base.GetMemberExpression(root, entity, member);
             }
@@ -144,39 +130,40 @@ namespace IQToolkit.Data.Common
 
         public override ProjectionExpression GetQueryExpression(MappingEntity entity)
         {
-            var tables = this.mapping.GetTables(entity);
+            var tables = _mapping.GetTables(entity);
             if (tables.Count <= 1)
             {
                 return base.GetQueryExpression(entity);
             }
 
             var aliases = new Dictionary<string, TableAlias>();
-            MappingTable rootTable = tables.Single(ta => !this.mapping.IsExtensionTable(ta));
-            var tex = new TableExpression(new TableAlias(), entity, this.mapping.GetTableName(rootTable));
-            aliases.Add(this.mapping.GetAlias(rootTable), tex.Alias);
+            MappingTable rootTable = tables.Single(ta => !_mapping.IsExtensionTable(ta));
+            var tex = new TableExpression(new TableAlias(), entity, _mapping.GetTableName(rootTable));
+            aliases.Add(_mapping.GetAlias(rootTable), tex.Alias);
             Expression source = tex;
 
-            foreach (MappingTable table in tables.Where(t => this.mapping.IsExtensionTable(t)))
+            foreach (MappingTable table in tables.Where(t => _mapping.IsExtensionTable(t)))
             {
                 TableAlias joinedTableAlias = new TableAlias();
-                string extensionAlias = this.mapping.GetAlias(table);
+                string extensionAlias = _mapping.GetAlias(table);
                 aliases.Add(extensionAlias, joinedTableAlias);
 
-                List<string> keyColumns = this.mapping.GetExtensionKeyColumnNames(table).ToList();
-                List<MemberInfo> relatedMembers = this.mapping.GetExtensionRelatedMembers(table).ToList();
-                string relatedAlias = this.mapping.GetExtensionRelatedAlias(table);
+                List<string> keyColumns = _mapping.GetExtensionKeyColumnNames(table).ToList();
+                List<MemberInfo> relatedMembers = _mapping.GetExtensionRelatedMembers(table).ToList();
+                string relatedAlias = _mapping.GetExtensionRelatedAlias(table);
 
                 TableAlias relatedTableAlias;
                 aliases.TryGetValue(relatedAlias, out relatedTableAlias);
 
-                TableExpression joinedTex = new TableExpression(joinedTableAlias, entity, this.mapping.GetTableName(table));
+                TableExpression joinedTex = new TableExpression(joinedTableAlias, entity, _mapping.GetTableName(table));
 
                 Expression cond = null;
                 for (int i = 0, n = keyColumns.Count; i < n; i++)
                 {
                     var memberType = TypeHelper.GetMemberType(relatedMembers[i]);
-                    var colType = this.GetColumnType(entity, relatedMembers[i]);
-                    var relatedColumn = new ColumnExpression(memberType, colType, relatedTableAlias, this.mapping.GetColumnName(entity, relatedMembers[i]));
+                    var colType = GetColumnType(entity, relatedMembers[i]);
+                    var relatedColumn = new ColumnExpression(memberType, colType, relatedTableAlias,
+                                                             _mapping.GetColumnName(entity, relatedMembers[i]));
                     var joinedColumn = new ColumnExpression(memberType, colType, joinedTableAlias, keyColumns[i]);
                     var eq = joinedColumn.Equal(relatedColumn);
                     cond = (cond != null) ? cond.And(eq) : eq;
@@ -186,37 +173,39 @@ namespace IQToolkit.Data.Common
             }
 
             var columns = new List<ColumnDeclaration>();
-            this.GetColumns(entity, aliases, columns);
+            GetColumns(entity, aliases, columns);
             SelectExpression root = new SelectExpression(new TableAlias(), columns, source, null);
 
-            Expression projector = this.GetEntityExpression(root, entity);
+            Expression projector = GetEntityExpression(root, entity);
             var selectAlias = new TableAlias();
-            var pc = ColumnProjector.ProjectColumns(this.Translator.Linguist.Language, projector, null, selectAlias, root.Alias);
+            var pc = ColumnProjector.ProjectColumns(Translator.Linguist.Language, projector, null, selectAlias,
+                                                    root.Alias);
             var proj = new ProjectionExpression(
                 new SelectExpression(selectAlias, pc.Columns, root, null),
                 pc.Projector
                 );
 
-            return (ProjectionExpression)this.Translator.Police.ApplyPolicy(proj, entity.ElementType);
+            return (ProjectionExpression) Translator.Police.ApplyPolicy(proj, entity.ElementType);
         }
 
-        private void GetColumns(MappingEntity entity, Dictionary<string, TableAlias> aliases, List<ColumnDeclaration> columns)
+        private void GetColumns(MappingEntity entity, Dictionary<string, TableAlias> aliases,
+                                List<ColumnDeclaration> columns)
         {
-            foreach (MemberInfo mi in this.mapping.GetMappedMembers(entity))
+            foreach (MemberInfo mi in _mapping.GetMappedMembers(entity))
             {
-                if (!this.mapping.IsAssociationRelationship(entity, mi))
+                if (!_mapping.IsAssociationRelationship(entity, mi))
                 {
-                    if (this.mapping.IsNestedEntity(entity, mi))
+                    if (_mapping.IsNestedEntity(entity, mi))
                     {
-                        this.GetColumns(this.mapping.GetRelatedEntity(entity, mi), aliases, columns);
+                        GetColumns(_mapping.GetRelatedEntity(entity, mi), aliases, columns);
                     }
-                    else if (this.mapping.IsColumn(entity, mi))
+                    else if (_mapping.IsColumn(entity, mi))
                     {
-                        string name = this.mapping.GetColumnName(entity, mi);
-                        string aliasName = this.mapping.GetAlias(entity, mi);
+                        string name = _mapping.GetColumnName(entity, mi);
+                        string aliasName = _mapping.GetAlias(entity, mi);
                         TableAlias alias;
                         aliases.TryGetValue(aliasName, out alias);
-                        var colType = this.GetColumnType(entity, mi);
+                        var colType = GetColumnType(entity, mi);
                         ColumnExpression ce = new ColumnExpression(TypeHelper.GetMemberType(mi), colType, alias, name);
                         ColumnDeclaration cd = new ColumnDeclaration(name, ce, colType);
                         columns.Add(cd);
@@ -225,9 +214,10 @@ namespace IQToolkit.Data.Common
             }
         }
 
-        public override Expression GetInsertExpression(MappingEntity entity, Expression instance, LambdaExpression selector)
+        public override Expression GetInsertExpression(MappingEntity entity, Expression instance,
+                                                       LambdaExpression selector)
         {
-            var tables = this.mapping.GetTables(entity);
+            var tables = _mapping.GetTables(entity);
             if (tables.Count < 2)
             {
                 return base.GetInsertExpression(entity, instance, selector);
@@ -235,33 +225,36 @@ namespace IQToolkit.Data.Common
 
             var commands = new List<Expression>();
 
-            var map = this.GetDependentGeneratedColumns(entity);
+            var map = GetDependentGeneratedColumns(entity);
             var vexMap = new Dictionary<MemberInfo, Expression>();
 
-            foreach (var table in this.GetDependencyOrderedTables(entity))
+            foreach (var table in GetDependencyOrderedTables(entity))
             {
                 var tableAlias = new TableAlias();
-                var tex = new TableExpression(tableAlias, entity, this.mapping.GetTableName(table));
-                var assignments = this.GetColumnAssignments(tex, instance, entity,
-                    (e, m) => this.mapping.GetAlias(e, m) == this.mapping.GetAlias(table) && !this.mapping.IsGenerated(e, m),
-                    vexMap
+                var tex = new TableExpression(tableAlias, entity, _mapping.GetTableName(table));
+                MappingTable table1 = table; //Removed modified closure
+                var assignments = GetColumnAssignments(tex, instance, entity,
+                                                       (e, m) =>
+                                                       _mapping.GetAlias(e, m) == _mapping.GetAlias(table1) &&
+                                                       !_mapping.IsGenerated(e, m),
+                                                       vexMap
                     );
                 var totalAssignments = assignments.Concat(
-                    this.GetRelatedColumnAssignments(tex, entity, table, vexMap)
+                    GetRelatedColumnAssignments(tex, entity, table, vexMap)
                     );
                 commands.Add(new InsertCommand(tex, totalAssignments));
 
                 List<MemberInfo> members;
-                if (map.TryGetValue(this.mapping.GetAlias(table), out members))
+                if (map.TryGetValue(_mapping.GetAlias(table), out members))
                 {
-                    var d = this.GetDependentGeneratedVariableDeclaration(entity, table, members, instance, vexMap);
+                    var d = GetDependentGeneratedVariableDeclaration(entity, table, members, instance, vexMap);
                     commands.Add(d);
                 }
             }
 
             if (selector != null)
             {
-                commands.Add(this.GetInsertResult(entity, instance, selector, vexMap));
+                commands.Add(GetInsertResult(entity, instance, selector, vexMap));
             }
 
             return new BlockCommand(commands);
@@ -269,24 +262,29 @@ namespace IQToolkit.Data.Common
 
         private Dictionary<string, List<MemberInfo>> GetDependentGeneratedColumns(MappingEntity entity)
         {
+            //TODO: CanInsertPersonWithAssociatedAddressUsingExtensionTableCapability failing Person isn't getting the alias mapping correctly
             return
-                (from xt in this.mapping.GetTables(entity).Where(t => this.mapping.IsExtensionTable(t))
-                 group xt by this.mapping.GetExtensionRelatedAlias(xt))
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.SelectMany(xt => this.mapping.GetExtensionRelatedMembers(xt)).Distinct().ToList()
-                );
+                (from xt in _mapping.GetTables(entity).Where(t => _mapping.IsExtensionTable(t))
+                 group xt by _mapping.GetExtensionRelatedAlias(xt))
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.SelectMany(xt => _mapping.GetExtensionRelatedMembers(xt)).Distinct().ToList()
+                    );
         }
 
         // make a variable declaration / initialization for dependent generated values
-        private CommandExpression GetDependentGeneratedVariableDeclaration(MappingEntity entity, MappingTable table, List<MemberInfo> members, Expression instance, Dictionary<MemberInfo, Expression> map)
+        private CommandExpression GetDependentGeneratedVariableDeclaration(MappingEntity entity, MappingTable table,
+                                                                           List<MemberInfo> members, Expression instance,
+                                                                           Dictionary<MemberInfo, Expression> map)
         {
             // first make command that retrieves the generated ids if any
             DeclarationCommand genIdCommand = null;
-            var generatedIds = this.mapping.GetMappedMembers(entity).Where(m => this.mapping.IsPrimaryKey(entity, m) && this.mapping.IsGenerated(entity, m)).ToList();
+            var generatedIds =
+                _mapping.GetMappedMembers(entity).Where(
+                    m => _mapping.IsPrimaryKey(entity, m) && _mapping.IsGenerated(entity, m)).ToList();
             if (generatedIds.Count > 0)
             {
-                genIdCommand = this.GetGeneratedIdCommand(entity, members, map);
+                genIdCommand = GetGeneratedIdCommand(entity, members, map);
 
                 // if that's all there is then just return the generated ids
                 if (members.Count == generatedIds.Count)
@@ -300,18 +298,18 @@ namespace IQToolkit.Data.Common
             members = members.Except(generatedIds).ToList();
 
             var tableAlias = new TableAlias();
-            var tex = new TableExpression(tableAlias, entity, this.mapping.GetTableName(table));
+            var tex = new TableExpression(tableAlias, entity, _mapping.GetTableName(table));
 
-            Expression where = null;
+            Expression where;
             if (generatedIds.Count > 0)
             {
                 where = generatedIds.Select((m, i) =>
-                    this.GetMemberExpression(tex, entity, m).Equal(map[m])
+                                            GetMemberExpression(tex, entity, m).Equal(map[m])
                     ).Aggregate((x, y) => x.And(y));
             }
             else
             {
-                where = this.GetIdentityCheck(tex, entity, instance);
+                where = GetIdentityCheck(tex, entity, instance);
             }
 
             TableAlias selectAlias = new TableAlias();
@@ -319,14 +317,15 @@ namespace IQToolkit.Data.Common
             var variables = new List<VariableDeclaration>();
             foreach (var mi in members)
             {
-                ColumnExpression col = (ColumnExpression)this.GetMemberExpression(tex, entity, mi);
-                columns.Add(new ColumnDeclaration(this.mapping.GetColumnName(entity, mi), col, col.QueryType));
+                ColumnExpression col = (ColumnExpression) GetMemberExpression(tex, entity, mi);
+                columns.Add(new ColumnDeclaration(_mapping.GetColumnName(entity, mi), col, col.QueryType));
                 ColumnExpression vcol = new ColumnExpression(col.Type, col.QueryType, selectAlias, col.Name);
                 variables.Add(new VariableDeclaration(mi.Name, col.QueryType, vcol));
                 map.Add(mi, new VariableExpression(mi.Name, col.Type, col.QueryType));
             }
 
-            var genMembersCommand = new DeclarationCommand(variables, new SelectExpression(selectAlias, columns, tex, where));
+            var genMembersCommand = new DeclarationCommand(variables,
+                                                           new SelectExpression(selectAlias, columns, tex, where));
 
             if (genIdCommand != null)
             {
@@ -341,22 +340,22 @@ namespace IQToolkit.Data.Common
             Func<MappingEntity, MemberInfo, bool> fnIncludeColumn,
             Dictionary<MemberInfo, Expression> map)
         {
-            foreach (var m in this.mapping.GetMappedMembers(entity))
+            foreach (var m in _mapping.GetMappedMembers(entity))
             {
-                if (this.mapping.IsColumn(entity, m) && fnIncludeColumn(entity, m))
+                if (_mapping.IsColumn(entity, m) && fnIncludeColumn(entity, m))
                 {
                     yield return new ColumnAssignment(
-                        (ColumnExpression)this.GetMemberExpression(table, entity, m),
-                        this.GetMemberAccess(instance, m, map)
+                        (ColumnExpression) GetMemberExpression(table, entity, m),
+                        GetMemberAccess(instance, m, map)
                         );
                 }
-                else if (this.mapping.IsNestedEntity(entity, m))
+                else if (_mapping.IsNestedEntity(entity, m))
                 {
-                    var assignments = this.GetColumnAssignments(
-                        table, 
-                        Expression.MakeMemberAccess(instance, m), 
-                        this.mapping.GetRelatedEntity(entity, m), 
-                        fnIncludeColumn, 
+                    var assignments = GetColumnAssignments(
+                        table,
+                        Expression.MakeMemberAccess(instance, m),
+                        _mapping.GetRelatedEntity(entity, m),
+                        fnIncludeColumn,
                         map
                         );
                     foreach (var ca in assignments)
@@ -367,22 +366,26 @@ namespace IQToolkit.Data.Common
             }
         }
 
-        private IEnumerable<ColumnAssignment> GetRelatedColumnAssignments(Expression expr, MappingEntity entity, MappingTable table, Dictionary<MemberInfo, Expression> map)
+        private IEnumerable<ColumnAssignment> GetRelatedColumnAssignments(Expression expr, MappingEntity entity,
+                                                                          MappingTable table,
+                                                                          Dictionary<MemberInfo, Expression> map)
         {
-            if (this.mapping.IsExtensionTable(table))
+            if (_mapping.IsExtensionTable(table))
             {
-                var keyColumns = this.mapping.GetExtensionKeyColumnNames(table).ToArray();
-                var relatedMembers = this.mapping.GetExtensionRelatedMembers(table).ToArray();
+                var keyColumns = _mapping.GetExtensionKeyColumnNames(table).ToArray();
+                var relatedMembers = _mapping.GetExtensionRelatedMembers(table).ToArray();
                 for (int i = 0, n = keyColumns.Length; i < n; i++)
                 {
                     MemberInfo member = relatedMembers[i];
                     Expression exp = map[member];
-                    yield return new ColumnAssignment((ColumnExpression)this.GetMemberExpression(expr, entity, member), exp);
+                    yield return new ColumnAssignment((ColumnExpression) GetMemberExpression(expr, entity, member), exp)
+                        ;
                 }
             }
         }
 
-        private Expression GetMemberAccess(Expression instance, MemberInfo member, Dictionary<MemberInfo, Expression> map)
+        private Expression GetMemberAccess(Expression instance, MemberInfo member,
+                                           Dictionary<MemberInfo, Expression> map)
         {
             Expression exp;
             if (map == null || !map.TryGetValue(member, out exp))
@@ -392,20 +395,26 @@ namespace IQToolkit.Data.Common
             return exp;
         }
 
-        public override Expression GetUpdateExpression(MappingEntity entity, Expression instance, LambdaExpression updateCheck, LambdaExpression selector, Expression @else)
+        public override Expression GetUpdateExpression(MappingEntity entity, Expression instance,
+                                                       LambdaExpression updateCheck, LambdaExpression selector,
+                                                       Expression @else)
         {
-            var tables = this.mapping.GetTables(entity);
+            var tables = _mapping.GetTables(entity);
             if (tables.Count < 2)
             {
                 return base.GetUpdateExpression(entity, instance, updateCheck, selector, @else);
             }
 
             var commands = new List<Expression>();
-            foreach (var table in this.GetDependencyOrderedTables(entity))
+            foreach (var table in GetDependencyOrderedTables(entity))
             {
-                TableExpression tex = new TableExpression(new TableAlias(), entity, this.mapping.GetTableName(table));
-                var assignments = this.GetColumnAssignments(tex, instance, entity, (e, m) => this.mapping.GetAlias(e, m) == this.mapping.GetAlias(table) && this.mapping.IsUpdatable(e, m), null);
-                var where = this.GetIdentityCheck(tex, entity, instance);
+                TableExpression tex = new TableExpression(new TableAlias(), entity, _mapping.GetTableName(table));
+                MappingTable table1 = table; //Moddified Closure removal
+                var assignments = GetColumnAssignments(tex, instance, entity,
+                                                       (e, m) =>
+                                                       _mapping.GetAlias(e, m) == _mapping.GetAlias(table1) &&
+                                                       _mapping.IsUpdatable(e, m), null);
+                var where = GetIdentityCheck(tex, entity, instance);
                 commands.Add(new UpdateCommand(tex, where, assignments));
             }
 
@@ -413,8 +422,9 @@ namespace IQToolkit.Data.Common
             {
                 commands.Add(
                     new IFCommand(
-                        this.Translator.Linguist.Language.GetRowsAffectedExpression(commands[commands.Count-1]).GreaterThan(Expression.Constant(0)),
-                        this.GetUpdateResult(entity, instance, selector),
+                        Translator.Linguist.Language.GetRowsAffectedExpression(commands[commands.Count - 1]).GreaterThan
+                            (Expression.Constant(0)),
+                        GetUpdateResult(entity, instance, selector),
                         @else
                         )
                     );
@@ -423,7 +433,8 @@ namespace IQToolkit.Data.Common
             {
                 commands.Add(
                     new IFCommand(
-                        this.Translator.Linguist.Language.GetRowsAffectedExpression(commands[commands.Count-1]).LessThanOrEqual(Expression.Constant(0)),
+                        Translator.Linguist.Language.GetRowsAffectedExpression(commands[commands.Count - 1]).
+                            LessThanOrEqual(Expression.Constant(0)),
                         @else,
                         null
                         )
@@ -434,50 +445,50 @@ namespace IQToolkit.Data.Common
 
             if (updateCheck != null)
             {
-                var test = this.GetEntityStateTest(entity, instance, updateCheck);
+                var test = GetEntityStateTest(entity, instance, updateCheck);
                 return new IFCommand(test, block, null);
             }
 
             return block;
         }
 
-        private Expression GetIdentityCheck(TableExpression root, MappingEntity entity, Expression instance, MappingTable table)
+        private Expression GetIdentityCheck(TableExpression root, MappingEntity entity, Expression instance,
+                                            MappingTable table)
         {
-            if (this.mapping.IsExtensionTable(table))
+            if (_mapping.IsExtensionTable(table))
             {
-                var keyColNames = this.mapping.GetExtensionKeyColumnNames(table).ToArray();
-                var relatedMembers = this.mapping.GetExtensionRelatedMembers(table).ToArray();
+                var keyColNames = _mapping.GetExtensionKeyColumnNames(table).ToArray();
+                var relatedMembers = _mapping.GetExtensionRelatedMembers(table).ToArray();
 
                 Expression where = null;
                 for (int i = 0, n = keyColNames.Length; i < n; i++)
                 {
                     var relatedMember = relatedMembers[i];
-                    var cex = new ColumnExpression(TypeHelper.GetMemberType(relatedMember), this.GetColumnType(entity, relatedMember), root.Alias, keyColNames[n]);
-                    var nex = this.GetMemberExpression(instance, entity, relatedMember);
+                    var cex = new ColumnExpression(TypeHelper.GetMemberType(relatedMember),
+                                                   GetColumnType(entity, relatedMember), root.Alias, keyColNames[n]);
+                    var nex = GetMemberExpression(instance, entity, relatedMember);
                     var eq = cex.Equal(nex);
                     where = (where != null) ? where.And(eq) : where;
                 }
                 return where;
             }
-            else
-            {
-                return base.GetIdentityCheck(root, entity, instance);
-            }
+            return base.GetIdentityCheck(root, entity, instance);
         }
 
-        public override Expression GetDeleteExpression(MappingEntity entity, Expression instance, LambdaExpression deleteCheck)
+        public override Expression GetDeleteExpression(MappingEntity entity, Expression instance,
+                                                       LambdaExpression deleteCheck)
         {
-            var tables = this.mapping.GetTables(entity);
+            var tables = _mapping.GetTables(entity);
             if (tables.Count < 2)
             {
                 return base.GetDeleteExpression(entity, instance, deleteCheck);
             }
 
             var commands = new List<Expression>();
-            foreach (var table in this.GetDependencyOrderedTables(entity).Reverse())
+            foreach (var table in GetDependencyOrderedTables(entity).Reverse())
             {
-                TableExpression tex = new TableExpression(new TableAlias(), entity, this.mapping.GetTableName(table));
-                var where = this.GetIdentityCheck(tex, entity, instance);
+                TableExpression tex = new TableExpression(new TableAlias(), entity, _mapping.GetTableName(table));
+                var where = GetIdentityCheck(tex, entity, instance);
                 commands.Add(new DeleteCommand(tex, where));
             }
 
@@ -485,42 +496,46 @@ namespace IQToolkit.Data.Common
 
             if (deleteCheck != null)
             {
-                var test = this.GetEntityStateTest(entity, instance, deleteCheck);
+                var test = GetEntityStateTest(entity, instance, deleteCheck);
                 return new IFCommand(test, block, null);
             }
 
             return block;
         }
-        protected override Expression GetInsertResult(MappingEntity entity, Expression instance, LambdaExpression selector, Dictionary<MemberInfo, Expression> map)
+
+        protected override Expression GetInsertResult(MappingEntity entity, Expression instance,
+                                                      LambdaExpression selector, Dictionary<MemberInfo, Expression> map)
         {
-            var tables = this.mapping.GetTables(entity);
+            var tables = _mapping.GetTables(entity);
             if (tables.Count <= 1)
             {
                 return base.GetInsertResult(entity, instance, selector, map);
             }
             var aliases = new Dictionary<string, TableAlias>();
-            MappingTable rootTable = tables.Single(ta => !mapping.IsExtensionTable(ta));
-            var tableExpression = new TableExpression(new TableAlias(), entity, mapping.GetTableName(rootTable));
-            var aggregator = Aggregator.GetAggregator(selector.Body.Type, typeof(IEnumerable<>).MakeGenericType(selector.Body.Type));
-            aliases.Add(mapping.GetAlias(rootTable), tableExpression.Alias);
+            MappingTable rootTable = tables.Single(ta => !_mapping.IsExtensionTable(ta));
+            var tableExpression = new TableExpression(new TableAlias(), entity, _mapping.GetTableName(rootTable));
+            var aggregator = Aggregator.GetAggregator(selector.Body.Type,
+                                                      typeof (IEnumerable<>).MakeGenericType(selector.Body.Type));
+            aliases.Add(_mapping.GetAlias(rootTable), tableExpression.Alias);
             Expression source = tableExpression;
-            foreach(MappingTable table in tables.Where(t => mapping.IsExtensionTable(t)))
+            foreach (MappingTable table in tables.Where(t => _mapping.IsExtensionTable(t)))
             {
                 TableAlias joinedTableAlias = new TableAlias();
-                string extensionAlias = mapping.GetAlias(table);
-                aliases.Add(extensionAlias,joinedTableAlias);
-                List<string> keyColumns = mapping.GetExtensionKeyColumnNames(table).ToList();
-                List<MemberInfo> relatedMembers = mapping.GetExtensionRelatedMembers(table).ToList();
-                string relatedAlias = mapping.GetExtensionRelatedAlias(table);
+                string extensionAlias = _mapping.GetAlias(table);
+                aliases.Add(extensionAlias, joinedTableAlias);
+                List<string> keyColumns = _mapping.GetExtensionKeyColumnNames(table).ToList();
+                List<MemberInfo> relatedMembers = _mapping.GetExtensionRelatedMembers(table).ToList();
+                string relatedAlias = _mapping.GetExtensionRelatedAlias(table);
                 TableAlias relatedTableAlias;
                 aliases.TryGetValue(relatedAlias, out relatedTableAlias);
-                TableExpression joinedTex = new TableExpression(joinedTableAlias, entity, mapping.GetTableName(table));
+                TableExpression joinedTex = new TableExpression(joinedTableAlias, entity, _mapping.GetTableName(table));
                 Expression cond = null;
                 for (int i = 0, n = keyColumns.Count; i < n; i++)
                 {
                     var memberType = TypeHelper.GetMemberType(relatedMembers[i]);
-                    var colType = this.GetColumnType(entity, relatedMembers[i]);
-                    var relatedColumn = new ColumnExpression(memberType, colType, relatedTableAlias, this.mapping.GetColumnName(entity, relatedMembers[i]));
+                    var colType = GetColumnType(entity, relatedMembers[i]);
+                    var relatedColumn = new ColumnExpression(memberType, colType, relatedTableAlias,
+                                                             _mapping.GetColumnName(entity, relatedMembers[i]));
                     var joinedColumn = new ColumnExpression(memberType, colType, joinedTableAlias, keyColumns[i]);
                     var eq = joinedColumn.Equal(relatedColumn);
                     cond = (cond != null) ? cond.And(eq) : eq;
@@ -529,52 +544,54 @@ namespace IQToolkit.Data.Common
             }
             Expression where;
             DeclarationCommand genIdCommand = null;
-            var generatedIds = this.mapping.GetMappedMembers(entity).Where(m => this.mapping.IsPrimaryKey(entity, m) && this.mapping.IsGenerated(entity, m)).ToList();
+            var generatedIds =
+                _mapping.GetMappedMembers(entity).Where(
+                    m => _mapping.IsPrimaryKey(entity, m) && _mapping.IsGenerated(entity, m)).ToList();
             if (generatedIds.Count > 0)
             {
                 if (map == null || !generatedIds.Any(m => map.ContainsKey(m)))
                 {
                     var localMap = new Dictionary<MemberInfo, Expression>();
-                    genIdCommand = this.GetGeneratedIdCommand(entity, generatedIds.ToList(), localMap);
+                    genIdCommand = GetGeneratedIdCommand(entity, generatedIds.ToList(), localMap);
                     map = localMap;
                 }
                 var mex = selector.Body as MemberExpression;
-                if (mex != null && this.mapping.IsPrimaryKey(entity, mex.Member) && this.mapping.IsGenerated(entity, mex.Member))
+                if (mex != null && _mapping.IsPrimaryKey(entity, mex.Member) && _mapping.IsGenerated(entity, mex.Member))
                 {
                     if (genIdCommand != null)
                     {
                         return new ProjectionExpression(
                             genIdCommand.Source,
-                            new ColumnExpression(mex.Type, genIdCommand.Variables[0].QueryType, genIdCommand.Source.Alias, genIdCommand.Source.Columns[0].Name),
+                            new ColumnExpression(mex.Type, genIdCommand.Variables[0].QueryType,
+                                                 genIdCommand.Source.Alias, genIdCommand.Source.Columns[0].Name),
                             aggregator
                             );
                     }
-                    else
-                    {
-                        TableAlias alias = new TableAlias();
-                        var colType = this.GetColumnType(entity, mex.Member);
-                        return new ProjectionExpression(
-                            new SelectExpression(alias, new[] { new ColumnDeclaration("", map[mex.Member], colType) }, null, null),
-                            new ColumnExpression(TypeHelper.GetMemberType(mex.Member), colType, alias, ""),
-                            aggregator
-                            );
-                    }
+                    TableAlias alias = new TableAlias();
+                    var colType = GetColumnType(entity, mex.Member);
+                    return new ProjectionExpression(
+                        new SelectExpression(alias, new[] {new ColumnDeclaration("", map[mex.Member], colType)},
+                                             null, null),
+                        new ColumnExpression(TypeHelper.GetMemberType(mex.Member), colType, alias, ""),
+                        aggregator
+                        );
                 }
                 where = generatedIds.Select((m, i) =>
-                    this.GetMemberExpression(source, entity, m).Equal(map[m])
+                                            GetMemberExpression(source, entity, m).Equal(map[m])
                     ).Aggregate((x, y) => x.And(y));
             }
             else
             {
-                where = this.GetIdentityCheck(tableExpression, entity, instance);
+                where = GetIdentityCheck(tableExpression, entity, instance);
             }
             var columns = new List<ColumnDeclaration>();
-            this.GetColumns(entity, aliases, columns);
+            GetColumns(entity, aliases, columns);
             SelectExpression root = new SelectExpression(new TableAlias(), columns, source, null);
-            Expression typeProjector = this.GetEntityExpression(tableExpression, entity);
+            Expression typeProjector = GetEntityExpression(tableExpression, entity);
             Expression selection = DbExpressionReplacer.Replace(selector.Body, selector.Parameters[0], typeProjector);
             TableAlias newAlias = new TableAlias();
-            var pc = ColumnProjector.ProjectColumns(Translator.Linguist.Language, selection, null, newAlias, tableExpression.Alias);
+            var pc = ColumnProjector.ProjectColumns(Translator.Linguist.Language, selection, null, newAlias,
+                                                    tableExpression.Alias);
             var pe = new ProjectionExpression(
                 new SelectExpression(newAlias, pc.Columns, root, where),
                 pc.Projector,
@@ -586,26 +603,31 @@ namespace IQToolkit.Data.Common
             }
             return pe;
         }
+
         protected override Expression GetIdentityCheck(Expression root, MappingEntity entity, Expression instance)
         {
-            var tables = this.mapping.GetTables(entity);
+            var tables = _mapping.GetTables(entity);
             if (tables.Count <= 1) //Default to base if there are no extension tables
             {
                 base.GetIdentityCheck(root, entity, instance);
             }
-            var members = mapping.GetMappedMembers(entity);
+            var members = _mapping.GetMappedMembers(entity);
             Expression retVal = null;
             foreach (var memberInfo in members)
             {
-                if(mapping.IsPrimaryKey(entity,memberInfo))
+                if (_mapping.IsPrimaryKey(entity, memberInfo))
                 {
-                    if(retVal == null)
+                    if (retVal == null)
                     {
-                        retVal = GetMemberExpression(root, entity, memberInfo).Equal(Expression.MakeMemberAccess(instance, memberInfo));
+                        retVal =
+                            GetMemberExpression(root, entity, memberInfo).Equal(Expression.MakeMemberAccess(instance,
+                                                                                                            memberInfo));
                     }
                     else
                     {
-                        retVal.And(GetMemberExpression(root, entity, memberInfo).Equal(Expression.MakeMemberAccess(instance, memberInfo)));
+                        retVal.And(
+                            GetMemberExpression(root, entity, memberInfo).Equal(Expression.MakeMemberAccess(instance,
+                                                                                                            memberInfo)));
                     }
                 }
             }

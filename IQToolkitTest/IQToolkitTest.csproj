@@ -65,6 +65,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IQToolkitExtendedTests.cs" />
+    <Compile Include="IQToolkitTestModel.cs" />
     <Compile Include="NorthwindCUDTests.cs" />
     <Compile Include="Northwind.cs" />
     <Compile Include="NorthwindExecutionTests.cs" />

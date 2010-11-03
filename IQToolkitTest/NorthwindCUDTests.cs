@@ -14,7 +14,7 @@ namespace IQToolkitTest
     [TestClass]
     public class NorthwindCUDTests
     {
-        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=IN2091VM;Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=(local);Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
         public NorthwindCUDTests()
         {
@@ -969,6 +969,41 @@ namespace IQToolkitTest
             // modifications after insert do trigger updates
             cust2.City = "ChicagoX";
             Assert.AreEqual(SubmitAction.Update, ns.Customers.GetSubmitAction(cust2));
+        }
+
+        [TestMethod]
+        public void TestInsertCustomersIncludeOrders()
+        {
+            var policy = new EntityPolicy();
+            policy.IncludeWith<Customer>(c => c.Orders);
+            policy.IncludeWith<Order>(o => o.Details);
+            Northwind nw = new Northwind(this.provider.New(policy));
+
+            var cust = new Customer
+            {
+                CustomerID = "XX1",
+                CompanyName = "Company1",
+                ContactName = "Contact1",
+                City = "Seattle",
+                Country = "USA"
+            };
+            var order = new Order
+            {
+                CustomerID = "XX1",
+                OrderDate = DateTime.Today,
+            };
+            cust.Orders = new List<Order> { order };
+
+            var custs = nw.Customers.Insert(cust);
+            var result = nw.Orders.Insert(order);
+            cust = nw.Customers.GetById(cust.CustomerID);
+            Assert.AreEqual(1, custs);
+            //TODO: Complete Assert
+            //Assert.IsNotNull(custs[0].Orders);
+            //Assert.AreEqual(6, custs[0].Orders.Count);
+            //Assert.IsTrue(custs[0].Orders.Any(o => o.OrderID == 10643));
+            //Assert.IsNotNull(custs[0].Orders.Single(o => o.OrderID == 10643).Details);
+            //Assert.AreEqual(3, custs[0].Orders.Single(o => o.OrderID == 10643).Details.Count);
         }
     }
 }
