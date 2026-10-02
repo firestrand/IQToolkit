@@ -1918,7 +1918,8 @@ namespace Test
         public void TestCustomersApplyOrderAndAssociateOrders()
         {
             var policy = new EntityPolicy();
-            policy.Apply<Order>(ords => ords.Where(o => o.OrderDate != null));
+            DateTime? missingOrderDate = null;
+            policy.Apply<Order>(ords => ords.Where(o => o.OrderDate != missingOrderDate));
             policy.IncludeWith<Customer>(c => c.Orders.Where(o => (o.OrderID & 1) == 0));
             Northwind nw = new Northwind(this.provider.New(policy));
 
