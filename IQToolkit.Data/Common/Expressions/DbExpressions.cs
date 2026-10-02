@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -57,9 +57,13 @@ namespace IQToolkit.Data.Common
     public abstract class DbExpression : Expression
     {
         protected DbExpression(DbExpressionType eType, Type type)
-            : base((ExpressionType)eType, type)
-        {
+            {
+            NodeType = (ExpressionType)eType;
+            Type = type;
         }
+
+        public override ExpressionType NodeType { get; }
+        public override Type Type { get; }
 
         public override string ToString()
         {
@@ -715,7 +719,7 @@ namespace IQToolkit.Data.Common
         }
     }
 
-    public class BatchExpression : Expression
+    public class BatchExpression : DbExpression
     {
         Expression input;
         LambdaExpression operation;
@@ -723,7 +727,7 @@ namespace IQToolkit.Data.Common
         Expression stream;
 
         public BatchExpression(Expression input, LambdaExpression operation, Expression batchSize, Expression stream)
-            : base((ExpressionType)DbExpressionType.Batch, typeof(IEnumerable<>).MakeGenericType(operation.Body.Type))
+            : base(DbExpressionType.Batch, typeof(IEnumerable<>).MakeGenericType(operation.Body.Type))
         {
             this.input = input;
             this.operation = operation;
@@ -985,13 +989,13 @@ namespace IQToolkit.Data.Common
         }
     }
 
-    public class VariableExpression : Expression
+    public class VariableExpression : DbExpression
     {
         string name;
         QueryType queryType;
 
         public VariableExpression(string name, Type type, QueryType queryType)
-            : base((ExpressionType)DbExpressionType.Variable, type)
+            : base(DbExpressionType.Variable, type)
         {
             this.name = name;
             this.queryType = queryType;

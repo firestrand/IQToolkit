@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -85,9 +85,9 @@ namespace IQToolkit.Data
 
         public static DbEntityProvider FromApplicationSettings()
         {
-            var provider = System.Configuration.ConfigurationSettings.AppSettings["Provider"];
-            var connection = System.Configuration.ConfigurationSettings.AppSettings["Connection"];
-            var mapping = System.Configuration.ConfigurationSettings.AppSettings["Mapping"];
+            var provider = System.Configuration.ConfigurationManager.AppSettings["Provider"];
+            var connection = System.Configuration.ConfigurationManager.AppSettings["Connection"];
+            var mapping = System.Configuration.ConfigurationManager.AppSettings["Mapping"];
             return From(provider, connection, mapping);
         }
 

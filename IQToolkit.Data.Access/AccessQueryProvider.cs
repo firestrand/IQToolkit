@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -19,6 +19,7 @@ namespace IQToolkit.Data.Access
     using IQToolkit.Data.Common;
     using IQToolkit.Data.OleDb;
 
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     public class AccessQueryProvider : OleDb.OleDbQueryProvider
     {
         Dictionary<QueryCommand, OleDbCommand> commandCache = new Dictionary<QueryCommand, OleDbCommand>();

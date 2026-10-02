@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -39,6 +39,7 @@ namespace IQToolkit.Data.Mapping
 
         private MappingEntity GetEntity(Type elementType, string tableId, Type entityType)
         {
+            tableId ??= this.GetTableId(elementType);
             MappingEntity entity;
 
             if (!_entities.TryGetValue(tableId, out entity))

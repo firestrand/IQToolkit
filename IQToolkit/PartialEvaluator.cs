@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -37,9 +37,40 @@ namespace IQToolkit
 
         public static Expression Eval(Expression expression, Func<Expression, bool> fnCanBeEvaluated, Func<ConstantExpression, Expression> fnPostEval)
         {
+            expression = ArrayContainsNormalizer.Normalize(expression);
             if (fnCanBeEvaluated == null)
                 fnCanBeEvaluated = PartialEvaluator.CanBeEvaluatedLocally;
             return SubtreeEvaluator.Eval(Nominator.Nominate(fnCanBeEvaluated, expression), fnPostEval, expression);
+        }
+
+        // C# 14 binds array.Contains(value) to MemoryExtensions.Contains. A span
+        // cannot be boxed into a ConstantExpression; preserve the equivalent
+        // enumerable operation understood by LINQ query translators instead.
+        sealed class ArrayContainsNormalizer : ExpressionVisitor
+        {
+            internal static Expression Normalize(Expression expression)
+                => new ArrayContainsNormalizer().Visit(expression);
+
+            protected override Expression VisitMethodCall(MethodCallExpression call)
+            {
+                if (call.Method.DeclaringType == typeof(MemoryExtensions)
+                    && call.Method.Name == "Contains" && call.Arguments.Count == 2
+                    && call.Method.IsGenericMethod
+                    && call.Arguments[0] is MethodCallExpression conversion
+                    && conversion.Method.Name == "op_Implicit"
+                    && conversion.Method.DeclaringType.IsGenericType
+                    && conversion.Method.DeclaringType.GetGenericTypeDefinition() == typeof(ReadOnlySpan<>)
+                    && conversion.Arguments.Count == 1 && conversion.Arguments[0].Type.IsArray)
+                {
+                    Type elementType = call.Method.GetGenericArguments()[0];
+                    Expression source = Visit(conversion.Arguments[0]);
+                    Expression emptyArray = Expression.NewArrayBounds(elementType, Expression.Constant(0));
+                    Expression nullSafeSource = Expression.Coalesce(source, emptyArray);
+                    return Expression.Call(typeof(Enumerable), "Contains", new[] { elementType },
+                        nullSafeSource, Visit(call.Arguments[1]));
+                }
+                return base.VisitMethodCall(call);
+            }
         }
 
         private static bool CanBeEvaluatedLocally(Expression expression)

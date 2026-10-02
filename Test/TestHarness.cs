@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -189,6 +189,7 @@ namespace Test
                 Console.WriteLine("Total tests passed: {0}", iPassed);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Total tests failed: {0}", iTest - iPassed);
+                Environment.ExitCode = 1;
                 foreach (var failure in failures)
                 {
                     Console.WriteLine("  {0}: {1}", failure.TestName, failure.Reason != null ? failure.Reason : string.Empty);
@@ -248,7 +249,7 @@ namespace Test
 
         private void ReadBaselines(string filename)
         {
-            if (!string.IsNullOrEmpty(filename) && File.Exists(filename))
+            if (!string.IsNullOrEmpty(filename))
             {
                 XDocument doc = XDocument.Load(filename);
                 this.baselines = doc.Root.Elements("baseline").ToDictionary(e => (string)e.Attribute("key"), e => e.Value);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -230,7 +230,7 @@ namespace IQToolkit.Data.Common
 
         public override object CloneEntity(MappingEntity entity, object instance)
         {
-            var clone = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(entity.EntityType);
+            var clone = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(entity.EntityType);
             foreach (var mi in this.GetMappedMembers(entity))
             {
                 if (this.IsColumn(entity, mi))

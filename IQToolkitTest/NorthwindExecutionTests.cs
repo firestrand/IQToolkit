@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -13,9 +13,10 @@ namespace IQToolkitTest
     /// Summary description for NorthwindExecutionTests
     /// </summary>
     [TestClass]
+    [TestCategory("SqlServerIntegration")]
     public class NorthwindExecutionTests
     {
-        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=(local);Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION") ?? "Server=localhost;Database=unused", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
 
         public NorthwindExecutionTests()
@@ -43,6 +44,8 @@ namespace IQToolkitTest
         [TestInitialize()]
         public void NorthwidnCUDTestsInit()
         {
+            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION")))
+                Assert.Inconclusive("Set IQTOOLKIT_NORTHWIND_CONNECTION to run this SQL Server integration suite.");
             provider.Connection.Open();
             db = new Northwind(provider);
             ClearOutTestData();
@@ -50,6 +53,7 @@ namespace IQToolkitTest
         [TestCleanup()]
         public void NorthwidnCUDTestsTeardown()
         {
+            if (db == null) return;
             ClearOutTestData();
             provider.Connection.Close();
         }
@@ -812,10 +816,10 @@ namespace IQToolkitTest
             var last = db.Customers.OrderBy(c => c.ContactName).LastOrDefault(c => c.City == "SpongeBob");
             Assert.AreEqual(null, last);
         }
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
         public void TestSingleFails()
         {
-            var single = db.Customers.Single();
+            Assert.ThrowsExactly<InvalidOperationException>(() => db.Customers.Single());
         }
         [TestMethod]
         public void TestSinglePredicate()
@@ -831,10 +835,10 @@ namespace IQToolkitTest
             Assert.IsNotNull(single);
             Assert.AreEqual("ALFKI", single.CustomerID);
         }
-        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod]
         public void TestSingleOrDefaultFails()
         {
-            var single = db.Customers.SingleOrDefault();
+            Assert.ThrowsExactly<InvalidOperationException>(() => db.Customers.SingleOrDefault());
         }
         [TestMethod]
         public void TestSingleOrDefaultPredicate()

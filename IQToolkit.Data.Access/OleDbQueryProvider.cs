@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,6 +12,7 @@ namespace IQToolkit.Data.OleDb
 {
     using IQToolkit.Data.Common;
 
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     public class OleDbQueryProvider : DbEntityProvider
     {
         public OleDbQueryProvider(OleDbConnection connection, QueryLanguage language, QueryMapping mapping, QueryPolicy policy)

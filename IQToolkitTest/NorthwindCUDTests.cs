@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
@@ -12,9 +12,10 @@ namespace IQToolkitTest
     /// Summary description for NorthwidnCUDTests
     /// </summary>
     [TestClass]
+    [TestCategory("SqlServerIntegration")]
     public class NorthwindCUDTests
     {
-        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=(local);Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION") ?? "Server=localhost;Database=unused", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
         public NorthwindCUDTests()
         {
@@ -59,6 +60,8 @@ namespace IQToolkitTest
         [TestInitialize()]
         public void NorthwidnCUDTestsInit()
         {
+            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION")))
+                Assert.Inconclusive("Set IQTOOLKIT_NORTHWIND_CONNECTION to run this SQL Server integration suite.");
             provider.Connection.Open();
             db = new Northwind(provider);
         }
@@ -69,6 +72,7 @@ namespace IQToolkitTest
         [TestCleanup()]
         public void NorthwidnCUDTestsTeardown()
         {
+            if (db == null) return;
             try
             {
                 this.provider.ExecuteCommand("DELETE FROM Orders WHERE CustomerID LIKE 'XX%'");
@@ -110,7 +114,7 @@ namespace IQToolkitTest
                 Country = "USA"
             };
             var result = db.Customers.Insert(cust, c => c.City);
-            Assert.AreEqual<string>(result, "Seattle");  // should be value we asked for
+            Assert.AreEqual<string>("Seattle", result);  // should be value we asked for
         }
         [TestMethod]
         public void TestBatchInsertCustomersNoResult()
@@ -719,7 +723,7 @@ namespace IQToolkitTest
 
             Assert.IsNotNull(cust);
             Assert.IsNotNull(cust2);
-            Assert.ReferenceEquals(cust, cust2);
+            Assert.AreSame(cust, cust2);
         }
         [TestMethod]
         public void TestSessionProviderNotIdentityCached()

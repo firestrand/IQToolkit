@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +13,10 @@ namespace IQToolkitTest
     /// Summary description for NorthwindFunctionalTests
     /// </summary>
     [TestClass]
+    [TestCategory("SqlServerIntegration")]
     public class NorthwindExtensionTableCUDTests
     {
-        readonly DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", @"Data Source=(local);Initial Catalog=Northwind;Integrated Security=True", "IQToolkitTest.NorthwindWithAttributes");
+        readonly DbEntityProvider provider = DbEntityProvider.From("IQToolkit.Data.SqlClient", Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION") ?? "Server=localhost;Database=unused", "IQToolkitTest.NorthwindWithAttributes");
         Northwind db;
 
         public NorthwindExtensionTableCUDTests()
@@ -33,6 +34,8 @@ namespace IQToolkitTest
         [TestInitialize()]
         public void NorthwindInit()
         {
+            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION")))
+                Assert.Inconclusive("Set IQTOOLKIT_NORTHWIND_CONNECTION to run this SQL Server integration suite.");
             provider.Connection.Open();
             db = new Northwind(provider);
             ClearOutTestData();
@@ -41,6 +44,7 @@ namespace IQToolkitTest
         [TestCleanup()]
         public void NorthwindTeardown()
         {
+            if (db == null) return;
             ClearOutTestData();
             provider.Connection.Close();
         }
@@ -150,7 +154,7 @@ namespace IQToolkitTest
                 Comment = "New Comment"
             };
             var result = db.CustomersWithComments.Insert(cust, c => c.City);
-            Assert.AreEqual(result, "Seattle");  // should be value we asked for
+            Assert.AreEqual("Seattle", result);  // should be value we asked for
         }
         [TestMethod]
         public void Extension_Table_BatchInsertCustomersNoResult()
@@ -818,7 +822,7 @@ namespace IQToolkitTest
 
             Assert.IsNotNull(cust);
             Assert.IsNotNull(cust2);
-            Assert.ReferenceEquals(cust, cust2);
+            Assert.AreSame(cust, cust2);
         }
         [TestMethod]
         public void Extension_Table_SessionProviderNotIdentityCached()
@@ -833,7 +837,7 @@ namespace IQToolkitTest
             Assert.AreNotEqual(null, cust);
             Assert.AreNotEqual(null, cust2);
             Assert.AreEqual(cust.CustomerID, cust2.CustomerID);
-            Assert.IsFalse(Assert.ReferenceEquals(cust, cust2));
+            Assert.AreNotSame(cust, cust2);
         }
         [TestMethod]
         public void Extension_Table_SessionSubmitActionOnModify()

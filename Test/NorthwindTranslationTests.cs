@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
+// Copyright (c) Microsoft Corporation.  All rights reserved.
 // This source code is made available under the terms of the Microsoft Public License (MS-PL)
 
 using System;
@@ -20,16 +20,16 @@ namespace Test
         {
             string prefix = GetBaselinePrefix(db);
             string baselineFile = prefix + ".base";
-            string newBase = prefix + ".new";
+            string newBase = null;
 
-            new NorthwindTranslationTests().RunTests(db, @"..\..\" + baselineFile, newBase, executeQueries);
+            new NorthwindTranslationTests().RunTests(db, Path.Combine(AppContext.BaseDirectory, baselineFile), newBase, executeQueries);
         }
 
         public static void Run(Northwind db, bool executeQueries, string testName)
         {
             string prefix = GetBaselinePrefix(db);
             string baselineFile = prefix + ".base";
-            new NorthwindTranslationTests().RunTest(db, @"..\..\" + baselineFile, executeQueries, testName);
+            new NorthwindTranslationTests().RunTest(db, Path.Combine(AppContext.BaseDirectory, baselineFile), executeQueries, testName);
         }
 
         protected static string GetBaselinePrefix(Northwind db)
@@ -1634,7 +1634,7 @@ namespace Test
 
         public void TestXmlMappingSelectCustomers()
         {
-            var nw = new Northwind(this.provider.New(XmlMapping.FromXml(File.ReadAllText(@"Northwind.xml"))));
+            var nw = new Northwind(this.provider.New(XmlMapping.FromXml(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Northwind.xml")))));
 
             TestQuery(
                 from c in db.Customers

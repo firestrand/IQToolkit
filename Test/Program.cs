@@ -1,47 +1,41 @@
-﻿// Copyright (c) Microsoft Corporation.  All rights reserved.
-// This source code is made available under the terms of the Microsoft Public License (MS-PL)
-
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using IQToolkit;
 using IQToolkit.Data;
-using IQToolkit.Data.Mapping;
 
 namespace Test
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient",@"Data Source=ET1841\ETTSILVERS08;Initial Catalog=Northwind;Integrated Security=True", "Test.NorthwindWithAttributes");
-            //var provider = DbEntityProvider.From(@"c:\data\Northwind.accdb", "Test.NorthwindWithAttributes");
-            //var provider = DbEntityProvider.From(@"c:\data\Northwind.mdb", "Test.NorthwindWithAttributes");
-            //var provider = DbEntityProvider.From(@"c:\data\Northwind.sdf", "Test.NorthwindWithAttributes");            
-            //var provider = DbEntityProvider.From("IQToolkit.Data.MySqlClient", "Northwind", "Test.MySqlNorthwind");
-            //var provider = DbEntityProvider.From("IQToolkit.Data.SQLite", @"c:\data\Northwind.db3", "Test.NorthwindWithAttributes");
-
-            //provider.Log = Console.Out;
-            provider.Connection.Open();
-            //provider.Cache = new QueryCache(5);
-
-            try
+            bool execute = args.Length == 1 && args[0] == "--execute";
+            if (args.Length > 0 && !execute)
+            {
+                Console.Error.WriteLine("Usage: dotnet run --project Test [-- --execute]");
+                return 2;
+            }
+            string connection = Environment.GetEnvironmentVariable("IQTOOLKIT_NORTHWIND_CONNECTION");
+            if (execute && string.IsNullOrWhiteSpace(connection))
+            {
+                Console.Error.WriteLine("Set IQTOOLKIT_NORTHWIND_CONNECTION to a SQL Server Northwind connection string.");
+                return 2;
+            }
+            var provider = DbEntityProvider.From("IQToolkit.Data.SqlClient",
+                connection ?? "Server=localhost;Database=Northwind", "Test.NorthwindWithAttributes");
+            using (provider.Connection)
             {
                 var db = new Northwind(provider);
-
-                //NorthwindTranslationTests.Run(db, true);
-                NorthwindExecutionTests.Run(db);
-                NorthwindCUDTests.Run(db); 
-                //MultiTableTests.Run(new MultiTableContext(provider.New(new AttributeMapping(typeof(MultiTableContext)))));
-                //NorthwindPerfTests.Run(db, "TestStandardQuery");
+                if (execute)
+                {
+                    provider.Connection.Open();
+                    NorthwindExecutionTests.Run(db);
+                    NorthwindCUDTests.Run(db);
+                }
+                else
+                {
+                    NorthwindTranslationTests.Run(db, false);
+                }
             }
-            finally
-            {
-                provider.Connection.Close();
-            }
-            Console.ReadKey();
+            return Environment.ExitCode;
         }
     }
 }

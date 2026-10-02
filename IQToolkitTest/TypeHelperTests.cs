@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,11 +62,10 @@ namespace IQToolkitTest
             Guid actual = (Guid)TypeHelper.Convert(expectedString, typeof(Guid));
             Assert.AreEqual(expected, actual);
         }
-        [ExpectedException(typeof(FormatException))]
         [TestMethod]
         public void Convert_Non_Guid_String_To_Guid_Throws_FormatException()
         {
-            Guid actual = (Guid)TypeHelper.Convert("000000000000", typeof(Guid));
+            Assert.ThrowsExactly<FormatException>(() => TypeHelper.Convert("000000000000", typeof(Guid)));
         }
     }
 }
