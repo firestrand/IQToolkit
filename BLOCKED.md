@@ -1,19 +1,17 @@
 # Blocked modernization work
 
-Updated: 2026-10-04. The full roadmap goal remains active; this record stops the affected verification task.
+Updated: 2026-10-08. The full modernization roadmap remains active; this record stops the affected V1aj.4 verification task. See the [resumption handoff](docs/modernization-handoff.md) for repository baseline and the independent MDB0.1 status.
 
 | Field | Recorded state |
 | :--- | :--- |
 | Task / dependents | V1aj.4 fresh final assessment; dependent V1ai.4 integration closure and any complete M0 readiness claim. |
-| Failure | Native assessment rejects evidence integrity: `Native consumer session identity differs.` No fresh fact classification or final-readiness outcome. |
+| Failure | Native assessment rejects evidence integrity with `Native consumer session identity differs.` No fresh fact classification or final-readiness outcome was produced. |
 | Evidence | `artifacts/recent-final-binding/assessment-recovery.8xvjjknw/`; result SHA256 `45d9eae496f0026cdaaed3a7797767a5418fe0b4d26dc260f67a938a11b0d051`. |
-| Diagnosis | Authentic PID/PGID/SID all equal 574814; `PackageIndependentEvidence.cs:536` rejects leading `ps` padding before the PID. |
-| Attempts | Integration artifact repairs 3/3 exhausted: PDB source context, preparation status, native admission selection. All original failures are retained; no budget reset. |
-| Last verified snapshot | Draft 0.109/profile `acb7740f935692ee2d6441dd5d9f8b1b32d4ffa6e4259f1d6848df2ce0e4f38f`; scoped continuity/cache/consumer controls pass. Nine fresh producer stages pass; assessment does not. |
-| Preservation | 5,585 origin/snapshot pairs, 13,780 protected files, source/index/336 binaries unchanged; both sessions terminal; private parent absent. |
-| Missing authority | A separately authorized, bounded follow-up for the witness parser and its verification. The existing exhausted packet does not authorize a fourth repair/retry. |
-| Next action | Review the retained raw session representation and strict identity contract; define a separate scope and budget before any guard edit, recompilation or assessment dispatch. |
+| Diagnosis | The authentic PID/PGID/SID are all `574814`. The retained `ps` witness has standard leading whitespace before the PID, while `PackageIndependentEvidence.cs:536` requires the digits at column zero. The failure is the parser's representation check, not a mismatch in the three process identifiers. |
+| Attempts | V1aj.4 integration artifact repairs are exhausted at 3/3: PDB source context, preparation status, and native admission selection. Do not reset or reuse this budget. |
+| Last verified baseline | The producer chain passed all nine stages with zero build warnings/errors: 435 test definitions, 110 passes, 325 explicit SQL Server skips, 247 translation checks; coverage measured 2,968/8,359 lines and 1,602/5,336 branches across 97 sources. The subsequent assessment failed before fact classification. Latest code/build baseline is `e9c9ab83efaddb76eb761bbd1468f16b83623867`; no source fix or new assessment has run on it. |
+| Preservation | At the failed assessment: 5,585 origin/snapshot pairs, 13,780 protected files, source/index/336 ordinary binaries unchanged; both sessions terminal and private parent absent. |
+| Authorization | A proposal for one fresh, bounded recovery was sent but has not received explicit approval. It proposed the authentic retained witness, trimming leading spaces/tabs only, a fresh producer chain and one assessment, with 3 GiB inner / 4 GiB outer storage, 120 seconds ordinary-stage / 300 seconds coverage limits, and no package acquisition or database service. This proposal is not authority. |
+| Next action | Wait for explicit owner decision. Until approval is recorded, do not edit the guard, rebuild, rerun producers, or dispatch an assessment. If declined or unanswered, keep the task stopped. |
 
-[Plan](docs/modernization-implementation-plan.md), [execution state](AGENT_STATE.md) and [scoped ATLAS](docs/modernization-recent-final-continuity-hardness.md) preserve the successes, failures and remaining gates. The new documentation/profile checkpoint receives metadata review only; it is not native-reverified. No source fix, commit, push, tag or publication follows this record.
-
-Independent ready work may continue within its existing authority. Coverage targets and branch arms, optimized cache qualification, full M0/roadmap and unanswered fixture/policy/public/provider/platform/workload decisions remain open. No human answer, exception or provider certification is inferred.
+The reviewable plan and execution history are in [the implementation plan](docs/modernization-implementation-plan.md) and [AGENT_STATE.md](AGENT_STATE.md). This blocker is independent of MDB0.1's Round30 planning/source verdicts; neither review authorizes V1aj.4 work. No provider certification, full M0 closure, coverage-target exception, or roadmap completion is implied.
