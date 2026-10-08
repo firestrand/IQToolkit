@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "IQToolkit": {
+        "type": "Direct",
+        "requested": "[1.1.2-preview.1, 1.1.2-preview.1]",
+        "resolved": "1.1.2-preview.1",
+        "contentHash": "sAP7aQYk2poUJMukG+DSBVljF7hCqJ+LAON4NvnTS3QMJq8z1C+PRo82Wrsj5IQm/pj8+oaLgfLp2TRUz7skOw=="
+      }
+    }
+  }
+}

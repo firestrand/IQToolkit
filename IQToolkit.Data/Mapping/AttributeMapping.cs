@@ -46,7 +46,7 @@ namespace IQToolkit.Data.Mapping
             {
 
                 entity = this.CreateEntity(elementType, tableId, entityType);
-                this._entities.GetOrAdd(tableId, entity);
+                entity = this._entities.GetOrAdd(tableId, entity);
             }
             return entity;
         }

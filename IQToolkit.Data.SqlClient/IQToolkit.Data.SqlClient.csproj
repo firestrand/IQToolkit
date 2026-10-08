@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>IQToolkit LINQ and entity operations for SQL Server using Microsoft.Data.SqlClient.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit.Data/IQToolkit.Data.csproj" />
     <ProjectReference Include="../IQToolkit/IQToolkit.csproj" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Relational query translation, entity mapping, policies, and ADO.NET execution infrastructure for IQToolkit.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit/IQToolkit.csproj" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.12" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
   </ItemGroup>
 </Project>

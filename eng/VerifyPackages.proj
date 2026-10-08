@@ -1,0 +1,92 @@
+<Project DefaultTargets="VerifyPackages">
+  <PropertyGroup>
+    <RepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</RepositoryRoot>
+    <PackageDirectory Condition="'$(PackageDirectory)' == ''">$(RepositoryRoot)/artifacts/packages</PackageDirectory>
+    <ResolvedPackageDirectory Condition="$([System.IO.Path]::IsPathRooted('$(PackageDirectory)'))">$(PackageDirectory)</ResolvedPackageDirectory>
+    <ResolvedPackageDirectory Condition="'$(ResolvedPackageDirectory)' == ''">$(RepositoryRoot)/$(PackageDirectory)</ResolvedPackageDirectory>
+    <ResolvedPackageDirectory>$([System.IO.Path]::GetFullPath('$(ResolvedPackageDirectory)'))</ResolvedPackageDirectory>
+    <InspectionDirectory>$(ResolvedPackageDirectory)/inspection-$([System.Guid]::NewGuid())</InspectionDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <ExpectedPackage Include="IQToolkit;IQToolkit.Data;IQToolkit.Data.Access;IQToolkit.Data.MySqlClient;IQToolkit.Data.SQLite;IQToolkit.Data.SqlClient" />
+    <PackageFile Include="$(ResolvedPackageDirectory)/*.nupkg" />
+    <SymbolFile Include="$(ResolvedPackageDirectory)/*.snupkg" />
+  </ItemGroup>
+  <Target Name="ValidatePackageSet">
+    <Error Condition="'@(PackageFile->Count())' != '6'" Text="Expected six library packages; found @(PackageFile->Count())." />
+    <Error Condition="'@(SymbolFile->Count())' != '6'" Text="Expected six symbol packages; found @(SymbolFile->Count())." />
+    <XmlPeek XmlInputPath="$(RepositoryRoot)/Directory.Build.props" Query="/Project/PropertyGroup/Version/text()">
+      <Output TaskParameter="Result" PropertyName="ExpectedVersion" />
+    </XmlPeek>
+    <Error Condition="!Exists('$(ResolvedPackageDirectory)/%(ExpectedPackage.Identity).$(ExpectedVersion).nupkg')" Text="Missing expected package %(ExpectedPackage.Identity) at version $(ExpectedVersion)." />
+  </Target>
+  <Target Name="ComputeHashes">
+    <GetFileHash Files="$(RepositoryRoot)/README.md" Algorithm="SHA256">
+      <Output TaskParameter="Hash" PropertyName="ReadmeHash" />
+    </GetFileHash>
+    <GetFileHash Files="$(RepositoryRoot)/License.txt" Algorithm="SHA256">
+      <Output TaskParameter="Hash" PropertyName="LicenseHash" />
+    </GetFileHash>
+  </Target>
+  <Target Name="VerifyPackages" DependsOnTargets="ValidatePackageSet;ComputeHashes;VerifyPackage">
+    <Message Importance="high" Text="Verified six library manifests, bundled documents, assemblies and symbol files." />
+  </Target>
+  <Target Name="VerifyPackage" Outputs="%(PackageFile.Identity)">
+    <PropertyGroup>
+      <PackageStem>%(PackageFile.Filename)</PackageStem>
+      <ExtractedPackage>$(InspectionDirectory)/$(PackageStem)</ExtractedPackage>
+      <ExtractedSymbols>$(InspectionDirectory)/$(PackageStem)-symbols</ExtractedSymbols>
+      <PackageId />
+      <Description />
+      <License />
+      <Readme />
+      <SourceCommit />
+      <SettingsDependency />
+    </PropertyGroup>
+    <Unzip SourceFiles="%(PackageFile.Identity)" DestinationFolder="$(ExtractedPackage)" />
+    <Unzip SourceFiles="$(ResolvedPackageDirectory)/$(PackageStem).snupkg" DestinationFolder="$(ExtractedSymbols)" />
+    <ItemGroup>
+      <Manifest Include="$(ExtractedPackage)/*.nuspec" />
+    </ItemGroup>
+    <Error Condition="'@(Manifest->Count())' != '1'" Text="Expected one manifest for $(PackageStem)." />
+    <XmlPeek XmlInputPath="@(Manifest)" Query="//*[local-name()='metadata']/*[local-name()='id']/text()">
+      <Output TaskParameter="Result" PropertyName="PackageId" />
+    </XmlPeek>
+    <Error Condition="'$(PackageStem)' != '$(PackageId).$(ExpectedVersion)'" Text="Unexpected package identity $(PackageId) in $(PackageStem)." />
+    <Error Condition="!Exists('$(ExtractedPackage)/$(PackageId).nuspec')" Text="Manifest name must match package ID $(PackageId)." />
+    <XmlPeek XmlInputPath="@(Manifest)" Query="//*[local-name()='metadata']/*[local-name()='description']/text()">
+      <Output TaskParameter="Result" PropertyName="Description" />
+    </XmlPeek>
+    <Error Condition="'$(Description)' == '' Or '$(Description)' == 'Package Description'" Text="Missing useful description for $(PackageId)." />
+    <XmlPeek XmlInputPath="@(Manifest)" Query="//*[local-name()='metadata']/*[local-name()='license' and @type='expression']/text()">
+      <Output TaskParameter="Result" PropertyName="License" />
+    </XmlPeek>
+    <Error Condition="'$(License)' != 'MS-PL'" Text="Missing MS-PL license expression for $(PackageId)." />
+    <XmlPeek XmlInputPath="@(Manifest)" Query="//*[local-name()='metadata']/*[local-name()='readme']/text()">
+      <Output TaskParameter="Result" PropertyName="Readme" />
+    </XmlPeek>
+    <Error Condition="'$(Readme)' != 'README.md'" Text="Missing README declaration for $(PackageId)." />
+    <XmlPeek XmlInputPath="@(Manifest)" Query="//*[local-name()='metadata']/*[local-name()='repository' and @type='git' and @url='https://github.com/firestrand/IQToolkit']/@commit">
+      <Output TaskParameter="Result" PropertyName="SourceCommit" />
+    </XmlPeek>
+    <Error Condition="'$(SourceCommit)' == ''" Text="Missing source repository metadata for $(PackageId)." />
+    <XmlPeek XmlInputPath="@(Manifest)" Query="//*[local-name()='metadata']/*[local-name()='dependencies']//*[local-name()='dependency' and @id='System.Configuration.ConfigurationManager']/@id">
+      <Output TaskParameter="Result" PropertyName="SettingsDependency" />
+    </XmlPeek>
+    <Error Condition="'$(PackageId)' == 'IQToolkit' And '$(SettingsDependency)' != ''" Text="IQToolkit core must not depend on legacy ConfigurationManager." />
+    <Error Condition="'$(PackageId)' == 'IQToolkit.Data' And '$(SettingsDependency)' == ''" Text="IQToolkit.Data must retain its legacy ConfigurationManager dependency." />
+    <Error Condition="!Exists('$(ExtractedPackage)/lib/net10.0/$(PackageId).dll')" Text="Missing library assembly for $(PackageId)." />
+    <Error Condition="!Exists('$(ExtractedSymbols)/lib/net10.0/$(PackageId).pdb')" Text="Missing symbol file for $(PackageId)." />
+    <GetFileHash Files="$(ExtractedPackage)/README.md" Algorithm="SHA256">
+      <Output TaskParameter="Hash" PropertyName="BundledReadmeHash" />
+    </GetFileHash>
+    <GetFileHash Files="$(ExtractedPackage)/License.txt" Algorithm="SHA256">
+      <Output TaskParameter="Hash" PropertyName="BundledLicenseHash" />
+    </GetFileHash>
+    <Error Condition="'$(ReadmeHash)' != '$(BundledReadmeHash)' Or '$(LicenseHash)' != '$(BundledLicenseHash)'" Text="Bundled documents differ from repository source in $(PackageId)." />
+    <Message Importance="high" Text="Verified $(PackageId)." />
+    <ItemGroup>
+      <Manifest Remove="@(Manifest)" />
+    </ItemGroup>
+  </Target>
+</Project>

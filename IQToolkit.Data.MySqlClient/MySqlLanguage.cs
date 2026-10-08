@@ -42,8 +42,6 @@ namespace IQToolkit.Data.MySqlClient
             return name;
         }
 
-        private static readonly char[] splitChars = new char[] { '.' };
-
         public override Expression GetGeneratedIdExpression(MemberInfo member)
         {
             return new FunctionExpression(TypeHelper.GetMemberType(member), "LAST_INSERT_ID()", null);

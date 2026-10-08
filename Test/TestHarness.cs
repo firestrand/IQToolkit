@@ -180,7 +180,13 @@ namespace Test
             Console.WriteLine("Total elapsed time: {0}", timer.Elapsed);
 
             Console.ForegroundColor = ConsoleColor.Green;
-            if (iPassed == iTest)
+            if (iTest == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("No tests executed.");
+                Environment.ExitCode = 1;
+            }
+            else if (iPassed == iTest)
             {
                 Console.WriteLine("ALL tests passed!");
             }

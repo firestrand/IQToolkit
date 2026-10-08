@@ -73,10 +73,5 @@ namespace IQToolkit.Data.Common
 
             return join;
         }
-
-        private bool CanBeColumn(Expression expr)
-        {
-            return expr != null && expr.NodeType == (ExpressionType)DbExpressionType.Column;
-        }
     }
 }

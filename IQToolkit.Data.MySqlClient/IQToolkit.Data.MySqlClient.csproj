@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>IQToolkit LINQ and entity operations for MySQL using MySql.Data.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit.Data/IQToolkit.Data.csproj" />
     <ProjectReference Include="../IQToolkit/IQToolkit.csproj" />
-    <PackageReference Include="MySql.Data" Version="26.7.0" />
+    <PackageReference Include="MySql.Data" />
   </ItemGroup>
 </Project>

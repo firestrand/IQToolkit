@@ -452,29 +452,6 @@ namespace IQToolkit.Data.Common
             return block;
         }
 
-        private Expression GetIdentityCheck(TableExpression root, MappingEntity entity, Expression instance,
-                                            MappingTable table)
-        {
-            if (_mapping.IsExtensionTable(table))
-            {
-                var keyColNames = _mapping.GetExtensionKeyColumnNames(table).ToArray();
-                var relatedMembers = _mapping.GetExtensionRelatedMembers(table).ToArray();
-
-                Expression where = null;
-                for (int i = 0, n = keyColNames.Length; i < n; i++)
-                {
-                    var relatedMember = relatedMembers[i];
-                    var cex = new ColumnExpression(TypeHelper.GetMemberType(relatedMember),
-                                                   GetColumnType(entity, relatedMember), root.Alias, keyColNames[n]);
-                    var nex = GetMemberExpression(instance, entity, relatedMember);
-                    var eq = cex.Equal(nex);
-                    where = (where != null) ? where.And(eq) : where;
-                }
-                return where;
-            }
-            return base.GetIdentityCheck(root, entity, instance);
-        }
-
         public override Expression GetDeleteExpression(MappingEntity entity, Expression instance,
                                                        LambdaExpression deleteCheck)
         {

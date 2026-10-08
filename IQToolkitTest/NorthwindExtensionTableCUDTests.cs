@@ -48,42 +48,6 @@ namespace IQToolkitTest
             ClearOutTestData();
             provider.Connection.Close();
         }
-        private void SetupTablesToTest()
-        {
-            string command = 
-                "USE [Northwind]" + Environment.NewLine +
-                "GO" + Environment.NewLine +
-                "SET ANSI_NULLS ON" + Environment.NewLine +
-                "GO" + Environment.NewLine +
-                "SET QUOTED_IDENTIFIER ON" + Environment.NewLine +
-                "GO" + Environment.NewLine +
-                "SET ANSI_PADDING ON" + Environment.NewLine +
-                "GO" + Environment.NewLine +
-                "IF  NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[CustomerComments]') AND type in (N'U'))" + Environment.NewLine +
-                "CREATE TABLE [dbo].[CustomerComments](" + Environment.NewLine +
-                "	[CustomerID] [nchar](5) NOT NULL," + Environment.NewLine +
-                "	[Comment] [varchar](max) NOT NULL," + Environment.NewLine +
-                " CONSTRAINT [PK_CustomerComments] PRIMARY KEY CLUSTERED " + Environment.NewLine +
-                "(" + Environment.NewLine +
-                "	[CustomerID] ASC" + Environment.NewLine +
-                ")WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]" + Environment.NewLine +
-                ") ON [PRIMARY]" + Environment.NewLine +
-                "GO" + Environment.NewLine +
-                "SET ANSI_PADDING OFF" + Environment.NewLine +
-                "GO" + Environment.NewLine;
-                                
-            try
-            {
-                //Create 0-1 relationship tables
-                provider.ExecuteCommand(command);
-
-            }
-            catch (Exception)
-            {
-                
-                throw;
-            }
-        }
         private void ClearOutTestData()
         {
             try

@@ -368,7 +368,7 @@ namespace IQToolkit.Data.SQLite
                     case "Tan":
                     case "Sqrt":
                     case "Sign":
-                        this.Write(m.Method.Name.ToUpper());
+                        this.Write(m.Method.Name.ToUpperInvariant());
                         this.Write("(");
                         this.Visit(m.Arguments[0]);
                         this.Write(")");
@@ -498,6 +498,14 @@ namespace IQToolkit.Data.SQLite
             if (b.NodeType == ExpressionType.Add && b.Type == typeof(string))
             {
                 return "||";
+            }
+            else if (b.NodeType == ExpressionType.NotEqual
+                && b.Left is ColumnExpression && b.Left.Type == typeof(string)
+                && b.Right is ColumnExpression && b.Right.Type == typeof(string)
+                && b.Method != null && b.Method.DeclaringType == typeof(string)
+                && b.Method.Name == "op_Inequality")
+            {
+                return "IS NOT";
             }
             else
             {

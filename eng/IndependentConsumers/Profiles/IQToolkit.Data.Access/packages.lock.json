@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "IQToolkit.Data.Access": {
+        "type": "Direct",
+        "requested": "[1.1.2-preview.1, 1.1.2-preview.1]",
+        "resolved": "1.1.2-preview.1",
+        "contentHash": "/mSBIyg6LlJrjvlCgN/dpy442FohXcJIpnKZh0iF3orgnM9lRs6laKJJ+CqBBgVuyFAnLH6i0pIadvdbBygcwg==",
+        "dependencies": {
+          "IQToolkit": "1.1.2-preview.1",
+          "IQToolkit.Data": "1.1.2-preview.1",
+          "System.Data.OleDb": "10.0.12"
+        }
+      },
+      "IQToolkit": {
+        "type": "Transitive",
+        "resolved": "1.1.2-preview.1",
+        "contentHash": "sAP7aQYk2poUJMukG+DSBVljF7hCqJ+LAON4NvnTS3QMJq8z1C+PRo82Wrsj5IQm/pj8+oaLgfLp2TRUz7skOw=="
+      },
+      "IQToolkit.Data": {
+        "type": "Transitive",
+        "resolved": "1.1.2-preview.1",
+        "contentHash": "9a1+slz91+51DFJvDFHoVVb2zuIvqQvwOJynKyiQG8aFnefTFxGF2yXsyd0JFrDvwFrSToSKGgymDq7lDoUGlQ==",
+        "dependencies": {
+          "IQToolkit": "1.1.2-preview.1",
+          "System.Configuration.ConfigurationManager": "10.0.12"
+        }
+      },
+      "System.Configuration.ConfigurationManager": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "6KP/CGB9YymJuhNorm5FS/urQJB40h6t4DIiXN8J1VT/jINZHNgjzcdWRHGYuXGLwO7SCOq5K/OMAnh6oRbeLg==",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "10.0.12",
+          "System.Security.Cryptography.ProtectedData": "10.0.12"
+        }
+      },
+      "System.Data.OleDb": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "IwdlDOFT+aVvq95Stb0+hX/L7id9eGOiYsfsbPQsComFWQQL9XoShkcx8qF/nhWL+/0sQgBfM0Yv9eB07/olYg==",
+        "dependencies": {
+          "System.Configuration.ConfigurationManager": "10.0.12",
+          "System.Diagnostics.PerformanceCounter": "10.0.12"
+        }
+      },
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "sOZM+VyRj1pg/ItlHsvrSbjws6oGqZveTzTNBGZ9ziwRDyKsOF3ub6vhvOdxotCIqtlnyHAIwP5sLNvgiZC+pQ=="
+      },
+      "System.Diagnostics.PerformanceCounter": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "KnKUtQdlT2rkPwwqSkLgltzmF0TA8fVIVLon4ApETc6dDFlQv3Bk7FdUhZQI/SYD4CnoY7UpsNX1VobRs6sbGQ==",
+        "dependencies": {
+          "System.Configuration.ConfigurationManager": "10.0.12"
+        }
+      },
+      "System.Security.Cryptography.ProtectedData": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "wO0W8VDMeRJZakRySOmemAnrBZMwEFRlbfBtATxUiLf2I3IhSRnCp1Vt157NWptdE4IJ7eftd5n8q9LtaKHFTQ=="
+      }
+    }
+  }
+}

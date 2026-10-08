@@ -1,11 +1,41 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <Version>1.1.1</Version>
+    <Version>1.1.2-preview.1</Version>
     <AssemblyVersion>1.1.1.0</AssemblyVersion>
-    <FileVersion>1.1.1.0</FileVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- The SDK defaults FileVersion to AssemblyVersion; derive it from the package version instead. -->
+    <FileVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '[-+].*$', '')).0</FileVersion>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <!-- Keep existing non-version metadata in each project's AssemblyInfo.cs. -->
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyTrademarkAttribute>false</GenerateAssemblyTrademarkAttribute>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>high</NuGetAuditLevel>
+    <Authors>IQToolkit contributors</Authors>
+    <PackageProjectUrl>https://github.com/firestrand/IQToolkit</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/firestrand/IQToolkit</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
+  <ItemGroup>
+    <GlobalAnalyzerConfigFiles Include="$(MSBuildThisFileDirectory)eng/dead-code.globalconfig" Condition="'$(CheckDeadCode)' == 'true'" />
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="/" />
+    <None Include="$(MSBuildThisFileDirectory)License.txt" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>

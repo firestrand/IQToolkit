@@ -1,0 +1,10 @@
+<Project>
+  <Target Name="ValidateIQToolkitCiSettings"
+          BeforeTargets="PrepareForBuild;Pack;Publish"
+          Condition="'$(ContinuousIntegrationBuild)' == 'true'">
+    <Error Condition="'$(LocalWarningRelaxation)' == 'true'"
+           Text="LocalWarningRelaxation is not permitted in CI." />
+    <Error Condition="'$(TreatWarningsAsErrors)' != 'true'"
+           Text="CI requires TreatWarningsAsErrors=true." />
+  </Target>
+</Project>

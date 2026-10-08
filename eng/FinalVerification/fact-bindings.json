@@ -1,0 +1,1556 @@
+{
+  "Schema": 1,
+  "Contract": "FINAL-CLASSIFICATION-1",
+  "Ledger": {
+    "Path": "docs/modernization-implementation-plan.md",
+    "Heading": "Project fact ledger and evidence index",
+    "RowCount": 34,
+    "RawRowHash": "SHA256 UTF-8 exact table row excluding line terminator"
+  },
+  "Facts": [
+    {
+      "FactId": "BASE.SYNC.v1",
+      "RawRowSha256": "a4d234ad599f41c6541cc16daa88ff5d42a679ae355a9eb95457dc52bf15548c",
+      "Kind": "Characterization",
+      "Lifecycle": "Active",
+      "Claim": "Baseline local CRUD, transaction rollback, translation and compiled-query cases remain green (LOCAL-RM-M0, LOCAL-RM-M1).",
+      "EvidenceText": "EV-BASE: existing MSTest and translation harness; observed baseline is 7 pass / 325 skipped plus 247 pass. Inherited fixtures are protected cases, not new representative evidence.",
+      "EvidenceIds": [
+        "EV-BASE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The ledger claim spans inherited baseline CRUD, rollback, translation and compiled queries across M0/M1. The current native subset does not establish that complete broad claim; inherited fixture characterization is not promoted by passing tests.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "CACHE.EXECUTE.v1",
+      "RawRowSha256": "6ba9f7085f081aa9c285a4a361122bdeb9b9f6bdb2587e1d533de72d2f4b76d2",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Given a supported IQueryable, untyped cache execution returns its executed result, not an equality boolean (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-EXEC: new focused public API regression; historical untyped RED repaired by V1c; broader characterization remains required.",
+      "EvidenceIds": [
+        "EV-CACHE-EXEC"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed broad IQueryable claim is not promoted by the separately scoped unchanged native-sequence cases.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "CACHE.LOOKUP.v1",
+      "RawRowSha256": "85112d13c912d042ea23d18ccae20193a10e743127c834bf71be59a372009a7e",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Cache lookup returns the matching cached object; a miss with add:false returns no entry. A miss with add:true returns the inserted item through the out parameter while the Boolean records whether an existing entry was found. Add-enabled accesses update recency without cross-entry substitution (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-LOOKUP: ordered hits/misses/eviction/concurrent calls; equality/result oracle, generated-data gate V0.2.",
+      "EvidenceIds": [
+        "EV-CACHE-LOOKUP"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed broad cache contract includes ordered and concurrent obligations and a pending generated-data gate; sequential native examples qualify only their separate scoped fact.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "CACHE.ISOLATION.v1",
+      "RawRowSha256": "b51663a8aeb39f86c51a4e99294c5cc28cc8b84016b547b840c4cc7aafd13be0",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "A shared compiled-query cache cannot reuse another provider's mapping or policy for the same CLR query root (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-ISOLATION: two explicitly different SQLite provider policies/mappings; result/translation oracle, V0.2.",
+      "EvidenceIds": [
+        "EV-CACHE-ISOLATION"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed broad provider mapping/policy contract is not established by distinct-root native controls; same-root mutation and broader isolation remain open.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "ARRAY.NATIVE.NONEMPTY.v1",
+      "RawRowSha256": "8f073b2ba1100de900d57ccb6919a33f8881e71b7c57e6f8cc9aea9dfeb11565",
+      "Kind": "Characterization",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Ordinary real-provider queries retain current nonempty native array captures through compiler normalization/SQL binding, uncached and cached (LOCAL-RM-M0).",
+      "EvidenceText": "EV-ARRAY-NATIVE: actual acquisition/compiler signatures, independent native multisets and A\u2192B\u2192A on the same query, V1a; no null/boundary or explicit delegate claim.",
+      "EvidenceIds": [
+        "EV-ARRAY-NATIVE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeArrayMembershipTests",
+          "Method": "CompilerArrayMembershipObservesReplacementWithCache"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeArrayMembershipTests",
+          "Method": "CompilerArrayMembershipObservesReplacementWithoutCache"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeArrayMembershipTests",
+          "Method": "EnumerableArrayMembershipObservesReplacementWithCache"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeArrayMembershipTests",
+          "Method": "EnumerableArrayMembershipObservesReplacementWithoutCache"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeArrayMembershipTests",
+          "Method": "NativeArrayInputsAreAcquired"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeArrayMembershipTests.cs",
+          "Sha256": "485ee8415ac869a4a934d6d5e0740ffcfa810f26833efe05bc3f1b0dc69640c0"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeArrayMembershipTests.cs",
+          "Sha256": "485ee8415ac869a4a934d6d5e0740ffcfa810f26833efe05bc3f1b0dc69640c0"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeProviderCacheTests.cs",
+          "Sha256": "63bba3047aed98e57755b2f3e99eae3c8d8147835b822982c5bd495c447fdd5d"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/PartialEvaluator.cs",
+          "Sha256": "244ded5ffa5327b0aa55586d08512e577c95845e1ea02f009cdc41c97e83b8be"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/Translation/QueryBinder.cs",
+          "Sha256": "7bd1d9731318e87ae625839b0e0afba98d10e4582efe37c2f0190c11d624b49b"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/ExecutionBuilder.cs",
+          "Sha256": "aea22504f7b03f7c7261bcb34171f3432039d2d1c3e81b1a2963efb9c90a5fae"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        }
+      ]
+    },
+    {
+      "FactId": "ARRAY.NULL.v1",
+      "RawRowSha256": "209498814de497e148c0559a159407d82e0505023bbea9ce61d13a39cb333813",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Normalized array/span membership treats a null implicit span as empty; explicit Enumerable null behavior is preserved (LOCAL-RM-M0).",
+      "EvidenceText": "EV-ARRAY: null/empty/nonempty and changing capture regressions; current rewrite may already satisfy them, so verification may start green.",
+      "EvidenceIds": [
+        "EV-ARRAY"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed null implicit-span and explicit Enumerable null contract has no eligible current native boundary binding.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "RESOURCE.OWNERSHIP.v1",
+      "RawRowSha256": "c6ecf0c49615ce9dcaa2b7b184f5985b86b8fef50b2efe92c629e885b820b00a",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Commands/readers and provider-owned connection leases release on success, errors and early disposal; borrowed connections remain owned by the caller (LOCAL-RM-M0, LOCAL-RM-M1).",
+      "EvidenceText": "EV-RESOURCE: real SQLite and instrumented lifetime checks; remaining eager/batch ownership paths require separate semantic RED under reviewed contracts.",
+      "EvidenceIds": [
+        "EV-RESOURCE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed broad lifetime contract spans providers, success, failures and reader/command/lease paths; individual native scoped facts do not establish the entire claim.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "CACHE.NATIVE.EXECUTE.v1",
+      "RawRowSha256": "923adfd34580bc94f3a999bc9bc572bb8d115927da31a6475d4c77fd37f2504b",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Untyped, typed and expression cache APIs execute unchanged native SQLite metadata sequences instead of yielding an equality Boolean (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-NATIVE-EXEC: direct captured sequence oracle and compilation control, V1c.1 \u2192 V1c.2. Broad generated/cache obligations stay open.",
+      "EvidenceIds": [
+        "EV-CACHE-NATIVE-EXEC"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "ExpressionQueryCompilationPreservesCapturedNativeRows"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "TypedQueryCompilationPreservesCapturedNativeRows"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "UntypedQueryExecutesCapturedNativeRows"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/CacheMetadataTests.cs",
+          "Sha256": "0341288508d7a42ce752939f6841ea4e875412a6e7cf73e39d5d39bfdafb38dc"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/CacheMetadataTests.cs",
+          "Sha256": "0341288508d7a42ce752939f6841ea4e875412a6e7cf73e39d5d39bfdafb38dc"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/QueryCache.cs",
+          "Sha256": "2beade69d5725de404085dd46a7617260ba0915b05dcbdba67d31d0b10c4e4bc"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/MostRecentlyUsedCache.cs",
+          "Sha256": "f665db9ece311cc13c1d2c368b9dc57bc0b6e161d9996b9343fec2f87ca0ec18"
+        }
+      ]
+    },
+    {
+      "FactId": "CACHE.NATIVE.LOOKUP.v1",
+      "RawRowSha256": "a29ce685ccdc16035d29906732eeb75a5a08598db6c61f12e86e4d7337c21312",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Configured sequential MRU lookups over unchanged live metadata return the matching cached entry, default on a nonadding miss, and preserve explicit promotion/eviction semantics (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-NATIVE-LOOKUP: native distinct strings and duplicate function names for canonical identity; V1c.1 \u2192 V1c.2. No generated schedules or boundary values.",
+      "EvidenceIds": [
+        "EV-CACHE-NATIVE-LOOKUP"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "AddingHitPromotesItsNativeOptionBeforeEviction"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "ClearReleasesEntriesAndAllowsNativeInsertion"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "EqualNativeFunctionNameHitRetainsTheCachedObject"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "HeadHitReturnsTheMatchingNativeOption"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "NonaddingHitPreservesRecencyOfNativeOptions"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "NonaddingMissReturnsDefaultInsteadOfAnotherNativeOption"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/CacheMetadataTests.cs",
+          "Sha256": "0341288508d7a42ce752939f6841ea4e875412a6e7cf73e39d5d39bfdafb38dc"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/CacheMetadataTests.cs",
+          "Sha256": "0341288508d7a42ce752939f6841ea4e875412a6e7cf73e39d5d39bfdafb38dc"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/MostRecentlyUsedCache.cs",
+          "Sha256": "f665db9ece311cc13c1d2c368b9dc57bc0b6e161d9996b9343fec2f87ca0ec18"
+        }
+      ]
+    },
+    {
+      "FactId": "CACHE.NATIVE.PROVIDER.v1",
+      "RawRowSha256": "131a7732fd988d2eed507c11a5eb41cb8fabe2e4468a7e9797c411b8009e89d2",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Distinct live SQLite provider roots retain their actual metadata mapping and configured native filter when using a shared query cache (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-NATIVE-PROVIDER: installed schema acquisition, independent native SQL result multisets and actual execution logs; V1c.5 Verify after root correction. Same-root policy mutation and tenant security remain unproved.",
+      "EvidenceIds": [
+        "EV-CACHE-NATIVE-PROVIDER"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeProviderCacheTests",
+          "Method": "SharedCacheKeepsDistinctNativeProviderPoliciesSeparate"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeProviderCacheTests",
+          "Method": "SharedCacheKeepsNativeProviderMappingsSeparate"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeProviderCacheTests.cs",
+          "Sha256": "63bba3047aed98e57755b2f3e99eae3c8d8147835b822982c5bd495c447fdd5d"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeProviderCacheTests.cs",
+          "Sha256": "63bba3047aed98e57755b2f3e99eae3c8d8147835b822982c5bd495c447fdd5d"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/QueryCache.cs",
+          "Sha256": "2beade69d5725de404085dd46a7617260ba0915b05dcbdba67d31d0b10c4e4bc"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/MostRecentlyUsedCache.cs",
+          "Sha256": "f665db9ece311cc13c1d2c368b9dc57bc0b6e161d9996b9343fec2f87ca0ec18"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Mapping/ImplicitMapping.cs",
+          "Sha256": "468d832abe0af9bd537f4f56844818be828809e200489607b13f800ce54c35fe"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Mapping/AttributeMapping.cs",
+          "Sha256": "4dcaae30ecfa02e90cbc00da1a8412b1d68e4be12fec5102f907504f548088d1"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/EntityPolicy.cs",
+          "Sha256": "14be07c77d5e54c0148f6381ea639b9b205949c9ed28196192d7ecdf34625ac5"
+        }
+      ]
+    },
+    {
+      "FactId": "CACHE.NATIVE.ROOT.v1",
+      "RawRowSha256": "ef0e2e09c7752821fd495e4e2f924a1e7a4f9b6a87ea51ecabaaf6f826c62a68",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "A shared cache does not substitute the result of another distinct captured real-metadata IQueryable root with the same CLR type (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-NATIVE-ROOT: distinct native version/options sources, V1c.3 \u2192 V1c.4 after lookup fixes; broader provider/mapping/policy isolation remains separate.",
+      "EvidenceIds": [
+        "EV-CACHE-NATIVE-ROOT"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "CapturedSelectionCanChangeBetweenObservedNativeOptions"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "DistinctNativeRootsPreserveOptionsThenVersionResults"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "DistinctNativeRootsPreserveVersionThenOptionsResults"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CacheMetadataTests",
+          "Method": "RepeatedNativeRootReusesItsCompiledEntry"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/CacheMetadataTests.cs",
+          "Sha256": "0341288508d7a42ce752939f6841ea4e875412a6e7cf73e39d5d39bfdafb38dc"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/CacheMetadataTests.cs",
+          "Sha256": "0341288508d7a42ce752939f6841ea4e875412a6e7cf73e39d5d39bfdafb38dc"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/QueryCache.cs",
+          "Sha256": "2beade69d5725de404085dd46a7617260ba0915b05dcbdba67d31d0b10c4e4bc"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit/MostRecentlyUsedCache.cs",
+          "Sha256": "f665db9ece311cc13c1d2c368b9dc57bc0b6e161d9996b9343fec2f87ca0ec18"
+        }
+      ]
+    },
+    {
+      "FactId": "COMMAND.NORMAL.DISPOSAL.v1",
+      "RawRowSha256": "270d10f4e857a050c57eff8162aab35a5705b48a7d137aea9fc536224e3ebfd0",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped implementation; phase gate open",
+      "Claim": "Raw and executor nonquery paths dispose their created command before returning after successful execution; a caller-opened connection stays open (LOCAL-RM-M0). Scope is native SQLite success paths, not transaction/failure/reader ownership.",
+      "EvidenceText": "EV-COMMAND-NORMAL: retained RED 2 fail/3 pass, same test source GREEN 5 pass; native events before teardown. Strict run.niFdPZiA and API run.5UTsrF9A pass. Coverage/phase policy remains unresolved; wider ownership is not activated.",
+      "EvidenceIds": [
+        "EV-COMMAND-NORMAL"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.CommandOwnershipTests",
+          "Method": "ExecutorCommandDisposesCommandAndPreservesBorrowedOpenConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CommandOwnershipTests",
+          "Method": "ExecutorCommandReleasesCommandAndItsConnectionLease"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CommandOwnershipTests",
+          "Method": "NativeCommandDisposalEventIsObservedBeforeConnectionTeardown"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CommandOwnershipTests",
+          "Method": "RawCommandDisposesCommandAndPreservesBorrowedOpenConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CommandOwnershipTests",
+          "Method": "RawCommandReleasesCommandAndItsConnectionLease"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/CommandOwnershipTests.cs",
+          "Sha256": "209e9414142842b95e5f88d5ec42dfa185518ce3e9270eb990ebf31c5ebd2d14"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/CommandOwnershipTests.cs",
+          "Sha256": "209e9414142842b95e5f88d5ec42dfa185518ce3e9270eb990ebf31c5ebd2d14"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        }
+      ]
+    },
+    {
+      "FactId": "COMMAND.DEFERRED.DISPOSAL.v1",
+      "RawRowSha256": "fbabae02ff00aa7859b8f22773f281f6593c488c7bbda167c566128a61e59512",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Deferred metadata queries close their actual reader and dispose their command on exhaustion or early enumerator disposal; borrowed connection ownership is preserved, and an unstarted iterator acquires nothing (LOCAL-RM-M0).",
+      "EvidenceText": "EV-COMMAND-DEFERRED: native command events/reader IsClosed before teardown, complete/early/unstarted paths, V1d.1 \u2192 V1d.2. No eager-reader, error or cancellation claim.",
+      "EvidenceIds": [
+        "EV-COMMAND-DEFERRED"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.DeferredCommandOwnershipTests",
+          "Method": "CompleteDeferredEnumerationDisposesCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.DeferredCommandOwnershipTests",
+          "Method": "CompleteDeferredEnumerationReleasesOwnedConnectionLease"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.DeferredCommandOwnershipTests",
+          "Method": "EarlyDeferredDisposalReleasesCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.DeferredCommandOwnershipTests",
+          "Method": "EarlyDeferredDisposalReleasesOwnedConnectionLease"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.DeferredCommandOwnershipTests",
+          "Method": "UnstartedDeferredEnumeratorDoesNotAcquireClosedConnectionResources"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.DeferredCommandOwnershipTests",
+          "Method": "UnstartedDeferredEnumeratorPreservesBorrowedConnection"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/DeferredCommandOwnershipTests.cs",
+          "Sha256": "58153d3ecd35f4263e712efe8b959a71deac0ca10db9334ca83d49b9a4a0d3e9"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/DeferredCommandOwnershipTests.cs",
+          "Sha256": "58153d3ecd35f4263e712efe8b959a71deac0ca10db9334ca83d49b9a4a0d3e9"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/FieldReader.cs",
+          "Sha256": "b667376fb47ee705cad8bebc2d64416cc3f274a8f52d67c61aaa0d99a6542728"
+        }
+      ]
+    },
+    {
+      "FactId": "PACKAGE.NATIVE.CONSUMER.v1",
+      "RawRowSha256": "e1e9936418ec9f785a05f3796d43833814938a30893ec23ba5e8bf0a86bc3269",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "An isolated consumer referencing only the SQLite package restores its declared dependencies and executes unchanged live metadata through the public executor API (LOCAL-RM-M0/SUPPORT).",
+      "EvidenceText": "EV-PACKAGE-NATIVE-CONSUMER: fresh outside-repository/cold-cache restore, exact lock/hash/assembly provenance and direct native SQL controls, V1p.1 Verify. EV-CI-CONSUMERS rebinds the same evidence through V1q run.tfpmYPiE using current verifier/tool inputs; LINQ/provider runtime qualification remains separate.",
+      "EvidenceIds": [
+        "EV-PACKAGE-NATIVE-CONSUMER",
+        "EV-CI-CONSUMERS"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "native-package-consumer-producer",
+      "Reason": "Dedicated native package-consumer binding authenticates completed SQLite-only cold restore, strict compilation, complete graph/source/archive/compiled method identities and actual native/public-executor metadata equality; LINQ, other backends/platforms and general lifetime qualification remain separate.",
+      "Tests": [],
+      "Dependencies": [
+        {
+          "Path": "eng/FinalVerification/PackageNativeConsumerEvidence.cs",
+          "Sha256": "24fdba41e28fa771a3e5a3db960fd6add7985361ba8f8792d232944088868ed9",
+          "Role": "producer-verifier-source"
+        },
+        {
+          "Path": "eng/FinalVerification/PackageIndependentEvidence.cs",
+          "Sha256": "61ab21ee85bbae480d690ca1d607506e4c46c4497dfdbf5778d4b6c28bf3d2b6",
+          "Role": "producer-shared-source"
+        }
+      ]
+    },
+    {
+      "FactId": "MAPPING.NATIVE.IDENTITY.v1",
+      "RawRowSha256": "dbbf73f97415a8c34168a56d578cee8aed4d5036a511e363d4b635beef2b4ad2",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "For a supported nonnull native CLR projection, an ImplicitMapping retains distinct actual table IDs, returns the canonical entity for a repeated resolved type/table pair, and resolves an omitted ID through its existing GetTableId contract rather than inheriting an earlier explicit table (LOCAL-RM-M0).",
+      "EvidenceText": "EV-MAPPING-NATIVE: actual schemas and unchanged native multisets; retained RED4fail/2controls \u2192 same-source GREEN6pass in artifacts/implicit-mapping/runs; focused Oracle CLEAR. No generated rows, boundary/concurrency or broader constructor claim.",
+      "EvidenceIds": [
+        "EV-MAPPING-NATIVE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.ImplicitMappingIdentityTests",
+          "Method": "FunctionsThenModulesExecuteTheirOwnNativeTables"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ImplicitMappingIdentityTests",
+          "Method": "ModulesThenFunctionsExecuteTheirOwnNativeTables"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ImplicitMappingIdentityTests",
+          "Method": "OmittedIdResolvesDefaultAfterAnotherExplicitNativeTable"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ImplicitMappingIdentityTests",
+          "Method": "RepeatedResolvedPairReturnsCanonicalEntityAndTable"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ImplicitMappingIdentityTests",
+          "Method": "SameProjectionHasDistinctNativeTableEntities"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ImplicitMappingIdentityTests",
+          "Method": "SingleNativeTableRetainsItsResults"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/ImplicitMappingIdentityTests.cs",
+          "Sha256": "9da82ceb62d8b37e11c9377db2034ef245c9280590cab91bfbb16cfcf2829812"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/ImplicitMappingIdentityTests.cs",
+          "Sha256": "9da82ceb62d8b37e11c9377db2034ef245c9280590cab91bfbb16cfcf2829812"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Mapping/ImplicitMapping.cs",
+          "Sha256": "468d832abe0af9bd537f4f56844818be828809e200489607b13f800ce54c35fe"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        }
+      ]
+    },
+    {
+      "FactId": "PACKAGE.INDEPENDENT.v1",
+      "RawRowSha256": "d423de93ff1c140fcef9998fc2ef47458b7330860da455b349d12d06110f25a5",
+      "Kind": "Characterization",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Each of the six actual active packages alone supplies its public consumer symbols and declared transitive dependencies through an independent exact local-feed restore/strict compilation (LOCAL-RM-M0/SUPPORT).",
+      "EvidenceText": "EV-PACKAGE-INDEPENDENT: preparation run.8860AsAV, locked verification run.QgzUdy9X against final post-mapping API run.dqoq1XYU feed; all six source/hash/copy/lock/public-symbol checks pass. Latest EV-CI-CONSUMERS V1q run.tfpmYPiE qualifies current verifier and fresh packages; earlier runs remain historical. Backend runtime/OS support remains separate; full phase gates remain open.",
+      "EvidenceIds": [
+        "EV-PACKAGE-INDEPENDENT",
+        "EV-CI-CONSUMERS"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "independent-package-producer",
+      "Reason": "Dedicated six-package producer binding authenticates completed independent local-feed restores and strict compilations against actual graph, source, archive and compiled symbol identities; backend runtime and platform qualification remain separate.",
+      "Tests": [],
+      "Dependencies": [
+        {
+          "Path": "eng/FinalVerification/PackageIndependentEvidence.cs",
+          "Sha256": "61ab21ee85bbae480d690ca1d607506e4c46c4497dfdbf5778d4b6c28bf3d2b6",
+          "Role": "producer-verifier-source"
+        }
+      ]
+    },
+    {
+      "FactId": "COMMAND.BATCH.DISPOSAL.v1",
+      "RawRowSha256": "d34dd76de4a794be21e896e2cbf40dcd6479cee164cf02a1745b0650ef74f9f8",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Actual private batch commands dispose on streamed exhaustion or active early disposal; generic readers close; caller-opened connections remain open and toolkit-opened connections retain existing buffering/release semantics (LOCAL-RM-M0).",
+      "EvidenceText": "EV-COMMAND-BATCH: actual GetValues responses/direct oracles; red.uM00qdDV4fail/3controls\u2192identical-source green.rCIeO5Ti7pass; exact two using declarations, focused Oracle CLEAR. Integrated gates pending.",
+      "EvidenceIds": [
+        "EV-COMMAND-BATCH"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "CompleteStreamedNonqueryBatchDisposesCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "CompleteStreamedReaderBatchDisposesCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "EarlyStreamedNonqueryBatchDisposalPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "EarlyStreamedReaderBatchDisposalReleasesReaderAndCommand"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "InitiallyClosedNonqueryBatchBuffersAndReleasesOwnedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "InitiallyClosedReaderBatchBuffersAndReleasesOwnedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.BatchCommandOwnershipTests",
+          "Method": "NativeBatchCommandDisposalEventIsObservedBeforeTeardown"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/BatchCommandOwnershipTests.cs",
+          "Sha256": "4ed849db8342f4b8d8e448b9da5fbaea1c855c8929929e6c35fb3bc5fb8e9f0e"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/BatchCommandOwnershipTests.cs",
+          "Sha256": "4ed849db8342f4b8d8e448b9da5fbaea1c855c8929929e6c35fb3bc5fb8e9f0e"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/FieldReader.cs",
+          "Sha256": "b667376fb47ee705cad8bebc2d64416cc3f274a8f52d67c61aaa0d99a6542728"
+        }
+      ]
+    },
+    {
+      "FactId": "COMMAND.EAGER.DISPOSAL.v1",
+      "RawRowSha256": "126c424a00cc7a2dfa4fc634c3e88e2c16bbe3129cd4a02b694ad52402797810",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped",
+      "Claim": "Eager execution preserves immediate command/reader acquisition, single-use borrowed streaming and owned buffering; exhaustion or explicit enumerator disposal, including before its first MoveNext, releases acquired reader/command while preserving caller-owned connections (LOCAL-RM-M0).",
+      "EvidenceText": "EV-COMMAND-EAGER: actual compile-option native rows and transparent native resource events/state, four cases, V1e.1\u2192V1e.2 RED3/1control\u2192GREEN4. Focused and joint integrated reviews CLEAR in scope. No abandoned-enumerable, error, cancellation, replay or lazy-acquisition guarantee.",
+      "EvidenceIds": [
+        "EV-COMMAND-EAGER"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.EagerCommandOwnershipTests",
+          "Method": "ActiveEagerDisposalReleasesReaderAndCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.EagerCommandOwnershipTests",
+          "Method": "EagerExhaustionReleasesReaderAndCommandBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.EagerCommandOwnershipTests",
+          "Method": "InitiallyClosedEagerQueryBuffersAndReleasesOwnedResourcesBeforeReturning"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.EagerCommandOwnershipTests",
+          "Method": "UnstartedEagerEnumeratorDisposalReleasesAlreadyAcquiredResourcesOnce"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/EagerCommandOwnershipTests.cs",
+          "Sha256": "430efa838021359fd6af291d233aabf1faf5696bd49085b22dcc8ce7a1519dc5"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/EagerCommandOwnershipTests.cs",
+          "Sha256": "430efa838021359fd6af291d233aabf1faf5696bd49085b22dcc8ce7a1519dc5"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/FieldReader.cs",
+          "Sha256": "b667376fb47ee705cad8bebc2d64416cc3f274a8f52d67c61aaa0d99a6542728"
+        }
+      ]
+    },
+    {
+      "FactId": "COMMAND.NATIVE.PROJECTION.FAILURE.v1",
+      "RawRowSha256": "d1f550e9d9c0003450b4f908c79a625ebaa15369cefe77771e512451f9f182b5",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase open",
+      "Claim": "Given an unchanged native string with an independently acquired BCL GUID conversion failure, eager/deferred projection propagates that same exception and releases actual reader/command/owned lease before caller disposal, preserving borrowed connections (LOCAL-RM-M0).",
+      "EvidenceText": "EV-COMMAND-NATIVE-PROJECTION: V1g.0 live native/BCL acquisition\u2192V1g.1 eight-case Verify plus native control. No arbitrary projector/read/disposal/cancellation guarantee.",
+      "EvidenceIds": [
+        "EV-COMMAND-NATIVE-PROJECTION"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "BorrowedDeferredReadGuidReleasesResourcesBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "BorrowedDeferredReadValueGuidReleasesResourcesBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "BorrowedEagerReadGuidReleasesResourcesBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "BorrowedEagerReadValueGuidReleasesResourcesBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "NativeGuidConversionFailureIsAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "OwnedDeferredReadGuidReleasesResourcesBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "OwnedDeferredReadValueGuidReleasesResourcesBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "OwnedEagerReadGuidReleasesResourcesBeforeFailureReturns"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.ProjectionConversionOwnershipTests",
+          "Method": "OwnedEagerReadValueGuidReleasesResourcesBeforeFailureReturns"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/ProjectionConversionOwnershipTests.cs",
+          "Sha256": "6a888b9bd45f0bf9efdb0dd4679da0d1a4b7405fff7647ca0c1905649cce3c85"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/ProjectionConversionOwnershipTests.cs",
+          "Sha256": "6a888b9bd45f0bf9efdb0dd4679da0d1a4b7405fff7647ca0c1905649cce3c85"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/FieldReader.cs",
+          "Sha256": "b667376fb47ee705cad8bebc2d64416cc3f274a8f52d67c61aaa0d99a6542728"
+        }
+      ]
+    },
+    {
+      "FactId": "COMMAND.NATIVE.ACQUISITION.FAILURE.v1",
+      "RawRowSha256": "1ee5bb38faa60361edb0546e466214fbd3d4347213138138df9d947f2daf4c0c",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase open",
+      "Claim": "Given an acquired native command, when eager ExecuteReader rejects an operation before returning a reader, dispose the command, preserve the original native exception and borrowed connection, and release any toolkit-opened lease (LOCAL-RM-M0).",
+      "EvidenceText": "EV-COMMAND-NATIVE-FAILURE: V1f.0 actual unsupported-write acquisition \u2192 V1f.1 Test \u2192 V1f.2 Implement; borrowed eager semantic RED1/5controls\u2192unchangedGREEN6, focused CLEAR; native/raw/nonquery/deferred/owned preservation controls. No generic acquisition/projector/disposal-error guarantee.",
+      "EvidenceIds": [
+        "EV-COMMAND-NATIVE-FAILURE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeCommandFailureTests",
+          "Method": "DeferredNativeAcquisitionFailureDisposesCommandBeforeCallerDisposal"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeCommandFailureTests",
+          "Method": "EagerNativeAcquisitionFailureDisposesCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeCommandFailureTests",
+          "Method": "InitiallyClosedEagerNativeFailureReleasesItsConnectionLease"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeCommandFailureTests",
+          "Method": "NativeRejectedMetadataWriteIsAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeCommandFailureTests",
+          "Method": "NonqueryNativeFailureDisposesCommandAndPreservesBorrowedConnection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeCommandFailureTests",
+          "Method": "RawNativeFailureDisposesCommandAndPreservesBorrowedConnection"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeCommandFailureTests.cs",
+          "Sha256": "e83345701681195e6dd5ce510130a9ce4c9e702bdd187af7e75704e81aac1fe0"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeCommandFailureTests.cs",
+          "Sha256": "e83345701681195e6dd5ce510130a9ce4c9e702bdd187af7e75704e81aac1fe0"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryExecutor.cs",
+          "Sha256": "4b23bd0ae892793006a9482e00871574930674d03fa8fc010b22752a97a59bba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/FieldReader.cs",
+          "Sha256": "b667376fb47ee705cad8bebc2d64416cc3f274a8f52d67c61aaa0d99a6542728"
+        }
+      ]
+    },
+    {
+      "FactId": "TRANSACTION.NATIVE.OWNERSHIP.v1",
+      "RawRowSha256": "430de92a1c4c7e1520541b6c1b6a50c9e98500219d85e192324bb5b5eed9e9b4",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase open",
+      "Claim": "Synchronous transaction scopes complete transactions they create and clear the toolkit property; preserve caller-opened connections and supplied transactions on actual metadata success/native rejection (LOCAL-RM-M0).",
+      "EvidenceText": "EV-TRANSACTION-NATIVE: acquired/reviewed native state\u2192seven-case first semantic GREEN Verify, acquisition/focused CLEAR; no persisted rollback, Dispose-event, raw assignment or all-provider claim.",
+      "EvidenceIds": [
+        "EV-TRANSACTION-NATIVE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "BorrowedConnectionCreatedTransactionCompletesOnNativeRejection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "BorrowedConnectionCreatedTransactionCompletesOnSuccess"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "CallerTransactionRemainsActiveOnNativeRejection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "CallerTransactionRemainsActiveOnSuccess"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "NativeTransactionStateAndRejectionAreAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "OwnedConnectionCreatedTransactionCompletesBeforeCloseOnNativeRejection"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.TransactionScopeOwnershipTests",
+          "Method": "OwnedConnectionCreatedTransactionCompletesBeforeCloseOnSuccess"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/TransactionScopeOwnershipTests.cs",
+          "Sha256": "80f8b47415192de383de69b9f4de65ef7539b29fefc87cdfdd1e2b24b7b73cc3"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/TransactionScopeOwnershipTests.cs",
+          "Sha256": "80f8b47415192de383de69b9f4de65ef7539b29fefc87cdfdd1e2b24b7b73cc3"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/DbEntityProvider.cs",
+          "Sha256": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        }
+      ]
+    },
+    {
+      "FactId": "CACHE.QUERY.NATIVE.OVERLAP.v1",
+      "RawRowSha256": "ff3cb3792fa0c7749b7a8823cf65850653f162b052d496825f1723f40dbfa1f6",
+      "Kind": "Characterization",
+      "Lifecycle": "Observed bounded; phase open",
+      "Claim": "In the recorded cold shared-cache experiment, two unchanged native-value selections retain independent results and one entry during observed overlapping calls on distinct threads (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-QUERY-OVERLAP: acquire.s1q67GPN\u2192probe.nAhJLVIw first attempt observed overlap/result isolation; no all-schedule/provider/mutation claim.",
+      "EvidenceIds": [
+        "EV-CACHE-QUERY-OVERLAP"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The observed bounded overlap is historical evidence from a removed temporary harness, with no current strict/coverage test-source/PDB execution binding. Its lifecycle and historical claim are retained.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "CACHE.MRU.NATIVE.OVERLAP.v1",
+      "RawRowSha256": "2a245049a37fd92597bd43330c5ccbdc23a332b950c90985a9067f3029f1e1b7",
+      "Kind": "Characterization",
+      "Lifecycle": "Proposed",
+      "Claim": "In the recorded cold experiment, equal acquired native names with distinct references converge on one retained canonical entry during observed overlapping calls on distinct threads (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CACHE-MRU-OVERLAP: probe.nAhJLVIw all three attempts lack eligible overlap; prerequisite unmet, no concurrency GREEN. Functional controls pass, qualified independently of QueryCache.",
+      "EvidenceIds": [
+        "EV-CACHE-MRU-OVERLAP"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed overlap prerequisite was not met in the recorded attempts; passing functional controls do not establish eligible concurrency.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "MAPPING.CANONICAL.INIT.v1",
+      "RawRowSha256": "cb44d706045701603be3e5492e34be903d9d08cd5fee7fa721e4afc7f2d35854",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Acquiring the same immutable attribute-mapping configuration returns its retained canonical cached metadata object (LOCAL-RM-M0); no exactly-once construction or general sharing guarantee.",
+      "EvidenceText": "EV-MAPPING-CANONICAL-INIT: V1ag.C1\u2192C2 actual factory-control RED\u2192unchanged-test GREEN in CanonicalPublicationTests.MappingCreationReturnsThePublishedNativeEntity plus SequentialMappingRetainsItsNativeEntityAndResults. Genuine native projections pass; V1k's three-attempt unforced Probe remains historical and unqualified.",
+      "EvidenceIds": [
+        "EV-MAPPING-CANONICAL-INIT"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.CanonicalPublicationTests",
+          "Method": "MappingCreationReturnsThePublishedNativeEntity"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CanonicalPublicationTests",
+          "Method": "SequentialMappingRetainsItsNativeEntityAndResults"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/CanonicalPublicationTests.cs",
+          "Sha256": "63c6e269ef893bce3f17ca9217d1d9df6009ae09d7dfb7b3fef226152616ee4b"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/CanonicalPublicationTests.cs",
+          "Sha256": "63c6e269ef893bce3f17ca9217d1d9df6009ae09d7dfb7b3fef226152616ee4b"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeProviderCacheTests.cs",
+          "Sha256": "63bba3047aed98e57755b2f3e99eae3c8d8147835b822982c5bd495c447fdd5d"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Mapping/AttributeMapping.cs",
+          "Sha256": "4dcaae30ecfa02e90cbc00da1a8412b1d68e4be12fec5102f907504f548088d1"
+        }
+      ]
+    },
+    {
+      "FactId": "TABLE.CANONICAL.INIT.v1",
+      "RawRowSha256": "680fbbf63983be211090a9a52762031c22bc83ff92398794ce7b755983659fd2",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Acquiring the same immutable mapped table configuration returns its retained canonical query root (LOCAL-RM-M0); no concurrent connection/query guarantee.",
+      "EvidenceText": "EV-TABLE-CANONICAL-INIT: V1ag.C3\u2192C4 actual factory-control RED\u2192unchanged-test GREEN in CanonicalPublicationTests.TableCreationReturnsThePublishedNativeTable plus SequentialTableRetainsItsNativeRootAndResults. Mapping pre-acquired; genuine native projections pass. V1k outcomes/caps remain preserved; no shared-connection guarantee.",
+      "EvidenceIds": [
+        "EV-TABLE-CANONICAL-INIT"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.CanonicalPublicationTests",
+          "Method": "TableCreationReturnsThePublishedNativeTable"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.CanonicalPublicationTests",
+          "Method": "SequentialTableRetainsItsNativeRootAndResults"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/CanonicalPublicationTests.cs",
+          "Sha256": "63c6e269ef893bce3f17ca9217d1d9df6009ae09d7dfb7b3fef226152616ee4b"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/CanonicalPublicationTests.cs",
+          "Sha256": "63c6e269ef893bce3f17ca9217d1d9df6009ae09d7dfb7b3fef226152616ee4b"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/SQLiteMetadata.cs",
+          "Sha256": "3a1015f73d0811adeec0364618c34aa0afcf9604898db5d881dfef46e675f845"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeProviderCacheTests.cs",
+          "Sha256": "63bba3047aed98e57755b2f3e99eae3c8d8147835b822982c5bd495c447fdd5d"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/EntityProvider.cs",
+          "Sha256": "176306f6fd437bdfce693216bb57f4cde29cb692bb00b92230a6c843aa720b5a"
+        }
+      ]
+    },
+    {
+      "FactId": "RAW.TRANSACTION.v1",
+      "RawRowSha256": "58b9bbae57822f37193eeed0941476f728ccfa9b0b7d9f123e16c35ad8f4964c",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Raw commands participate in the provider's active transaction (LOCAL-RM-M0).",
+      "EvidenceText": "EV-RAW-TX: rollback via actual SQLite and tracked command.Transaction; V0.2.",
+      "EvidenceIds": [
+        "EV-RAW-TX"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed raw-command participation claim requires actual command.Transaction and rollback evidence; scoped transaction ownership cases do not establish raw assignment.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "FORMAT.STRING.LITERAL.v1",
+      "RawRowSha256": "c2d42da4495d385539ab71b7e73b2f80b3f5dfcf58b1c74e869e39f021cf3f6e",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; integrated Oracle CLEAR",
+      "Claim": "Given an unchanged quote-bearing native string and an independent parameter oracle, common/SQLite literal formatting preserves one TEXT/String column and exact ordinal content (LOCAL-RM-M0).",
+      "EvidenceText": "EV-SQL-STRING-LITERAL: reviewed native acquisition, red.fk3wistp two native failures/three controls\u2192identical-source green.cgw8ej9t five passes; fresh API/packages/symbols/seven private consumers/strict and coverage.zzhhnhb6 protect97sources/16716leaves and cover repaired781. Scoped and integrated Oracle reviews CLEAR for V1y; M0/full-roadmap and targets remain open. No general LINQ injection or all-dialect claim.",
+      "EvidenceIds": [
+        "EV-SQL-STRING-LITERAL"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringLiteralTests",
+          "Method": "CommonFormatterPreservesNativeQuotedString"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringLiteralTests",
+          "Method": "CommonFormatterPreservesNativeRawString"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringLiteralTests",
+          "Method": "NativeStringLiteralInputsAreAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringLiteralTests",
+          "Method": "SQLiteFormatterPreservesNativeQuotedString"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringLiteralTests",
+          "Method": "SQLiteFormatterPreservesNativeRawString"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeStringLiteralTests.cs",
+          "Sha256": "9fcb56473e299cba393e89971ae2b9e6cead3d3dbeacd27ec14a0d0eb51b082b"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeStringLiteralTests.cs",
+          "Sha256": "9fcb56473e299cba393e89971ae2b9e6cead3d3dbeacd27ec14a0d0eb51b082b"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/Language/SqlFormatter.cs",
+          "Sha256": "a3716c3ccdce41f315b8fd453b185e091c8f5a38411cca5d42cbda0e3b10a407"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteFormatter.cs",
+          "Sha256": "7f4180c30a777d6b10de21bf102c4b59d423b81e4735ac6c394788c81eaf6918"
+        }
+      ]
+    },
+    {
+      "FactId": "FORMAT.AGGREGATE.CULTURE.v1",
+      "RawRowSha256": "ea5a53b58d94cedb85fecffabaa11d18d53b5280172808f9a695113cc81e2b51",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Given actual native compile-option rows, relational Min translation/scalar execution preserves the independent native aggregate result under installed tr-TR (LOCAL-RM-M0; DOTNET-GLOB-001).",
+      "EvidenceText": "EV-SQL-AGGREGATE-CULTURE: reviewed actual acquisition then unchanged red.vt2pafag1nativefailure/3controls\u2192green.04ve16sm4pass, actual uncached relational Turkish Min/native oracle and invariant Min/Turkish Max controls. Fresh protecting gates pass in measured scope; integrated Oracle CLEAR. No custom aggregate, data collation, all-provider or numeric claim.",
+      "EvidenceIds": [
+        "EV-SQL-AGGREGATE-CULTURE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeAggregateCultureTests",
+          "Method": "NativeAggregateInputsAreAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeAggregateCultureTests",
+          "Method": "RelationalMaximumPreservesNativeResultInTurkishCulture"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeAggregateCultureTests",
+          "Method": "RelationalMinimumPreservesNativeResultInInvariantCulture"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeAggregateCultureTests",
+          "Method": "RelationalMinimumPreservesNativeResultInTurkishCulture"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeAggregateCultureTests.cs",
+          "Sha256": "9145d09fb10ba5466e08d148510d7b9f284e5dba576a9ea7c158af4e582d0175"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeAggregateCultureTests.cs",
+          "Sha256": "9145d09fb10ba5466e08d148510d7b9f284e5dba576a9ea7c158af4e582d0175"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeProviderCacheTests.cs",
+          "Sha256": "63bba3047aed98e57755b2f3e99eae3c8d8147835b822982c5bd495c447fdd5d"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/Language/SqlFormatter.cs",
+          "Sha256": "a3716c3ccdce41f315b8fd453b185e091c8f5a38411cca5d42cbda0e3b10a407"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/QueryTranslator.cs",
+          "Sha256": "23246597b013a8dec02b82f4b3e798d7edf5fa4469ffcdf3bd6fe82064580d0b"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/Translation/QueryBinder.cs",
+          "Sha256": "7bd1d9731318e87ae625839b0e0afba98d10e4582efe37c2f0190c11d624b49b"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "Sha256": "5e3159be7dff6a8898646a1d148f930f078ec5093d1412dcccfb44debb5d5639"
+        }
+      ]
+    },
+    {
+      "FactId": "FORMAT.DOUBLE.CULTURE.v1",
+      "RawRowSha256": "e6048470a5e606a7883d821199603f582676844fd3b49cabe7ad9a3635e68810",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Given a finite fractional native Double, public SQL literal formatting preserves the parameterized native oracle column/type/value under a supported comma-decimal culture (LOCAL-RM-M0; DOTNET-GLOB-001).",
+      "EvidenceText": "EV-SQL-DOUBLE-CULTURE: actual acquisition then same-source red.8nkipefi2fail/3controls\u2192green.o1ns6d_b5pass; both public formatters preserve native Double shape/type/bits in fr-FR and invariant cultures. Fresh protecting gates pass in measured scope; integrated Oracle CLEAR. Single and wider numeric boundaries excluded.",
+      "EvidenceIds": [
+        "EV-SQL-DOUBLE-CULTURE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeFloatingLiteralTests",
+          "Method": "CommonFormatterPreservesNativeDoubleInCommaCulture"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeFloatingLiteralTests",
+          "Method": "CommonFormatterPreservesNativeDoubleInInvariantCulture"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeFloatingLiteralTests",
+          "Method": "NativeDoubleInputsAreAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeFloatingLiteralTests",
+          "Method": "SQLiteFormatterPreservesNativeDoubleInCommaCulture"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeFloatingLiteralTests",
+          "Method": "SQLiteFormatterPreservesNativeDoubleInInvariantCulture"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeFloatingLiteralTests.cs",
+          "Sha256": "116080fcb0476f0020926c32405d36168c985854a91fd7b8bc2aed8db4ae37ba"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeFloatingLiteralTests.cs",
+          "Sha256": "116080fcb0476f0020926c32405d36168c985854a91fd7b8bc2aed8db4ae37ba"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data/Common/Language/SqlFormatter.cs",
+          "Sha256": "a3716c3ccdce41f315b8fd453b185e091c8f5a38411cca5d42cbda0e3b10a407"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteFormatter.cs",
+          "Sha256": "7f4180c30a777d6b10de21bf102c4b59d423b81e4735ac6c394788c81eaf6918"
+        }
+      ]
+    },
+    {
+      "FactId": "PACKAGE.CORE.ISOLATION.v1",
+      "RawRowSha256": "72715c1c7764f42c8bba5f6c5eab774393bbb5382f3ef7f57e52c1e29f9ec8c7",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; matrix gate open",
+      "Claim": "Given the modern core package, when restored alone, ConfigurationManager and its settings-only dependency chain are absent; Data retains its public legacy factory and explicit dependency (LOCAL-RM-M0).",
+      "EvidenceText": "EV-CORE-SETTINGS: actual acquired manifests/red.umciu50o\u2192green.twdqo7vw same assertion, assemblies.a2qwsul4, nine-lock review, fresh API run.e3e31qE1 and CI consumers run.DCJrkySb; local evidence GREEN; integrated Oracle CLEAR. Package graph reduction is intentional; no public settings factory removal.",
+      "EvidenceIds": [
+        "EV-CORE-SETTINGS"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "This package dependency-graph fact requires its dedicated archive/manifest/lock/assembly producer binding; native strict/coverage tests do not authenticate package graph reduction.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "PACKAGE.CONSUMER.v1",
+      "RawRowSha256": "5649a505163e7320137f6cf7ae3a650fbb877b1571617a74fd14ef0ed8c58349",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Six active library packages restore independently with declared dependencies, license/readme/source/symbol metadata; executables/test projects are excluded (LOCAL-RM-M0).",
+      "EvidenceText": "EV-PACKAGE: pack inspection and isolated local-feed consumer; metadata may start green only after package correction. EV-PACKAGE-SYMBOL-PROVENANCE additionally checks paired debug identities/checksums and commit-bound Source Link via V1s; retrieval/disclosure remain open.",
+      "EvidenceIds": [
+        "EV-PACKAGE",
+        "EV-PACKAGE-SYMBOL-PROVENANCE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "unqualified",
+      "Reason": "The Proposed full six-package metadata/source/symbol contract includes open retrieval/disclosure obligations; neither native tests nor scoped consumer compilation evidence establishes the complete claim.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "FORMAT.SQLITE.SIN.CULTURE.v1",
+      "RawRowSha256": "3d5e0c515328dad72fbcf6bc5c916bb3b600577c856f9d169d3916d8a95220e0",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Given an unchanged native source-timestamp Double and successful independent SQLite sin parameter oracle, public SQLite Math.Sin formatting and native evaluation preserve the oracle under installed invariant and Turkish cultures (LOCAL-RM-M0; DOTNET-GLOB-001).",
+      "EvidenceText": "EV-SQLITE-SIN-CULTURE: actual acquisition acquire.meb_1d_2; causal red.b18i41v7 Turkish native failure with invariant control; identical-source green.1_odmlyu three passes. Fresh strict/packages/symbols/consumers and qualification.1p9l6zbh preserve inherited leaves; observed scoped Oracle CLEAR. Durable fact classification/integrated closure/current-final remain required; other Math methods/dialects/platforms excluded.",
+      "EvidenceIds": [
+        "EV-SQLITE-SIN-CULTURE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for acquired native fractional Double and separate native parameter oracle, the listed three compiled methods and installed invariant/tr-TR cultures. Distinct current strict/coverage executions and portable-PDB source bindings are required by the classifier. Preparation is not an executed classification or a phase/current-final/globalization/platform claim.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeMathIdentifierCultureTests",
+          "Method": "NativeSQLiteMathSinInputsAreAcquired"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeMathIdentifierCultureTests",
+          "Method": "SQLiteMathSinPreservesNativeResultInInvariantCulture"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeMathIdentifierCultureTests",
+          "Method": "SQLiteMathSinPreservesNativeResultInTurkishCulture"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeMathIdentifierCultureTests.cs",
+          "Sha256": "c93ac9671eeaedf6d972078fa9b8f1dbf7285f358667987a59d58246e4286a49"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeMathIdentifierCultureTests.cs",
+          "Sha256": "c93ac9671eeaedf6d972078fa9b8f1dbf7285f358667987a59d58246e4286a49"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteFormatter.cs",
+          "Sha256": "7f4180c30a777d6b10de21bf102c4b59d423b81e4735ac6c394788c81eaf6918"
+        }
+      ]
+    },
+    {
+      "FactId": "ASYNC.EXECUTION.v1",
+      "RawRowSha256": "58c78156ffa489b722db877ba4b4094e1630bac99df1cde62e654a2234dabc9d",
+      "Kind": "Behavior",
+      "Lifecycle": "Proposed",
+      "Claim": "Async APIs reach actual asynchronous driver operations and dispose live streams under cancellation (LOCAL-RM-M1).",
+      "EvidenceText": "EV-ASYNC: future live driver tests; not established by Task.Run, precancellation or SQLite synchronous async methods.",
+      "EvidenceIds": [
+        "EV-ASYNC"
+      ],
+      "DuePhase": "M1",
+      "Qualification": "not-due",
+      "Reason": "Due in M1, not the M0 classification gate. No current native synchronous or precancellation case establishes actual asynchronous driver execution and live cancellation disposal.",
+      "Tests": [],
+      "Dependencies": []
+    },
+    {
+      "FactId": "SQLITE.STRING.NULL.NE.v1",
+      "RawRowSha256": "a3702f765fc9a0139a007f5f91d8def80c76f08f3782ece77e2b38aecd3938f3",
+      "Kind": "Behavior",
+      "Lifecycle": "Observed scoped; phase gate open",
+      "Claim": "Given the acquired existing pragma_table_xinfo rows and explicit CLR string name/default/arg mapping, SQLite column-inequality filtering preserves the acquired CLR selection and ordinary client projection preserves its Boolean results (LOCAL-RM-M0). Scope is this native null/nonNULL case, not generalized null/collation/coercion or other providers.",
+      "EvidenceText": "EV-SQLITE-STRING-NULL-NE: actual native predicate RED1/three controls\u2192unchanged-source GREEN4 after the scoped IS NOT insertion; materialization/literal-null, client-projection and acquired null/nonNULL controls pass. Qualified coverage preserves inherited leaves and admits 12 PDB-bound additions; other null/collation/coercion and provider behavior remains unproved.",
+      "EvidenceIds": [
+        "EV-SQLITE-STRING-NULL-NE"
+      ],
+      "DuePhase": "M0",
+      "Qualification": "scoped-current-tests",
+      "Reason": "Eligible only for the exact scoped ledger claim and listed unchanged native cases/controls. Qualification requires fresh unique passing strict and coverage executions plus matching source/oracle and production portable-PDB provenance; this binding does not close phase, policy, fixture, provider-support or full-roadmap gates.",
+      "Tests": [
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringColumnInequalityTests",
+          "Method": "NativeStringColumnInequalityFiltersNullRow"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringColumnInequalityTests",
+          "Method": "NativeStringColumnsPreserveProjectionAndLiteralNull"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringColumnInequalityTests",
+          "Method": "NativeStringColumnInequalityProjectsClrResult"
+        },
+        {
+          "Class": "IQToolkitTest.RealProvider.NativeStringColumnInequalityTests",
+          "Method": "NativeStringColumnInequalityPreservesAcquiredControls"
+        }
+      ],
+      "Dependencies": [
+        {
+          "Role": "test-source",
+          "Path": "IQToolkitTest/RealProvider/NativeStringColumnInequalityTests.cs",
+          "Sha256": "d7a9e7e5befd7defbef13567b69536c2aa6c72cef8a2263b8c4eaa534bf1678c"
+        },
+        {
+          "Role": "oracle-source",
+          "Path": "IQToolkitTest/RealProvider/NativeStringColumnInequalityTests.cs",
+          "Sha256": "d7a9e7e5befd7defbef13567b69536c2aa6c72cef8a2263b8c4eaa534bf1678c"
+        },
+        {
+          "Role": "production-source",
+          "Path": "IQToolkit.Data.SQLite/SQLiteFormatter.cs",
+          "Sha256": "7f4180c30a777d6b10de21bf102c4b59d423b81e4735ac6c394788c81eaf6918"
+        }
+      ]
+    }
+  ]
+}

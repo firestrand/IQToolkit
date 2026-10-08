@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>IQToolkit LINQ and entity operations for SQLite using Microsoft.Data.Sqlite.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit.Data/IQToolkit.Data.csproj" />
     <ProjectReference Include="../IQToolkit/IQToolkit.csproj" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
 </Project>

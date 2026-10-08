@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "Microsoft.Win32.SystemEvents": {
+        "type": "Direct",
+        "requested": "[10.0.8, 10.0.8]",
+        "resolved": "10.0.8",
+        "contentHash": "J9+VT0lkrA7wW38CGxO2sZd+iH9C0qzioMi/2ztpT32WOVr+04uNqFIrxisTRf+mvtXLtdqcio1AoS0vfAVLLQ=="
+      },
+      "System.Drawing.Common": {
+        "type": "Direct",
+        "requested": "[10.0.8, 10.0.8]",
+        "resolved": "10.0.8",
+        "contentHash": "LCISd6JAF80vsy9L6wuetZeOMR3FH+SwKovw5Zl0Nov9pB9ZOiCSqvOfMzooypPItQLv0mGfEePjJ1nCCQztNw==",
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "10.0.8"
+        }
+      }
+    }
+  }
+}

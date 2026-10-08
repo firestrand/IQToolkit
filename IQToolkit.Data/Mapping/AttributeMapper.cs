@@ -13,12 +13,9 @@ namespace IQToolkit.Data.Mapping
     using Common;
     sealed class AttributeMapper : AdvancedMapper
     {
-        private AttributeMapping _mapping;
-
         public AttributeMapper(AttributeMapping mapping, QueryTranslator translator)
             : base(mapping, translator)
         {
-            this._mapping = mapping;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace IQToolkit
         {
             if (x == y) return true;
             if (x == null || y == null) return false;
-            if (x is IQueryable && y is IQueryable && x.GetType() == y.GetType()) return true;
+            if (x is IQueryable || y is IQueryable) return false;
             return object.Equals(x, y);
         }
 
@@ -40,7 +40,7 @@ namespace IQToolkit
 
         public object Execute(IQueryable query)
         {
-            return this.Equals(query.Expression);
+            return this.Execute(query.Expression);
         }
 
         public IEnumerable<T> Execute<T>(IQueryable<T> query)

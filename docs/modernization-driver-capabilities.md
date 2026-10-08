@@ -1,0 +1,70 @@
+---
+title: Exact-version driver capability inspection
+version: 0.3
+last_updated: 2026-10-03
+status: Source inspection and scoped PostgreSQL metadata/cancellation evidence
+owner: IQToolkit project owner
+tags: [modernization, async, drivers]
+---
+
+# Exact-version driver capability inspection
+
+The installed SqlClient 7.1.1 source has genuine asynchronous command/reader packet paths on Unix, but cold physical opens run blocking work on background threads, and transaction/disposal APIs inherit synchronous fallbacks. Consequently this driver cannot establish the proposed entirely nonblocking lifecycle by itself. This is an operation-level source finding, not a new public contract or a live SQL Server result. M0, owner acceptance of D1 and native integration gates remain open.
+
+## Provenance and configuration
+
+Root retained41 immutable SqlClient/runtime source files, official URLs, HTTP200 statuses and SHA256 hashes under `artifacts/modern-execution/source-audit.b9crcp7b`; both source manifests were independently checked by execution_design. Installed SqlClient nuspec identifies commit `29ce2d856cb5a9450f79ea62c0afc744fd337fde`. Current assets use net9 references and include Unix/win runtime targets. The copied Unix DLL matches the package's `runtimes/unix/lib/net9.0` DLL; the separate top-level copied DLL matches the portable `lib/net9.0` asset. Assets/deps/copies were inspected, not a loaded-process path or DLL instruction equivalence.
+
+The installed .NET10.0.12 `.version` records dotnet/dotnet commit `95017c711e6afc1085133d440e42b4bd78155701`. Root retained seven BCL files from its `src/runtime/` subtree; all are byte-identical to the independently resolved dotnet/runtime 10.0.12 tag commit `4271d88e0aebf3d04f188f1334c2220d80555ef6`. `installed-profile.json` and `manifest-installed-runtime.json` retain actual identities and comparisons. This prevents treating a release tag alone as the installed build's provenance.
+
+Source defaults select managed networking on Unix, V1 connection pooling and compatibility packet processing. `Switch.Microsoft.Data.SqlClient.MakeReadAsyncBlocking` defaults false; enabling it sets `_syncOverAsync=true` during response processing. Command/reader packet findings below require that switch to remain false. No actual SQL Server process configuration is qualified. [Pinned switches](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/LocalAppContextSwitches.cs#L497), [blocking switch consumption](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/TdsParser.cs#L3610).
+
+## Operation matrix
+
+| Operation | Source path and conclusion | Live evidence still required |
+| :--- | :--- | :--- |
+| OpenAsync | Driver override. Warm pool acquisition can complete inline; default pool queues cold physical acquisition to a worker executing synchronous connection creation. V2 similarly dispatches blocking creation through Task.Run, and nonpooled opens use a LongRunning continuation. | Endpoint/transport/configuration, cold/warm operation behavior, cancellation/recovery. Source already contradicts a universally nonblocking open promise. |
+| ExecuteReaderAsync | Async write/read packet path, including the protected DbCommand override. Begin/End bridging reaches async transport rather than wrapping synchronous query execution. | Real successful query, genuinely pending I/O, reader ownership/error/cancellation. |
+| ExecuteNonQueryAsync | Async packet write and response acquisition under the declared configuration. | Approved command/result and active cancellation/cleanup. |
+| ReadAsync | Missing packets are acquired asynchronously; buffered rows can validly return completed tasks. Default behavior completes a whole row; sequential getters need their own contract. | Pending reads, large-result buffering/memory, early disposal and cancellation. |
+| BeginTransactionAsync | No driver override; inherited DbConnection method invokes synchronous BeginDbTransaction. | Native transaction behavior remains unverified; method naming cannot satisfy genuine async begin. |
+| CommitAsync / RollbackAsync | No SqlTransaction async overrides; inherited BCL methods invoke synchronous commit/rollback. Driver transaction packet writes disable async writes. | Native transaction semantics/recovery remain unverified; inherited fallback is not async certification. |
+| Connection/command/reader/transaction DisposeAsync | No overrides in the complete inspected partial types; BCL bases call Dispose. Reader close may wait on network work, and active transaction disposal may synchronously roll back. | Error/early/disposal ownership and latency; source cannot support nonblocking cleanup. |
+
+Primary opening chains: [OpenAsync](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/SqlConnection.cs#L2006), [default pool worker](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/ConnectionPool/WaitHandleDbConnectionPool.cs#L874), [V2 physical-open limitation](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/ConnectionPool/ChannelDbConnectionPool.cs#L1125), [nonpooled factory](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/SqlConnectionFactory.cs#L838).
+
+Primary query/read chains: [reader bridge](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/SqlCommand.Reader.cs#L1015), [nonquery bridge](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/SqlCommand.NonQuery.cs#L708), [pending reader continuation](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/SqlDataReader.cs#L5516), [managed dispatch](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/TdsParserStateObjectManaged.netcore.cs#L269), [packet stream](https://github.com/dotnet/sqlclient/blob/29ce2d856cb5a9450f79ea62c0afc744fd337fde/src/Microsoft.Data.SqlClient/src/Microsoft/Data/SqlClient/ManagedSni/SniPacket.netcore.cs#L267), [installed-build BCL transport](https://github.com/dotnet/dotnet/blob/95017c711e6afc1085133d440e42b4bd78155701/src/runtime/src/libraries/System.Net.Sockets/src/System/Net/Sockets/NetworkStream.cs#L586).
+
+Primary fallback chains: [installed-build transaction begin](https://github.com/dotnet/dotnet/blob/95017c711e6afc1085133d440e42b4bd78155701/src/runtime/src/libraries/System.Data.Common/src/System/Data/Common/DbConnection.cs#L67), [transaction completion/disposal](https://github.com/dotnet/dotnet/blob/95017c711e6afc1085133d440e42b4bd78155701/src/runtime/src/libraries/System.Data.Common/src/System/Data/Common/DbTransaction.cs#L23), [reader disposal](https://github.com/dotnet/dotnet/blob/95017c711e6afc1085133d440e42b4bd78155701/src/runtime/src/libraries/System.Data.Common/src/System/Data/Common/DbDataReader.cs#L60).
+
+Cancellation reaches driver request handling; stream packet calls use CancellationToken.None and cancellation-request failures can be suppressed. This inspection establishes no bound on cancellation latency or resource recovery. Async packet paths also do not promise nonblocking validation, parser locks or every ancillary operation.
+
+## Roadmap consequence
+
+Keep SqlClient support and synchronous contracts intact. Its candidate first M1 packet has an unsatisfied genuine-open/lifecycle prerequisite; do not label it fully async, hide Task.Run fallbacks, or silently relax the public contract. Acquisition and source inspection remain useful independently. The separately bounded PostgreSQL/Npgsql probe can supply alternative feasibility evidence before any reviewed production adapter is chosen. Npgsql metadata success alone will not certify its async lifecycle.
+
+Independent source audit and final integrated Oracle verdicts: CLEAR for the recorded per-operation classifications with the blocking-switch caveat, retained immutable sources and root's installed-runtime/copy comparisons. No SDK, live SQL Server query, production change or public acceptance occurred in this source inspection. The separate PostgreSQL/Npgsql metadata consumer has its own observed SDK/runtime evidence below.
+
+## Npgsql 10.0.3 source candidate
+
+Root retained seven files at published commit `d3768398c17877b3a916c3c4d87e8e11698991fc` in the same source-audit directory, with `manifest-npgsql.json` hashes. version_metadata independently traced these operations read-only; source presence does not establish their live behavior or the supported IQToolkit surface.
+
+| Operation | Exact-source finding |
+| :--- | :--- |
+| OpenAsync | Explicit override selects async:true; the Unix connector constructs the socket endpoint and awaits Socket.ConnectAsync. |
+| Query/nonquery/row reads | Command/base-reader async overrides select async:true. ReadAsync and NextResultAsync have asynchronous unbuffered paths and valid buffered completion paths. |
+| BeginTransactionAsync | Explicit override; BEGIN is normally queued for the following command. Completion alone does not prove a server roundtrip. |
+| CommitAsync / RollbackAsync | Explicit overrides select async:true. Pending transaction DisposeAsync awaits asynchronous rollback. |
+| Active query cancellation | Original operation token registers driver cancellation; callback synchronously opens a separate Unix connection and sends CancelRequest. Native user-request57014 maps to OperationCanceledException with that token after the original connection receives its response. CancellationTimeout does not bound the complete callback. Reader acquisition prefetches the first row; this does not prove pending ReadAsync cancellation. |
+| Savepoints | SaveAsync queues locally and returns a completed task; savepoint rollback selects async:true. ReleaseAsync selects async:false, so the async name does not establish nonblocking release. |
+| Scalar/value reads | ExecuteScalarAsync performs synchronous GetValue after async execution/read. Buffered getters can complete inline; unbuffered GetFieldValueAsync has async converter/read paths. |
+
+Primary anchors: [opening](https://github.com/npgsql/npgsql/blob/d3768398c17877b3a916c3c4d87e8e11698991fc/src/Npgsql/NpgsqlConnection.cs#L169), [Unix connect](https://github.com/npgsql/npgsql/blob/d3768398c17877b3a916c3c4d87e8e11698991fc/src/Npgsql/Internal/NpgsqlConnector.cs#L1375), [commands](https://github.com/npgsql/npgsql/blob/d3768398c17877b3a916c3c4d87e8e11698991fc/src/Npgsql/NpgsqlCommand.cs#L1271), [row reads](https://github.com/npgsql/npgsql/blob/d3768398c17877b3a916c3c4d87e8e11698991fc/src/Npgsql/NpgsqlDataReader.cs#L174), [begin](https://github.com/npgsql/npgsql/blob/d3768398c17877b3a916c3c4d87e8e11698991fc/src/Npgsql/NpgsqlConnection.cs#L622), [completion/disposal/savepoints](https://github.com/npgsql/npgsql/blob/d3768398c17877b3a916c3c4d87e8e11698991fc/src/Npgsql/NpgsqlTransaction.cs#L146).
+
+The private [PostgreSQL probe](modernization-postgresql-probe.md) supplies explicit absolute socket directory/port and matching OS Username, avoiding ambient username inference. Peer is selected by the server and verified through native metadata; passwordless success alone would not distinguish peer from trust. P2 targets opening/read/rollback metadata smoke only. Active cancellation, pending I/O, large-stream memory, complete cleanup and every unsupported operation remain separate evidence obligations.
+
+P2 subsequently passed exact three-package cold locked restore/build and actual same-engine metadata/schema/eight typed rows/acquired-OID parameter/loaded-driver checks, with Closed connection and verified shutdown. Integrated Oracle CLEAR covers this observed metadata-driver readiness; it does not qualify genuinely pending I/O, active cancellation, every async-named operation or production IQToolkit support.
+
+P3 separately observed active ExecuteReaderAsync acquisition cancellation and same-backend recovery on the private18.6/LinuxARM64 Unix profile: actual activePgSleep plus pending task, original exception/token/native-user-message57014, unchanged PID/backend_start and eight typed catalog rows, closed connections/backend disappearance/clean server shutdown. [Probe record](modernization-postgresql-cancellation-probe.md) and [ATLAS](modernization-cancellation-and-keyed-contract-hardness.md) bind actual source/output identities and the disposable post-await deadline-check limitation. Source snapshots add three Npgsql cancellation-path files and archive-verified postgres.c without altering the historical55-source manifest. This evidence leaves pending row reads, async lifecycle, other operations, memory/performance, platforms and production-provider support open.
+
+P4 observed a genuinely pending ReadAsync after139 actual validated rows with fresh active/PgSleep evidence, but that read returned true normally after token cancellation. The required native exception and same-backend recovery were not observed, so [P4 qualification failed terminally](modernization-postgresql-row-read-probe.md). Read(async) returns true on a DataRow and graceful cancellation can receive earlier row messages before an error; pending task/server activity cannot guarantee that particular read throws. Successful disposal does not reveal whether native cancellation was acknowledged. Preserve the failed evidence and separate stream-level policy from driver acknowledgment before a future probe; no driver defect or successful pending-read cancellation is inferred.

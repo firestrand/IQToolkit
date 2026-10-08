@@ -1,0 +1,149 @@
+{
+  "Schema": 1,
+  "Scope": "V1aj precursor; authenticated original/recent compilation continuity and diagnostic cache evidence; full readiness remains unsupported",
+  "FinalSuccessSupported": false,
+  "OriginalDescriptor": {
+    "Path": "artifacts/coverage/runs/run.JbUMhIGI/descriptor.json",
+    "Sha256": "92ec8ed76f6319b09793a7098125cb3ded36acc98aa0d5959fbd39528de834c0"
+  },
+  "AnchorDescriptor": {
+    "Path": "artifacts/sql-string-literal/coverage.zzhhnhb6/collection/descriptor.json",
+    "Sha256": "173f9ce97c74f21f4c739f0afb74ce1abb596ed8e4ab7befd7280d849a940f10"
+  },
+  "TransitionReceipt": {
+    "Path": "artifacts/sql-string-literal/coverage.zzhhnhb6/retention/transition.json",
+    "Sha256": "1762e22108cd2248c6b2fcfcb76cc54d3b52ac5628333d5e114168f468fb9740"
+  },
+  "TransitionInputsBefore": {
+    "Path": "artifacts/sql-string-literal/coverage.zzhhnhb6/retention/inputs-before.json",
+    "Sha256": "26a0bb7822b2dba84c3e3fdb05ea703d7ffc2dadc0d31a207fa32595f12976fc"
+  },
+  "TransitionInputsAfter": {
+    "Path": "artifacts/sql-string-literal/coverage.zzhhnhb6/retention/inputs-after.json",
+    "Sha256": "547318383be6a76a21ae2c2b3f98d1a66ebaa61b2daddc74b5b0afe91116bd09"
+  },
+  "CurrentDescriptor": {
+    "Path": "artifacts/native-null-array/coverage.yrni_8j2/collection/descriptor.json",
+    "Sha256": "77495a1bcb8b29eb57deec221325b1305fdf2f728515cb885198dc82df3bd64c"
+  },
+  "CompilationManifest": {
+    "Path": "artifacts/native-null-array/coverage.yrni_8j2/transition.json",
+    "Sha256": "dc7ea30a288b9d64a50c98a5b23315a8b663fb2ad50382ba27d61b0fd298d497"
+  },
+  "CompilationReceipt": {
+    "Path": "artifacts/native-null-array/coverage.yrni_8j2/retention/transition.json",
+    "Sha256": "6e2a328479e34786ccf5ba2e73072033123f7632ee78b7ef2c9939cb61cfcd2b"
+  },
+  "CompilationInputsBefore": {
+    "Path": "artifacts/native-null-array/coverage.yrni_8j2/retention/inputs-before.json",
+    "Sha256": "6bbb7d086ed80474406f24cd777961276a815482ddaf9fd7ccc3f1152b27b5b0"
+  },
+  "CompilationInputsAfter": {
+    "Path": "artifacts/native-null-array/coverage.yrni_8j2/retention/inputs-after.json",
+    "Sha256": "1e3a44f4972a229ef12280b7324cd8fbf3f24b26a8c2bac6cc13a47d0a155362"
+  },
+  "CacheSeedResult": {
+    "Path": "artifacts/cache-sensitivity/run.3_dhn7xv/result.json",
+    "Sha256": "bfe32ff5c8158e13f92523a2f6e2fb3f8c4c4f3ae8708ea33cb6f1fc03476479"
+  },
+  "CacheSeedReviewedDeltas": {
+    "AGENT_STATE.md": "fba4481997975fab5d2894e68ba365388258d0258d8e1d8bbe8cbe2c27cdca70",
+    "README.md": "02d38f4382a4f60f5e5177cd32d6e03e810d0fe629f323b8454f87460dde20d4",
+    "docs/modernization-implementation-plan.md": "0eff588996315e031c53046f52aa5eec61d1d16efbb193954d6b444d9ef0d456",
+    "docs/standards/dotnet-rules.json": "d5e168a6ab6ce477d2dc5b33f2d69773d555d1abb2fb56fec608ae0ee26e3935",
+    "eng/FinalVerification/Program.cs": "68e23a8e675958d66032bda04cba27f4a22418da04dd7f298562180fa634d16b",
+    "eng/verify-final.sh": "8936dc460462b2104a55c98818e8973cee5041fbe388dfd296e4a14ef8514f2d",
+    "IQToolkit.Data/DbEntityProvider.cs": "ea08fc785fd365bf93962e2d5e566b6ab9cb13a423c7302bc486172d13a31c9a",
+    "eng/verify-ci-consumers.sh": "35143d9d0c4d0dad51e42d425570befbbac3b4156e9fc3dc1b91a37cb58b627d",
+    "eng/FinalVerification/fact-bindings.json": "5ee34e84bacf4df731efa02e5b1c70fc3ea849c9599098109f0a86fb842c5e8f",
+    "IQToolkit.Data.SQLite/SQLiteFormatter.cs": "7f4180c30a777d6b10de21bf102c4b59d423b81e4735ac6c394788c81eaf6918",
+    "eng/FinalVerification/Classifiers.cs": "64053ff66f0be7079bec42e737c782695c4758242e4c5389fff5678a42218156",
+    "IQToolkit.Data/Mapping/AttributeMapping.cs": "4dcaae30ecfa02e90cbc00da1a8412b1d68e4be12fec5102f907504f548088d1",
+    "IQToolkit.Data/EntityProvider.cs": "176306f6fd437bdfce693216bb57f4cde29cb692bb00b92230a6c843aa720b5a",
+    "eng/IndependentConsumers/Profiles/IQToolkit/packages.lock.json": "48d73207792683a390a3dfe32d87888c51717bf942a3b5dd037f062c76210f85",
+    "eng/IndependentConsumers/Profiles/IQToolkit.Data/packages.lock.json": "0e51c6abd0f26cfeb9a685c8c7bb3fac0690eff6694b23aa80fe8c09f71539f1",
+    "eng/IndependentConsumers/Profiles/IQToolkit.Data.Access/packages.lock.json": "b389ce642f5ce83fb93f29a5044e548654dfc61f33b12c3d035ece689833f70a",
+    "eng/IndependentConsumers/Profiles/IQToolkit.Data.MySqlClient/packages.lock.json": "a1b09e9ef4bbe99e675473e30f78244117ad7af3ec5dda8c88cae01f5e02c365",
+    "eng/IndependentConsumers/Profiles/IQToolkit.Data.SQLite/packages.lock.json": "71448977769999a5b5a7d87e05d3dd10209471a8318f22bae81a21b1d97f96fa",
+    "eng/IndependentConsumers/Profiles/IQToolkit.Data.SqlClient/packages.lock.json": "5bf50e35e11298338d97369fdccd9337175836f825f056d66d5742dfb5467390",
+    "eng/PackageConsumer/packages.lock.json": "71448977769999a5b5a7d87e05d3dd10209471a8318f22bae81a21b1d97f96fa",
+    "eng/IndependentConsumers/prepared-feed.sha256": "78c30fc8d148970ccd6e781a64ab8910de31c030a849b4331e558ef853356092"
+  },
+  "CacheSeedReviewedAdditions": {
+    "IQToolkitTest/RealProvider/NativeNullArrayMembershipTests.cs": "dbe555bf3fc58e4a2d8febea1c20b15016a5f76ec72054fd295f9ac5a8f5d088",
+    "eng/FinalVerification/CompilationContinuity.cs": "481a542ce8a10e02c219931711b88a6f9b6ab17c3e2a9576fd5ce1e017231721",
+    "eng/FinalVerification/CacheSeedEvidence.cs": "98290562e7d031c9fb41ff843b1cf48e976c86ae898fddc23f36d79b3fc1ef49",
+    "docs/modernization-null-array-hardness.md": "b993e3734f4b595f89b28906b1f72f572c83de06e5490932a4fbfd8f7741288d",
+    "docs/modernization-cache-sensitivity-hardness.md": "2bf1fcf400bbc361e2d89bd5643b3bdd5436260177d17269b3733fb833f8e86e",
+    "docs/modernization-final-binding-hardness.md": "a6212e922a690591ea98b85881d81146277733ba3598266b263e656a97c6bfd2",
+    "IQToolkitTest/RealProvider/NativeCommandInitializationTests.cs": "8e4ce7f9d15f41f45a111675e777f0f35df538a9bf264378f4a87bd43b67914a",
+    "eng/FinalVerification/CommandInitializationContinuity.cs": "5e9c7aae7e7c61ca88cc2d65c86db4ea241db8b5dbfa2bb8daeb3719fc3076d4",
+    "eng/verify-command-continuity-outcome.sh": "01c69c88c8bf100a605fa523434690ca17b836db2fda572d2b615e78388d11ff",
+    "eng/verify-ci-consumer-outcome.sh": "3aaaf2756478bbc2bed041ef1a9c8200ed1fed1a6b507f4fee52721bbb6fcd52",
+    "eng/verify-final-continuity-outcome.sh": "8651a29e67e4070b25a9ee41d5354a6ef2de9a47ec5544373b2bc12081964106",
+    "docs/modernization-command-initialization-hardness.md": "955aeffe61fb9584d718f6defc9a9684966693f002569fa7e8f2ac2ad1b8fb30",
+    "docs/modernization-consumer-interruption-hardness.md": "ee1732208cf7924228bf81014180a59c6b8b9dc73d7b2916bcdd15d88b525c6d",
+    "docs/modernization-command-final-continuity-hardness.md": "a57db0dfa6f338484459e5e97d5f5693f8b955a1447123298d8b63258781fd63",
+    "docs/modernization-final-current-binding-hardness.md": "2b2fd31f638da4327f82271b9f64fa921349fb81105f4ac8c8d54a5e960b21aa",
+    "IQToolkitTest/RealProvider/NativeMathIdentifierCultureTests.cs": "c93ac9671eeaedf6d972078fa9b8f1dbf7285f358667987a59d58246e4286a49",
+    "eng/FinalVerification/MathIdentifierContinuity.cs": "57c0a0cd2b21973a4acaa11350db5ccdf0bb8a073b490d13836b596c475de128",
+    "docs/modernization-sqlite-math-culture-hardness.md": "b51b2db49e6afc82815b8dbd9970ab7f5ab178dc433aa12e2e42b13acc050cd4",
+    "eng/FinalVerification/PackageIndependentEvidence.cs": "61ab21ee85bbae480d690ca1d607506e4c46c4497dfdbf5778d4b6c28bf3d2b6",
+    "docs/modernization-package-independent-binding-hardness.md": "487a01f042e03407636dc70b7908a175c5d8c9224b028bcbb88385dfbc1ee616",
+    "eng/FinalVerification/PackageNativeConsumerEvidence.cs": "24fdba41e28fa771a3e5a3db960fd6add7985361ba8f8792d232944088868ed9",
+    "docs/modernization-native-consumer-binding-hardness.md": "4a34331e3ac2115d2b8f86e6a17b01201f71316b954e4bafc7301a00ce52d16f",
+    "IQToolkitTest/RealProvider/CanonicalPublicationTests.cs": "63c6e269ef893bce3f17ca9217d1d9df6009ae09d7dfb7b3fef226152616ee4b",
+    "IQToolkitTest/RealProvider/NativeStringColumnInequalityTests.cs": "d7a9e7e5befd7defbef13567b69536c2aa6c72cef8a2263b8c4eaa534bf1678c",
+    "eng/FinalVerification/NullableColumnContinuity.cs": "4bed2babb4684c1b9eb048129b9ef26d80649ba07c61da5ab0499908672fa8b9",
+    "eng/FinalVerification/CanonicalPublicationContinuity.cs": "bab796ec8c2768a65dad37d4e173fce23e3558c0b99eeeea24c65f68f115cfa0",
+    "docs/modernization-canonical-publication-hardness.md": "0e268b4a13f4e772b0c746c4abbc2bc4f2cfe205eb2c8137ceda78fbe272aaae",
+    "docs/modernization-nullable-column-acquisition-hardness.md": "121929d33bb7db7a591400922d401835f36faecde1b0c654e3642b0cc2bfe01e",
+    "docs/modernization-nullable-continuity-hardness.md": "5555201b5a8559cc4de43fe0cb2ea01e7d55e1d78dc69c70945f3b7493bd9ac5",
+    "docs/modernization-sqlite-string-column-inequality-hardness.md": "e2606b0b45e089d0ff8667dcdd877d875ca699506b76c50cbd323eedd36200e4",
+    "docs/modernization-recent-final-continuity-hardness.md": "5d3ff44b1cf20ce61ea84310b5cb013c916a92fb0a1795f0fc2f7134db05bccb"
+  },
+  "CommandDescriptor": {
+    "Path": "artifacts/command-initialization/coverage.gw5awfx_/collection/descriptor.json",
+    "Sha256": "d70a5e3734b25302f7d700122c178f7604d084a819ed202fb9c8a824621989f8"
+  },
+  "CommandManifest": {
+    "Path": "artifacts/command-initialization/coverage-qualification._c6y3y6f/transition.json",
+    "Sha256": "b9691f9b2c9acf77c41b1d9c0efb07d1ffc9cb6a54e4dfd5005442bb4fa2202e"
+  },
+  "CommandReceipt": {
+    "Path": "artifacts/command-initialization/coverage-qualification._c6y3y6f/retention/transition.json",
+    "Sha256": "474402be9e5645471395d88895284afd6be4b2d42f87eb1294975d7bb0bcffe8"
+  },
+  "CommandInputsBefore": {
+    "Path": "artifacts/command-initialization/coverage-qualification._c6y3y6f/retention/inputs-before.json",
+    "Sha256": "9eae976161a59ba716ff549e5a1c82fadb67a86249595632b8828dc09eeda56a"
+  },
+  "CommandInputsAfter": {
+    "Path": "artifacts/command-initialization/coverage-qualification._c6y3y6f/retention/inputs-after.json",
+    "Sha256": "aa585a7f7e56c03c63c0639208941001ebaeaf568c6f03e277d03969f5c8fd88"
+  },
+  "MathDescriptor": {
+    "Path": "artifacts/sqlite-math-culture/coverage.nx5khe0v/collection/descriptor.json",
+    "Sha256": "596f7ea743ea586d779d3f22ac43d82d98d4c8e73978eac5e67fd20c00c849b3"
+  },
+  "MathManifest": {
+    "Path": "artifacts/sqlite-math-culture/coverage.nx5khe0v/transition.json",
+    "Sha256": "ec07776a112c5248299c6b2363735355c07c1e63ae24ab6b5b534b19ead46293"
+  },
+  "MathReceipt": {
+    "Path": "artifacts/sqlite-math-culture/qualification.1p9l6zbh/retention/transition.json",
+    "Sha256": "ded76477fdc9f00ca49a4f4a36c2683cb081df6f2bccdc6433dfa41d88a62f4a"
+  },
+  "MathInputsBefore": {
+    "Path": "artifacts/sqlite-math-culture/qualification.1p9l6zbh/retention/inputs-before.json",
+    "Sha256": "529766e910c183fff8498e9cffb74e796901a2c34434235173704fb0618ec9c0"
+  },
+  "MathInputsAfter": {
+    "Path": "artifacts/sqlite-math-culture/qualification.1p9l6zbh/retention/inputs-after.json",
+    "Sha256": "395621b885c280ec6aef90ac9a7a9a0ee0b25298dca4d1684d4fc1af49f31208"
+  },
+  "MathProducerSource": {
+    "Path": "artifacts/sqlite-math-culture/coverage-helper/Program.cs",
+    "Sha256": "9b7dccb3e75ac2b19e260fbb6158930330d401323149af676ca0b0664804f407"
+  }
+}

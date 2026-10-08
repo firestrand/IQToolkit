@@ -1,0 +1,83 @@
+{
+  "Schema": 1,
+  "Contract": "FINAL-CLASSIFICATION-1",
+  "BaselineCommit": "60ddef60d4b635c4b24b78bff4327e3f3ff9ca5e",
+  "BaselineTree": "f9ea6fd6d431dcc0a6b72fd89273a67076491fec",
+  "BaselineInventorySha256": "2fc2b60a6d8e1fd9c9d591812d9d1222587f5b0f42580c3d4010ebbd98c31c56",
+  "BaselineInventoryFormat": "git ls-tree -r -z --full-tree <BaselineCommit>; exact native output",
+  "Rules": [
+    {
+      "Layer": "assembly-metadata",
+      "Pattern": "^([^/]+/Properties/AssemblyInfo\\.cs)$",
+      "TargetPercent": null,
+      "Disposition": "assembly-only"
+    },
+    {
+      "Layer": "test-evidence",
+      "Pattern": "^IQToolkitTest/.*\\.cs$",
+      "TargetPercent": null,
+      "Disposition": "test-source"
+    },
+    {
+      "Layer": "execution-orchestration",
+      "Pattern": "^IQToolkit\\.Data/(DbEntityProvider|EntityProvider)\\.cs$",
+      "TargetPercent": 92,
+      "Disposition": "runtime"
+    },
+    {
+      "Layer": "domain",
+      "Pattern": "^(IQToolkit/.*\\.cs|IQToolkit\\.Data/(Common|Mapping)/.*\\.cs)$",
+      "TargetPercent": 95,
+      "Disposition": "runtime"
+    },
+    {
+      "Layer": "adapters",
+      "Pattern": "^IQToolkit\\.Data[^/]*/.*\\.cs$",
+      "TargetPercent": 90,
+      "Disposition": "runtime"
+    },
+    {
+      "Layer": "engineering-cli",
+      "Pattern": "^(eng/.*\\.(cs|sh|py)|Test/.*\\.cs|.*\\.cmd)$",
+      "TargetPercent": 90,
+      "Disposition": "runtime"
+    },
+    {
+      "Layer": "configuration",
+      "Pattern": "^(.*\\.(csproj|props|targets|proj|config|runsettings|globalconfig|settings|template)|eng/.*\\.(json|sha256)|.*packages\\.lock\\.json|\\.github/.*\\.ya?ml|\\.editorconfig|global\\.json)$",
+      "TargetPercent": 90,
+      "Disposition": "configuration"
+    },
+    {
+      "Layer": "documents",
+      "Pattern": "^(docs/.*\\.(md|json)|AGENT_STATE\\.md|README\\.md|.*\\.md)$",
+      "TargetPercent": null,
+      "Disposition": "documentation"
+    },
+    {
+      "Layer": "repository-metadata",
+      "Pattern": "^(\\.gitignore|.*\\.(sln|xml|base|jpg|png|txt))$",
+      "TargetPercent": null,
+      "Disposition": "non-runtime"
+    }
+  ],
+  "RuleOrder": "first-match; narrow rules precede broader roots",
+  "LineDenominator": "unique repository source plus line from class-level lines only",
+  "BranchDenominator": "class identity plus line; native branch fractions, no method duplication; individual branch arms unsupported",
+  "ReviewedRemovals": [
+    {
+      "Path": "IQToolkit/Properties/Settings.Designer.cs",
+      "BaselineBlob": "562e5339b41abab1f626e0808d5bf21d0483b8e1",
+      "EvidencePath": "docs/modernization-core-settings-hardness.md",
+      "EvidenceSha256": "339dc5edd9016e70441f7fbcf94fd745dc99140e385d025a0a919f2ba29bd8d1",
+      "Reason": "Unused generated core settings implementation removed by V1t; independent package graph and retained legacy Data factory verified separately."
+    },
+    {
+      "Path": "IQToolkit/Properties/Settings.settings",
+      "BaselineBlob": "049245f401462e7e3dfbb96385e122ca467a9dab",
+      "EvidencePath": "docs/modernization-core-settings-hardness.md",
+      "EvidenceSha256": "339dc5edd9016e70441f7fbcf94fd745dc99140e385d025a0a919f2ba29bd8d1",
+      "Reason": "Unused core settings configuration removed with its generated implementation by V1t."
+    }
+  ]
+}

@@ -1,0 +1,1230 @@
+{
+  "schema_version": 1,
+  "catalog_version": "0.1.9",
+  "last_reviewed": "2026-10-03",
+  "compliance_claim": false,
+  "standard": {
+    "id": "ENG-STD-DOTNET-XPLAT",
+    "version": "1.1.0-draft.1",
+    "source_path": "docs/standards/source/Cross-Platform-DotNet-Engineering-Standard-1.1.0-draft.1.md",
+    "source_sha256": "8c56930ec1cd26e8b58a273d47cb0b9713f55e6d4961b6d29a636ffaf4f0ebe2",
+    "selection": "Explicitly selected by the project owner on 2026-10-02. Corporate publication is not asserted.",
+    "selected_source_path": "/home/firestrand/Downloads/Cross-Platform-DotNet-Engineering-Standard-1.1.0-draft.1.md",
+    "snapshot_policy": "Byte-identical review snapshot of the owner-selected source; do not edit manually or treat illustrative examples as exception approvals."
+  },
+  "interpretation": {
+    "rule_status": "declared means present in the selected source, not implemented, compliant or approved as an exception.",
+    "source_ranges": "Groups end before the next group or top-level section; individual definitions are exact declaration lines and retain parent-group precedence. Unnumbered context is interpreted from the selected source; ranges do not grant waiver scope.",
+    "enforcement": "required_enforcement values are obligations to implement or review, not claims that named gates/tests exist. adoption.evidence records inspected source/configuration or retained local output; no whole-group PASS is inferred from one green subgate.",
+    "exceptions": "Adoption verdicts are not independent approvals. Only explicit named clause keys or exact normative sentences may identify a future narrow waiver; no registry record is created here."
+  },
+  "rules": [
+    {
+      "id": "DOTNET-BASE-004",
+      "title": "Scope, vocabulary, and servicing policy.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 74,
+        "end_line": 127
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:sdk-selection",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "The source standard is explicitly selected and the .NET10 baseline is in use; production servicing and corporate approval/SLA evidence are outside this local checkpoint.",
+        "evidence": [
+          "global.json",
+          "docs/modernization-implementation-plan.md",
+          "README.md"
+        ],
+        "next_action": "Qualify the declared platforms and document release servicing ownership; owner selection of this draft is already resolved."
+      }
+    },
+    {
+      "id": "DOTNET-BASE-001",
+      "title": "repositories **MUST** contain a root `global.json`. Its version **MUST** be advanced as part of routine dependency/platform maintenance.",
+      "declaration_form": "standard",
+      "source": {
+        "start_line": 122,
+        "end_line": 122
+      },
+      "parent_group": "DOTNET-BASE-004",
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:sdk-selection",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "All active projects use the root SDK selection; routine update automation is not yet present.",
+        "evidence": [
+          "global.json",
+          "Directory.Packages.props"
+        ],
+        "next_action": "Add reviewed dependency/SDK servicing automation and retain patch-maintenance evidence."
+      }
+    },
+    {
+      "id": "DOTNET-BASE-002",
+      "title": "stable branches **MUST NOT** use `allowPrerelease: true`, `rollForward: latestMajor`, or an equivalent mechanism that can silently advance the compiler/runtime generation.",
+      "declaration_form": "standard",
+      "source": {
+        "start_line": 124,
+        "end_line": 124
+      },
+      "parent_group": "DOTNET-BASE-004",
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:sdk-selection"
+      ],
+      "adoption": {
+        "verdict": "PASS",
+        "observation": "The selected stable SDK disallows prereleases and uses latestPatch rather than compiler-generation roll-forward.",
+        "evidence": [
+          "global.json"
+        ],
+        "next_action": "Preserve these settings when the approved servicing version changes."
+      }
+    },
+    {
+      "id": "DOTNET-BASE-003",
+      "title": "the SDK version is a build-tool decision; the TFM is a runtime/API-contract decision. They **MUST NOT** be treated as interchangeable.",
+      "declaration_form": "standard",
+      "source": {
+        "start_line": 126,
+        "end_line": 126
+      },
+      "parent_group": "DOTNET-BASE-004",
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:sdk-selection",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PASS",
+        "observation": "SDK and runtime contract are separate inputs: global.json selects 10.0.401; shared properties select net10.0.",
+        "evidence": [
+          "global.json",
+          "Directory.Build.props"
+        ],
+        "next_action": "Review SDK and TFM changes independently."
+      }
+    },
+    {
+      "id": "DOTNET-BASE-005",
+      "title": "Target frameworks and language baseline.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 128,
+        "end_line": 156
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:target-framework",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PASS",
+        "observation": "Eight active projects inherit net10.0 and the SDK default stable C# language version; no speculative multi-targeting was added.",
+        "evidence": [
+          "Directory.Build.props",
+          "IQToolkit.sln",
+          "global.json"
+        ],
+        "next_action": "Keep explicit consumer requirements ahead of any additional TFM or preview compiler selection."
+      }
+    },
+    {
+      "id": "DOTNET-BASE-006",
+      "title": "Supported platforms and forward validation.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 157,
+        "end_line": 182
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:native-platform-matrix",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "The workflow declares Linux x64/ARM64, Windows x64 and macOS ARM64; only local Linux ARM64 evidence is available.",
+        "evidence": [
+          "README.md",
+          ".github/workflows/ci.yml",
+          "AGENT_STATE.md"
+        ],
+        "next_action": "Run the declared native jobs and provider-specific qualification before publishing support claims."
+      }
+    },
+    {
+      "id": "DOTNET-REPO-001",
+      "title": "new repositories MUST use `.slnx` unless required tooling cannot consume it.",
+      "declaration_form": "inline",
+      "source": {
+        "start_line": 189,
+        "end_line": 189
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "N/A",
+        "observation": "This is an existing repository with a legacy .sln; the explicit new-repository .slnx obligation does not require a compatibility-only migration here.",
+        "evidence": [
+          "IQToolkit.sln"
+        ],
+        "next_action": "Use the applicable solution standard if a new repository/solution is introduced."
+      }
+    },
+    {
+      "id": "DOTNET-REPO-002",
+      "title": "source, tests, build automation, documentation, package configuration, and standards configuration MUST be clearly separated.",
+      "declaration_form": "inline",
+      "source": {
+        "start_line": 191,
+        "end_line": 191
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PASS",
+        "observation": "Runtime projects, test/harness projects, eng automation, docs, root package/build configuration and docs/standards have distinct locations.",
+        "evidence": [
+          "IQToolkit/IQToolkit.csproj",
+          "IQToolkitTest/IQToolkitTest.csproj",
+          "Test/Test.csproj",
+          "eng/verify.sh",
+          "docs/standards/dotnet-rules.json",
+          "Directory.Packages.props"
+        ],
+        "next_action": "Preserve separation without moving unrelated legacy code merely to match the sample tree."
+      }
+    },
+    {
+      "id": "DOTNET-REPO-003",
+      "title": "Project identity and dependency boundaries.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 260,
+        "end_line": 287
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:project-dependency-boundaries",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "The core/provider project boundaries remain intact; legacy test naming and Common namespaces have not been globally renamed, and the full graph/naming audit is pending.",
+        "evidence": [
+          "IQToolkit/IQToolkit.csproj",
+          "IQToolkit.Data/IQToolkit.Data.csproj",
+          "IQToolkitTest/IQToolkitTest.csproj"
+        ],
+        "next_action": "Audit project graph and touched-unit identity while preserving public namespaces and compatibility."
+      }
+    },
+    {
+      "id": "DOTNET-REPO-004",
+      "title": "Analyzers, warnings, symbols, and source style.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 288,
+        "end_line": 434
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:strict-build",
+        "gate:source-style",
+        "gate:source-retrieval",
+        "gate:standards-overrides",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Strict warnings, deterministic portable symbols, explicit CI properties, private-member analyzer checks, basic editor preferences and explicit CA1416 warnings are configured; complete CI formatting/security/naming controls, clean source retrieval and protected suppression validation are not.",
+        "evidence": [
+          ".editorconfig",
+          "Directory.Build.props",
+          "Directory.Build.targets",
+          "eng/dead-code.globalconfig",
+          "eng/verify.sh",
+          "docs/modernization-foundation-hardness.md"
+        ],
+        "next_action": "Add scoped style tooling and qualify source retrieval from a clean committed checkout; never infer compliance from zero configured warnings alone."
+      }
+    },
+    {
+      "id": "DOTNET-DEP-001",
+      "title": "multi-project repositories MUST use Central Package Management unless a documented technical limitation prevents it.",
+      "declaration_form": "inline",
+      "source": {
+        "start_line": 439,
+        "end_line": 439
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:central-package-management",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Existing package versions are centrally owned without adding runtime dependencies; automated servicing updates are not configured.",
+        "evidence": [
+          "Directory.Packages.props",
+          "IQToolkit.Data.MySqlClient/IQToolkit.Data.MySqlClient.csproj"
+        ],
+        "next_action": "Retain CPM and introduce reviewed servicing automation, including SDK and action pins."
+      }
+    },
+    {
+      "id": "DOTNET-DEP-002",
+      "title": "Locked dependency and restore profiles.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 469,
+        "end_line": 524
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:locked-restore-profiles",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Portable net10.0 Release app/test and metadata-reference graphs have actual locks and locked restores; changes are awaiting review and native hosted restore qualification.",
+        "evidence": [
+          "Test/packages.lock.json",
+          "IQToolkitTest/packages.lock.json",
+          "eng/ApiCompatibilityReferences/packages.lock.json",
+          "eng/verify.sh",
+          "eng/verify-api.sh",
+          "README.md"
+        ],
+        "next_action": "Include the actual locks in the reviewed change and qualify the same profile on declared platforms; no unlocked retry after a locked failure."
+      }
+    },
+    {
+      "id": "DOTNET-DEP-003",
+      "title": "Feed mapping and package-cache trust.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 525,
+        "end_line": 578
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:feed-mapping-cache-trust",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "One verified public feed is explicitly mapped to all existing packages with an ignored project cache; hosted cache/feed trust policy has not been qualified.",
+        "evidence": [
+          "NuGet.config",
+          ".gitignore",
+          "docs/modernization-foundation-hardness.md"
+        ],
+        "next_action": "Retain controlled cache policy and review source mapping/credentials when new feeds or packages are introduced."
+      }
+    },
+    {
+      "id": "DOTNET-DEP-004",
+      "title": "Dependency vulnerability policy.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 579,
+        "end_line": 582
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:dependency-vulnerability-audit",
+        "gate:standards-overrides",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Restore enables transitive auditing and treats high/critical warnings as failures; the local vulnerability snapshot reports none, while protected release/Security-exception control is not established.",
+        "evidence": [
+          "Directory.Build.props",
+          "eng/verify.sh",
+          "artifacts/standard-adoption/vulnerability-report.json"
+        ],
+        "next_action": "Retain CI audit evidence and trusted time-bounded Security approval for any future exception."
+      }
+    },
+    {
+      "id": "DOTNET-API-003",
+      "title": "Package versioning and compatibility contracts.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 583,
+        "end_line": 676
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:package-contract",
+        "gate:package-api-compatibility",
+        "test:runtime-package-consumer",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Unreleased preview packages avoid reusing the release identity; binary assembly identity and static APIs are preserved. Runtime consumer, source retrieval and broader wire/config/telemetry contracts remain unverified.",
+        "evidence": [
+          "Directory.Build.props",
+          "eng/VerifyPackages.proj",
+          "eng/verify-api.sh",
+          "docs/modernization-implementation-plan.md"
+        ],
+        "next_action": "Complete approved consumer evidence and review non-signature compatibility before release/promotion."
+      }
+    },
+    {
+      "id": "DOTNET-API-001",
+      "title": "externally or cross-team consumed libraries MUST run package/API compatibility validation in CI.",
+      "declaration_form": "inline",
+      "source": {
+        "start_line": 637,
+        "end_line": 637
+      },
+      "parent_group": "DOTNET-API-003",
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:package-api-compatibility"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "All six static package/API comparisons pass locally against the pinned release; CI declares Linux execution but hosted protected enforcement is not yet observed.",
+        "evidence": [
+          "eng/verify-api.sh",
+          "eng/api-compatibility.targets",
+          ".github/workflows/ci.yml",
+          "docs/modernization-foundation-hardness.md"
+        ],
+        "next_action": "Run protected CI and retain comparison inputs and complete reference resolution."
+      }
+    },
+    {
+      "id": "DOTNET-API-002",
+      "title": "an API-compatibility suppression MUST identify the corresponding intentional SemVer-major change or approved compatibility exception.",
+      "declaration_form": "inline",
+      "source": {
+        "start_line": 639,
+        "end_line": 639
+      },
+      "parent_group": "DOTNET-API-003",
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:standards-overrides",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "N/A",
+        "observation": "No API-compatibility suppression is configured in the active runtime source/build controls; unresolved references were fixed rather than suppressed.",
+        "evidence": [
+          "eng/api-compatibility.targets",
+          "eng/verify-api.sh",
+          "Directory.Build.props"
+        ],
+        "next_action": "Any future API suppression must identify an intentional major break or independently approved narrow compatibility exception."
+      }
+    },
+    {
+      "id": "DOTNET-CI-001",
+      "title": "CI-provider YAML MUST remain a thin orchestration layer around repository-owned `dotnet` commands.",
+      "declaration_form": "inline",
+      "source": {
+        "start_line": 693,
+        "end_line": 693
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PASS",
+        "observation": "The workflow orchestrates repository-selected dotnet commands and eng runners; application behavior is not implemented in CI YAML.",
+        "evidence": [
+          ".github/workflows/ci.yml",
+          "eng/verify.sh",
+          "eng/verify-api.sh",
+          "eng/VerifyPackages.proj"
+        ],
+        "next_action": "Keep operational logic and runnable commands under repository ownership."
+      }
+    },
+    {
+      "id": "DOTNET-CI-002",
+      "title": "Build and immutable artifact lifecycle.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 707,
+        "end_line": 737
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:immutable-release-artifacts",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Local runners fail fast and retain immutable per-run provenance/inputs; production clean-checkout artifact acceptance and same-artifact promotion have not been executed.",
+        "evidence": [
+          "eng/verify.sh",
+          "eng/verify-api.sh",
+          "eng/prepare-api-baseline.sh",
+          "docs/modernization-foundation-hardness.md"
+        ],
+        "next_action": "Qualify clean CI artifacts once and preserve accepted bytes through any eventual publication/promotion."
+      }
+    },
+    {
+      "id": "DOTNET-CI-003",
+      "title": "Provider template and native architecture verification.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 738,
+        "end_line": 834
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:native-platform-matrix",
+        "gate:standards-overrides",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Actions are commit-pinned and native architecture jobs are declared; protected standards and native hosted/provider execution remain unverified.",
+        "evidence": [
+          ".github/workflows/ci.yml",
+          "README.md"
+        ],
+        "next_action": "Run the declared native matrix and preserve provider-specific skip/exclusion evidence."
+      }
+    },
+    {
+      "id": "DOTNET-TEST-001",
+      "title": "Test runner, test levels, and coverage.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 835,
+        "end_line": 877
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:test-discovery-results",
+        "gate:coverage-no-regression",
+        "test:runtime-package-consumer",
+        "test:provider-contracts",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Earlier V0.6b Linux ARM64 strict verification observed416results/91passes; its classifiers/inventory below are historical to that compilation. Current V1z strict verifies419discovered/94passes/325explicitSQLskips/247translations with zero warnings/errors. The copied-output collector preserves 336 ordinary binaries and compares 97 sources/16,716 leaves without regression at 2732/8349 lines and 1460/5320 branches. V0.6b freshly binds API/package/symbol/private-consumer/strict/coverage evidence and authenticates the original baseline/V1y transition chain. Executable classifiers preserve all32 ledger rows:16 scoped facts bind84 distinct compiled native methods to passing strict-plus-coverage executions;15 broader/proposed/historical/external facts stay unqualified and async is dueM1. Native baseline/current inventory classifies170 touched files:82 unmeasured andeight below target remain gaps. The coverage-verifier argument guard is causally RED/GREEN verified. Component gates pass then final readiness rejects five gaps: missing full coverage scope, unmet default target, incomplete actual touched-file/fact qualifications and six cache seeds awaiting final-gate integration. V0.6c independently qualifies all six named native cache challenges with exact intended assertions/control/restoration under an explicit unoptimized/no-inlining diagnostic profile:68unique executions62passes6intendedfailures,14zero-warning/error builds,324inputs/336ordinarybinaries/index unchanged. Both optimized-frame attempts remain FAILED; diagnostic success does not certify optimized artifacts. No fixture/policy/public/data approval, other-platform/backend-runtime or protected-governance closure is inferred. V1z ordinary compiler-null membership passes both cached and uncached null\u2192nativeNonempty\u2192nativeEmpty\u2192nonempty\u2192null sequences, tenfull native-oracle result/Closed-connection observations. Its private Test-compilation transition preserves all416inheriteddefinitions/categories/outcomes plus exactlythreepasses, one new PDBdocument, all97production source hashes/16716leafstructures and previous coverage;848inputs/all336currentbinaries/source/index unchanged. Permanentoriginal\u2192V1ychain/durabletools preserved. FullARRAY.NULL and accepting the changed Test pair in the durable final profile remain unqualified.",
+        "evidence": [
+          "eng/verify.sh",
+          "eng/coverage.runsettings",
+          "IQToolkitTest/IQToolkitTest.csproj",
+          "docs/modernization-foundation-hardness.md",
+          "eng/verify-test-results.sh",
+          "eng/TestResultsVerifier/Program.cs",
+          "docs/modernization-test-execution-hardness.md",
+          "eng/verify-coverage-results.sh",
+          "eng/CoverageVerifier/Program.cs",
+          "docs/modernization-coverage-hardness.md",
+          "eng/verify-coverage.sh",
+          "eng/CoverageCollector/Program.cs",
+          "docs/modernization-string-literal-hardness.md",
+          "eng/verify-final.sh",
+          "eng/FinalVerification/Program.cs",
+          "eng/FinalVerification/profile.json",
+          "docs/modernization-final-verification-hardness.md",
+          "eng/FinalVerification/Classifiers.cs",
+          "eng/FinalVerification/fact-bindings.json",
+          "eng/FinalVerification/coverage-layers.json",
+          "docs/modernization-final-classification-hardness.md",
+          "docs/modernization-cache-sensitivity-hardness.md",
+          "docs/modernization-null-array-hardness.md"
+        ],
+        "next_action": "Authenticate the qualified V1z Test-compilation transition in the durable final profile and bind scoped diagnostic cache seed evidence without certifying optimized artifacts. Qualify remaining mandatory facts, complete coverage scope/targets and durable final-gate binding of the scoped diagnostic cache seed evidence; qualify timeout/cancellation and other platform adapters. Resolve outstanding fixture/policy/public/data decisions explicitly. Preserve baseline continuity and actual failures; executable classifiers still reject full readiness."
+      }
+    },
+    {
+      "id": "DOTNET-PKG-001",
+      "title": "Publication modes and runtime servicing.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 878,
+        "end_line": 902
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:package-contract",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Six portable library/symbol pairs are inspected; the legacy Test executable is excluded from packages. No deployable application, single-file/AOT or production publish contract is certified.",
+        "evidence": [
+          "eng/VerifyPackages.proj",
+          "Test/Test.csproj",
+          "README.md",
+          "docs/modernization-roadmap.md"
+        ],
+        "next_action": "Keep application deployment modes conditional on a consumer; perform the required bounded AOT/trimming probe before making support claims."
+      }
+    },
+    {
+      "id": "DOTNET-CTR-001",
+      "title": "Container build inputs, cache, and runtime contract.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 903,
+        "end_line": 980
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "N/A",
+        "observation": "The repository does not ship a production application container; future database test containers do not establish an application deployment contract.",
+        "evidence": [
+          "IQToolkit.sln",
+          "docs/modernization-roadmap.md"
+        ],
+        "next_action": "Apply container input/cache/runtime requirements if an application container becomes part of the supported product."
+      }
+    },
+    {
+      "id": "DOTNET-PLAT-001",
+      "title": "Portable file-system contracts.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 983,
+        "end_line": 1008
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:native-platform-matrix",
+        "test:portable-file-contracts",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Caller mapping files and translation baseline files are runtime/harness boundaries; portable Path use exists but legacy paths/newline contracts and hosted Unix evidence are incomplete.",
+        "evidence": [
+          "IQToolkit.Data/EntityProvider.cs",
+          "Test/NorthwindTranslationTests.cs",
+          "Test/TestHarness.cs",
+          "Test/app.config",
+          ".github/workflows/ci.yml"
+        ],
+        "next_action": "Specify newline/casing contracts and inspect touched legacy file references under scoped adoption."
+      }
+    },
+    {
+      "id": "DOTNET-PROC-001",
+      "title": "External process execution boundary.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1009,
+        "end_line": 1054
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "N/A",
+        "observation": "No active library .NET child-process runner was found; Bash engineering commands are outside this runtime rule boundary.",
+        "evidence": [
+          "IQToolkit/IQToolkit.csproj",
+          "IQToolkit.Data/IQToolkit.Data.csproj",
+          "eng/verify.sh"
+        ],
+        "next_action": "Reassess timeout, process-tree, argument, pipe and environment controls if a .NET process runner is introduced."
+      }
+    },
+    {
+      "id": "DOTNET-FS-001",
+      "title": "Private file creation and access control.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1055,
+        "end_line": 1092
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:private-file-creation",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "UNVERIFIED",
+        "observation": "SQLite ReadWriteCreate delegates file creation to its driver; diagnostic TextWriter sinks are caller-owned. Private permissions/ACLs and trusted parent ownership are not qualified.",
+        "evidence": [
+          "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs",
+          "IQToolkit.Data/EntityProvider.cs"
+        ],
+        "next_action": "Document ownership/trusted-path contracts and qualify native creation permissions on supported platforms."
+      }
+    },
+    {
+      "id": "DOTNET-FS-002",
+      "title": "Temporary storage allocation and lifecycle.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1093,
+        "end_line": 1103
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:evidence-workspace-lifecycle",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Runtime temporary-file allocation is absent; the missing-file SQLite case creates no database. Engineering mktemp workspaces are retained per-run, with CI artifact retention but no local size/lifecycle cleanup policy.",
+        "evidence": [
+          "IQToolkitTest/SQLiteTests.cs",
+          "eng/verify.sh",
+          "eng/verify-api.sh",
+          ".github/workflows/ci.yml"
+        ],
+        "next_action": "Define local workspace ownership, bounds and safe cleanup; do not misclassify the inherited missing-file test as temporary allocation."
+      }
+    },
+    {
+      "id": "DOTNET-PLAT-002",
+      "title": "Platform boundaries and analyzer protection.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1104,
+        "end_line": 1147
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [
+        {
+          "key": "platform-analyzer-protection",
+          "source_line": 1106,
+          "obligation": "Platform-specific calls **MUST** have analyzer-recognized platform protection; any required analyzer suppression **MUST** follow the approved, narrowly scoped exception protocol."
+        }
+      ],
+      "required_enforcement": [
+        "gate:platform-analyzers",
+        "test:platform-provider-boundaries",
+        "gate:standards-overrides",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Access/OleDb public provider types carry Windows annotations and strict builds pass; reflective provider selection and actual Windows behavior need qualification.",
+        "evidence": [
+          "IQToolkit.Data.Access/AccessQueryProvider.cs",
+          "IQToolkit.Data.Access/OleDbQueryProvider.cs",
+          "IQToolkit.Data/DbEntityProvider.cs",
+          "Directory.Build.props"
+        ],
+        "next_action": "Qualify selection/unsupported-platform behavior and public caller diagnostics without blanket suppression."
+      }
+    },
+    {
+      "id": "DOTNET-PLAT-003",
+      "title": "Native library interoperability.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1148,
+        "end_line": 1161
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:native-provider-matrix",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "UNVERIFIED",
+        "observation": "SQLite driver packages supply native assets; local Linux ARM64 tests do not certify every declared OS/architecture. No repository-owned active P/Invoke layer was found.",
+        "evidence": [
+          "IQToolkit.Data.SQLite/IQToolkit.Data.SQLite.csproj",
+          "README.md",
+          ".github/workflows/ci.yml"
+        ],
+        "next_action": "Select and certify exact native provider/RID combinations using real execution."
+      }
+    },
+    {
+      "id": "DOTNET-SEC-001",
+      "title": "Runtime and application security baseline.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1162,
+        "end_line": 1184
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:dependency-vulnerability-audit",
+        "test:provider-boundary-security",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "SDK/feed/audit/provenance controls and parameter binding exist; raw SQL, mapping files and reflective provider-selection inputs still need explicit trust/security contracts.",
+        "evidence": [
+          "global.json",
+          "NuGet.config",
+          "IQToolkit.Data/Common/Translation/Parameterizer.cs",
+          "IQToolkit.Data/DbEntityProvider.cs"
+        ],
+        "next_action": "Define trusted-input and diagnostic boundaries plus servicing/security ownership; deployment identity belongs to qualified consumers."
+      }
+    },
+    {
+      "id": "DOTNET-CFG-001",
+      "title": "Configuration binding and validation.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1185,
+        "end_line": 1231
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:hosting-options-validation",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Legacy application-settings factory and console environment configuration remain; constructors support externally supplied connections/mapping/policy. Typed hosting/options startup validation is not implemented.",
+        "evidence": [
+          "IQToolkit.Data/DbEntityProvider.cs",
+          "Test/Program.cs"
+        ],
+        "next_action": "Preserve compatibility and add the optional M1 hosting/options adapter without pulling hosting dependencies into core."
+      }
+    },
+    {
+      "id": "DOTNET-SEC-002",
+      "title": "Secret management and disclosure prevention.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1232,
+        "end_line": 1249
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:diagnostic-redaction",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "FAIL",
+        "observation": "Source inspection finds unclassified parameter values written to a caller-supplied log. Environment-variable inputs and a password connection-string builder do not prove protected secret storage/rotation.",
+        "evidence": [
+          "IQToolkit.Data/DbEntityProvider.cs",
+          "Test/Program.cs",
+          "IQToolkit.Data.SQLite/SQLiteQueryProvider.cs"
+        ],
+        "next_action": "Implement approved regression-led redaction defaults and explicit sensitive opt-in; document credential ownership/rotation. No leak was generated or captured for this source finding."
+      }
+    },
+    {
+      "id": "DOTNET-OBS-001",
+      "title": "Structured logs and sensitive diagnostics.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1250,
+        "end_line": 1299
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:diagnostic-redaction",
+        "test:structured-diagnostic-contracts",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "FAIL",
+        "observation": "Current diagnostics are preformatted TextWriter SQL/parameter output without structured event/property contracts or redaction.",
+        "evidence": [
+          "IQToolkit.Data/EntityProvider.cs",
+          "IQToolkit.Data/DbEntityProvider.cs"
+        ],
+        "next_action": "Add the optional M1 structured logging adapter and safe event contracts while retaining the synchronous compatibility surface."
+      }
+    },
+    {
+      "id": "DOTNET-OBS-002",
+      "title": "Metrics and distributed trace contracts.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1300,
+        "end_line": 1313
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:instrumentation-context-dimensions",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Distributed-service clauses are currently outside the library-as-service boundary; required M1 tracing/metrics are not implemented. No ActivitySource/Meter instrumentation was found.",
+        "evidence": [
+          "IQToolkit.Data/DbEntityProvider.cs",
+          "docs/modernization-roadmap.md"
+        ],
+        "next_action": "Implement safe operation spans/metrics and coordinate driver instrumentation; keep labels bounded and sensitive contents absent."
+      }
+    },
+    {
+      "id": "DOTNET-PERF-001",
+      "title": "Performance evidence and diagnostics.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1314,
+        "end_line": 1331
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:workload-performance-baseline",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Legacy timed query/cache routines exist, but the current translation entry point does not invoke them. No reproducible workload/allocation or regression gate is established.",
+        "evidence": [
+          "Test/NorthwindPerfTests.cs",
+          "Test/TestHarness.cs",
+          "Test/Program.cs"
+        ],
+        "next_action": "Select an authorized workload and retain reproducible cold/warm, allocation and before/after measurements before performance claims."
+      }
+    },
+    {
+      "id": "DOTNET-TIME-001",
+      "title": "Instants, civil schedules, and time-zone IDs.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1332,
+        "end_line": 1343
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:date-offset-roundtrip",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "UNVERIFIED",
+        "observation": "DateTime and DateTimeOffset mapping/read paths exist without complete provider round-trip proof; named-zone and scheduling clauses are currently outside scope.",
+        "evidence": [
+          "IQToolkit.Data/DbTypeSystem.cs",
+          "IQToolkit.Data/Common/FieldReader.cs"
+        ],
+        "next_action": "Specify supported date/instant/offset preservation per provider without treating all legacy DateTime data as UTC."
+      }
+    },
+    {
+      "id": "DOTNET-GLOB-001",
+      "title": "Globalization and localization semantics.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1344,
+        "end_line": 1361
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "test:invariant-machine-contracts",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "FAIL",
+        "observation": "V1u native Double literal cases and V1v uncached relational Turkish Min demonstrate retained semantic RED followed by unchanged GREEN after explicit invariant floating conversion and aggregate keyword casing. Other numeric/aggregate/dialect/culture boundaries remain unqualified. Ambient machine casing remains in provider Math translation, type declaration parsing and provider identification; those source findings keep this group FAIL and do not establish runtime results for those paths.",
+        "evidence": [
+          "IQToolkit.Data/Common/Language/SqlFormatter.cs",
+          "IQToolkit.Data/DbTypeSystem.cs",
+          "IQToolkit.Data/Mapping/XmlMapping.cs",
+          "IQToolkit.Data/DbEntityProvider.cs",
+          "IQToolkitTest/RealProvider/NativeFloatingLiteralTests.cs",
+          "IQToolkitTest/RealProvider/NativeAggregateCultureTests.cs",
+          "docs/modernization-sql-double-culture-hardness.md",
+          "docs/modernization-sql-aggregate-culture-hardness.md",
+          "IQToolkit.Data.SQLite/SQLiteFormatter.cs"
+        ],
+        "next_action": "Qualify and correct remaining invariant/ordinal machine boundaries with approved real inputs or named generated-input authorization; preserve intentionally culture-sensitive LINQ/user-data conversion and collation. Broader runtime/hosted qualification and protected enforcement remain open."
+      }
+    },
+    {
+      "id": "DOTNET-GOV-001",
+      "title": "Rule identity and enforcement traceability.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1364,
+        "end_line": 1375
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:standards-catalog",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "This catalog derived from 43 source declarations records ownership, provenance and adoption obligations. An enforced catalog/unknown-ID CI gate and protected catalog review are not implemented.",
+        "evidence": [
+          "docs/standards/dotnet-rules.json",
+          "docs/standards/adoption.md",
+          "docs/modernization-implementation-plan.md"
+        ],
+        "next_action": "Complete V0.9b with fixture-authorized tests and protected enforcement; catalog existence is not a compliance or waiver claim."
+      }
+    },
+    {
+      "id": "DOTNET-GOV-002",
+      "title": "Roles, tooling, and repository templates.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1376,
+        "end_line": 1434
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:source-style",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "The dotnet CLI, pinned SDK, analyzers, basic editorconfig conventions and shared dependency controls are configured; complete style/template tooling and corporate tooling/role approvals are not established.",
+        "evidence": [
+          ".editorconfig",
+          "global.json",
+          "eng/verify.sh",
+          "Directory.Build.props",
+          "Directory.Packages.props"
+        ],
+        "next_action": "Record scoped formatting/tooling conventions and role ownership without implying enterprise approvals from local files."
+      }
+    },
+    {
+      "id": "DOTNET-GOV-003",
+      "title": "Compliance, audit, and review requirements.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1435,
+        "end_line": 1500
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:final-verification",
+        "gate:standards-catalog",
+        "gate:standards-overrides",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PARTIAL",
+        "observation": "Scoped build/test/package/API and independent Oracle evidence is retained; formatting, governance, protected platform/provider and final behavioral gates are incomplete.",
+        "evidence": [
+          "docs/modernization-foundation-hardness.md",
+          "docs/modernization-implementation-plan.md",
+          "eng/verify.sh"
+        ],
+        "next_action": "Complete the recorded final-gate inventory and judgment-based reviews before any whole-project compliance claim."
+      }
+    },
+    {
+      "id": "DOTNET-GOV-004",
+      "title": "Exception authorization and expiration.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1501,
+        "end_line": 1553
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "gate:standards-overrides",
+        "test:override-boundary-cases",
+        "review"
+      ],
+      "adoption": {
+        "verdict": "UNVERIFIED",
+        "observation": "No new exception has been approved or invented. A protected registry, independent approval/issue evidence and expiration/scope gate are not implemented or qualified.",
+        "evidence": [
+          "docs/modernization-implementation-plan.md",
+          "docs/standards/adoption.md"
+        ],
+        "next_action": "Resolve trusted-review/issue evidence and scope-bound fixtures before V0.9b; never self-authorize by changing the gate/catalog/approval fields."
+      }
+    },
+    {
+      "id": "DOTNET-GOV-005",
+      "title": "Legacy adoption scope.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1554,
+        "end_line": 1557
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "PASS",
+        "observation": "Current source changes remove seven verified private declaration sites and centralize metadata without unrelated public namespace/style rewrites; expanded work scopes and gates are recorded.",
+        "evidence": [
+          "docs/modernization-implementation-plan.md",
+          "docs/modernization-foundation-hardness.md",
+          "AGENT_STATE.md"
+        ],
+        "next_action": "Apply current rules to new files/touched units and keep known legacy gaps explicit; this verdict grants no mandatory-rule waiver."
+      }
+    },
+    {
+      "id": "DOTNET-GOV-006",
+      "title": "Standard versioning and lifecycle.",
+      "declaration_form": "rule_group",
+      "source": {
+        "start_line": 1558,
+        "end_line": 1600
+      },
+      "parent_group": null,
+      "owner": "IQToolkit project owner",
+      "status": "declared",
+      "named_clauses": [],
+      "required_enforcement": [
+        "review"
+      ],
+      "adoption": {
+        "verdict": "UNVERIFIED",
+        "observation": "The project owner explicitly selected this exact draft revision; corporate publication/effective-date/RFC lifecycle is not established by repository work and is not a reason to reask the project selection.",
+        "evidence": [
+          "docs/modernization-implementation-plan.md",
+          "docs/standards/adoption.md"
+        ],
+        "next_action": "Track the selected hash/version and re-evaluate future revisions; corporate lifecycle decisions remain with the standard owner."
+      }
+    }
+  ]
+}

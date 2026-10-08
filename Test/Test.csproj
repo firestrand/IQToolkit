@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <PropertyGroup><OutputType>Exe</OutputType><IsPackable>false</IsPackable><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile></PropertyGroup>
   <ItemGroup><None Update="Northwind.xml;app.config;*.base" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit.Data/IQToolkit.Data.csproj" />

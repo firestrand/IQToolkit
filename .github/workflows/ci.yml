@@ -1,0 +1,98 @@
+name: Build, test, and package
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025, macos-15]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install selected SDK
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          global-json-file: global.json
+      - name: Build and run offline verification
+        shell: bash
+        run: bash eng/verify.sh
+      - name: Pack libraries and symbols
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet pack IQToolkit.sln -c Release --no-build --no-restore -p:ContinuousIntegrationBuild=true -warnaserror -o artifacts/packages
+      - name: Inspect package contract
+        shell: bash
+        run: dotnet msbuild eng/VerifyPackages.proj -nologo -p:PackageDirectory=artifacts/packages
+      - name: Validate symbol identities and Source Link
+        shell: bash
+        run: bash eng/verify-symbols.sh artifacts/packages
+      - name: Verify isolated package consumers
+        if: runner.os == 'Linux'
+        shell: bash
+        run: bash eng/verify-ci-consumers.sh artifacts/packages
+      - name: Compare APIs against the pinned release
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash eng/prepare-api-baseline.sh
+          api_baseline_run="$(cat artifacts/api-baselines/latest-success.txt)"
+          bash eng/verify-api.sh "$(cat "$api_baseline_run/packages-directory.txt")"
+      - name: Retain verification logs and packages
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: verification-${{ matrix.runner }}
+          path: |
+            artifacts/verification/
+            artifacts/packages/
+            artifacts/package-symbols/runs/*/*.txt
+            artifacts/package-symbols/runs/*/*.log
+            artifacts/package-symbols/runs/*/*.jsonl
+            artifacts/package-symbols/runs/*/tested-packages/
+            artifacts/package-symbols/runs/*/environment/source/
+            artifacts/ci-consumers/runs/*/*.txt
+            artifacts/ci-consumers/runs/*/*.tsv
+            artifacts/ci-consumers/runs/*/*.sha256
+            artifacts/ci-consumers/runs/*/*.log
+            artifacts/ci-consumers/runs/*/source/
+            artifacts/ci-consumers/runs/*/reviewed-locks/
+            artifacts/ci-consumers/runs/*/prepared-locks/
+            artifacts/ci-consumers/runs/*/tested-packages/
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*.txt
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*.tsv
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*.sha256
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*.log
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*/*.txt
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*/*.log
+            artifacts/ci-consumers/runs/*/environment/artifacts/independent-consumers/*-runs/*/*/*.json
+            artifacts/ci-consumers/runs/*/environment/artifacts/package-consumer/runs/*/*.txt
+            artifacts/ci-consumers/runs/*/environment/artifacts/package-consumer/runs/*/*.log
+            artifacts/ci-consumers/runs/*/environment/artifacts/package-consumer/runs/*/*.json
+            artifacts/ci-consumers/runs/*/environment/artifacts/package-consumer/lock-preparation-runs/*/*.txt
+            artifacts/ci-consumers/runs/*/environment/artifacts/package-consumer/lock-preparation-runs/*/*.log
+            artifacts/ci-consumers/runs/*/environment/artifacts/package-consumer/lock-preparation-runs/*/*.json
+            artifacts/api-baselines/runs/*/*.txt
+            artifacts/api-baselines/runs/*/*.sha256
+            artifacts/api-compatibility/runs/*/*.txt
+            artifacts/api-compatibility/runs/*/*.sha256
+            artifacts/api-compatibility/runs/*/*.metadata/*.txt
+            artifacts/api-compatibility/runs/*/tested-packages/*.nupkg
+            artifacts/api-compatibility/runs/*/baseline-packages/*.nupkg
+          if-no-files-found: warn
+          retention-days: 14

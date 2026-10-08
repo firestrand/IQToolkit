@@ -266,7 +266,7 @@ namespace IQToolkit.Data
             this.StartUsingConnection();
             try
             {
-                DbCommand cmd = this.Connection.CreateCommand();
+                using DbCommand cmd = this.Connection.CreateCommand();
                 cmd.CommandText = commandText;
                 return cmd.ExecuteNonQuery();
             }
@@ -333,8 +333,18 @@ namespace IQToolkit.Data
                 try
                 {
                     DbCommand cmd = this.GetCommand(command, paramValues);
-                    DbDataReader reader = this.ExecuteReader(cmd);
-                    var result = Project(reader, fnProjector, entity, true);
+                    DbDataReader reader;
+                    try
+                    {
+                        reader = this.ExecuteReader(cmd);
+                    }
+                    catch
+                    {
+                        cmd.Dispose();
+                        throw;
+                    }
+                    IEnumerable<T> result = new CommandOwnedEnumerable<T>(
+                        Project(reader, fnProjector, entity, true), reader, cmd);
                     if (this.provider.ActionOpenedConnection)
                     {
                         result = result.ToList();
@@ -348,6 +358,96 @@ namespace IQToolkit.Data
                 finally
                 {
                     this.StopUsingConnection();
+                }
+            }
+
+            private sealed class CommandOwnedEnumerable<T> : IEnumerable<T>
+            {
+                private readonly IEnumerable<T> _projection;
+                private readonly DbDataReader _reader;
+                private readonly DbCommand _command;
+
+                public CommandOwnedEnumerable(IEnumerable<T> projection, DbDataReader reader, DbCommand command)
+                {
+                    _projection = projection;
+                    _reader = reader;
+                    _command = command;
+                }
+
+                public IEnumerator<T> GetEnumerator()
+                {
+                    return new CommandOwnedEnumerator<T>(_projection.GetEnumerator(), _reader, _command);
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    return this.GetEnumerator();
+                }
+            }
+
+            private sealed class CommandOwnedEnumerator<T> : IEnumerator<T>
+            {
+                private readonly IEnumerator<T> _projection;
+                private readonly DbDataReader _reader;
+                private readonly DbCommand _command;
+                private bool _disposed;
+
+                public CommandOwnedEnumerator(IEnumerator<T> projection, DbDataReader reader, DbCommand command)
+                {
+                    _projection = projection;
+                    _reader = reader;
+                    _command = command;
+                }
+
+                public T Current { get { return _projection.Current; } }
+                object IEnumerator.Current { get { return this.Current; } }
+
+                public bool MoveNext()
+                {
+                    if (_disposed)
+                        return false;
+                    try
+                    {
+                        if (_projection.MoveNext())
+                            return true;
+                    }
+                    catch
+                    {
+                        this.Dispose();
+                        throw;
+                    }
+                    this.Dispose();
+                    return false;
+                }
+
+                public void Reset()
+                {
+                    _projection.Reset();
+                }
+
+                public void Dispose()
+                {
+                    if (_disposed)
+                        return;
+                    _disposed = true;
+                    try
+                    {
+                        _projection.Dispose();
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            // An unstarted iterator has not entered Project's
+                            // reader finally, despite eager reader acquisition.
+                            if (!_reader.IsClosed)
+                                _reader.Close();
+                        }
+                        finally
+                        {
+                            _command.Dispose();
+                        }
+                    }
                 }
             }
 
@@ -394,7 +494,7 @@ namespace IQToolkit.Data
                 this.StartUsingConnection();
                 try
                 {
-                    DbCommand cmd = this.GetCommand(query, paramValues);
+                    using DbCommand cmd = this.GetCommand(query, paramValues);
                     this.rowsAffected = cmd.ExecuteNonQuery();
                     return this.rowsAffected;
                 }
@@ -428,7 +528,7 @@ namespace IQToolkit.Data
             private IEnumerable<int> ExecuteBatch(QueryCommand query, IEnumerable<object[]> paramSets)
             {
                 this.LogCommand(query, null);
-                DbCommand cmd = this.GetCommand(query, null);
+                using DbCommand cmd = this.GetCommand(query, null);
                 foreach (var paramValues in paramSets)
                 {
                     this.LogParameters(query, paramValues);
@@ -463,7 +563,7 @@ namespace IQToolkit.Data
             private IEnumerable<T> ExecuteBatch<T>(QueryCommand query, IEnumerable<object[]> paramSets, Func<FieldReader, T> fnProjector, MappingEntity entity)
             {
                 this.LogCommand(query, null);
-                DbCommand cmd = this.GetCommand(query, null);
+                using DbCommand cmd = this.GetCommand(query, null);
                 cmd.Prepare();
                 foreach (var paramValues in paramSets)
                 {
@@ -497,7 +597,7 @@ namespace IQToolkit.Data
                 this.StartUsingConnection();
                 try
                 {
-                    DbCommand cmd = this.GetCommand(query, paramValues);
+                    using DbCommand cmd = this.GetCommand(query, paramValues);
                     var reader = this.ExecuteReader(cmd);
                     var freader = new DbFieldReader(this, reader);
                     try
@@ -529,11 +629,19 @@ namespace IQToolkit.Data
             {
                 // create command object (and fill in parameters)
                 DbCommand cmd = this.provider.Connection.CreateCommand();
-                cmd.CommandText = query.CommandText;
-                if (this.provider.Transaction != null)
-                    cmd.Transaction = this.provider.Transaction;
-                this.SetParameterValues(query, cmd, paramValues);
-                return cmd;
+                try
+                {
+                    cmd.CommandText = query.CommandText;
+                    if (this.provider.Transaction != null)
+                        cmd.Transaction = this.provider.Transaction;
+                    this.SetParameterValues(query, cmd, paramValues);
+                    return cmd;
+                }
+                catch
+                {
+                    cmd.Dispose();
+                    throw;
+                }
             }
 
             protected virtual void SetParameterValues(QueryCommand query, DbCommand command, object[] paramValues)

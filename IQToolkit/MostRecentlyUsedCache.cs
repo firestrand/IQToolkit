@@ -77,10 +77,12 @@ namespace IQToolkit
             {
                 for (int i = 0, n = this.list.Count; i < n; i++)
                 {
-                    cached = this.list[i];
-                    if (fnEquals(cached, item))
+                    T candidate = this.list[i];
+                    if (fnEquals(candidate, item))
                     {
-                        cacheIndex = 0;
+                        cached = candidate;
+                        cacheIndex = i;
+                        break;
                     }
                 }
             }
@@ -97,12 +99,15 @@ namespace IQToolkit
                     if (this.version != version)
                     {
                         cacheIndex = -1;
+                        cached = default(T);
                         for (int i = 0, n = this.list.Count; i < n; i++)
                         {
-                            cached = this.list[i];
-                            if (fnEquals(cached, item))
+                            T candidate = this.list[i];
+                            if (fnEquals(candidate, item))
                             {
-                                cacheIndex = 0;
+                                cached = candidate;
+                                cacheIndex = i;
+                                break;
                             }
                         }
                     }
@@ -118,7 +123,7 @@ namespace IQToolkit
                         {
                             // if item is not at start, move it to the start
                             this.list.RemoveAt(cacheIndex);
-                            this.list.Insert(0, item);
+                            this.list.Insert(0, cached);
                         }
                     }
                     // drop any items beyond max

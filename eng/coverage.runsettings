@@ -1,0 +1,24 @@
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Code Coverage" enabled="true">
+        <Configuration>
+          <Format>Cobertura</Format>
+          <IncludeTestAssembly>False</IncludeTestAssembly>
+          <CodeCoverage>
+            <EnableDynamicManagedInstrumentation>False</EnableDynamicManagedInstrumentation>
+            <EnableStaticManagedInstrumentation>True</EnableStaticManagedInstrumentation>
+            <EnableStaticManagedInstrumentationRestore>True</EnableStaticManagedInstrumentationRestore>
+            <EnableDynamicNativeInstrumentation>False</EnableDynamicNativeInstrumentation>
+            <EnableStaticNativeInstrumentation>False</EnableStaticNativeInstrumentation>
+            <ModulePaths>
+              <Include>
+                <ModulePath>.*[/\\]IQToolkit(\.Data(\.(SqlClient|SQLite|MySqlClient|Access))?)?\.dll$</ModulePath>
+              </Include>
+            </ModulePaths>
+          </CodeCoverage>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

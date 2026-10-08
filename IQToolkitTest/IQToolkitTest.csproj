@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><IsTestProject>true</IsTestProject><IsPackable>false</IsPackable></PropertyGroup>
+  <PropertyGroup><IsTestProject>true</IsTestProject><IsPackable>false</IsPackable><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile></PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit.Data.SqlClient/IQToolkit.Data.SqlClient.csproj" />
     <ProjectReference Include="../IQToolkit.Data/IQToolkit.Data.csproj" />
     <ProjectReference Include="../IQToolkit/IQToolkit.csproj" />
     <ProjectReference Include="../IQToolkit.Data.SQLite/IQToolkit.Data.SQLite.csproj" />
-    <PackageReference Include="MSTest.TestFramework" Version="4.4.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="4.4.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="MSTest.TestFramework" />
+    <PackageReference Include="MSTest.TestAdapter" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
 </Project>

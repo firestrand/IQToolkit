@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <NuGetLockFilePath>packages.lock.json</NuGetLockFilePath>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>high</NuGetAuditLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="IQToolkit.Data.SQLite" Version="[1.1.2-preview.1]" />
+  </ItemGroup>
+  <Target Name="RequireIndependentPackageConsumer" BeforeTargets="PrepareForBuild">
+    <Error Condition="'@(ProjectReference)' != ''" Text="Independent consumers require package references only." />
+    <Error Condition="'@(PackageReference->Count())' != '1'" Text="Exactly one direct package reference is required." />
+  </Target>
+</Project>

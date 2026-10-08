@@ -1,0 +1,146 @@
+<Project>
+  <!-- Imported only by verify-api.sh through CustomAfterMicrosoftCommonTargets.
+       RunPackageValidation's dependencies populate the SDK's reference groups
+       before this hook appends the isolated metadata-only search references. -->
+  <Target Name="AddIQToolkitApiCompatibilityReferences"
+          BeforeTargets="RunPackageValidation"
+          DependsOnTargets="_GetReferencePathFromInnerProjects"
+          Condition="'$(EnablePackageValidation)' == 'true'">
+    <Error Condition="'$(ApiCompatibilityReferenceDirectory)' == ''"
+           Text="ApiCompatibilityReferenceDirectory is required for complete API verification." />
+    <Error Condition="!Exists('$(ApiCompatibilityReferenceDirectory)/system.drawing.common/10.0.8/lib/net10.0/System.Drawing.Common.dll')"
+           Text="The pinned System.Drawing.Common API reference is missing." />
+    <Error Condition="!Exists('$(ApiCompatibilityReferenceDirectory)/microsoft.win32.systemevents/10.0.8/lib/net10.0/Microsoft.Win32.SystemEvents.dll')"
+           Text="The pinned Microsoft.Win32.SystemEvents API reference is missing." />
+    <Error Condition="'@(PackageValidationReferencePath)' == ''"
+           Text="The SDK did not supply package validation references; API verification cannot proceed." />
+    <ItemGroup>
+      <_IQToolkitNet10ReferenceGroup Include="@(PackageValidationReferencePath)"
+                                    Condition="'%(PackageValidationReferencePath.TargetFrameworkMoniker)' == '.NETCoreApp,Version=v10.0'" />
+    </ItemGroup>
+    <Error Condition="'@(_IQToolkitNet10ReferenceGroup)' == ''"
+           Text="The SDK did not supply the net10.0 reference group required by this API gate." />
+    <Error Condition="!Exists('$(MSBuildToolsPath)/System.Formats.Nrbf.dll')"
+           Text="The selected SDK must supply the System.Formats.Nrbf metadata reference." />
+    <GetAssemblyIdentity AssemblyFiles="$(MSBuildToolsPath)/System.Formats.Nrbf.dll">
+      <Output TaskParameter="Assemblies" ItemName="_IQToolkitSdkNrbfIdentity" />
+    </GetAssemblyIdentity>
+    <GetFileHash Files="$(MSBuildToolsPath)/System.Formats.Nrbf.dll;$(MSBuildToolsPath)/dotnet.deps.json" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="_IQToolkitSdkNrbfReference" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(ApiCompatibilitySdkReferenceManifest)"
+                      Lines="SDK tools path: $(MSBuildToolsPath);@(_IQToolkitSdkNrbfIdentity->'Assembly identity: %(Identity)');@(_IQToolkitSdkNrbfIdentity->'Assembly version: %(Version)');@(_IQToolkitSdkNrbfReference->'%(Identity)|%(FileHash)');Purpose: installed SDK metadata reference only, no runtime provider dependency."
+                      Overwrite="true" />
+    <WriteLinesToFile File="$(ApiCompatibilitySdkReferenceManifest).sha256"
+                      Lines="@(_IQToolkitSdkNrbfReference->'%(FileHash)  %(Identity)')"
+                      Overwrite="true" />
+    <!-- Match RunPackageValidation's own selection, rather than reconstructing
+         a filename from a presumed current version. -->
+    <ItemGroup>
+      <_IQToolkitApiCurrentPackage Include="@(NuGetPackOutput->WithMetadataValue('Extension', '.nupkg'))"
+                                  Condition="!$([System.String]::new('%(Identity)').EndsWith('.symbols.nupkg'))" />
+    </ItemGroup>
+    <Error Condition="'@(_IQToolkitApiCurrentPackage->Count())' != '1'"
+           Text="Expected exactly one current package from the SDK NuGetPackOutput." />
+    <GetFileHash Files="@(_IQToolkitApiCurrentPackage);$(PackageValidationBaselinePath)"
+                 Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="_IQToolkitApiComparisonInputs" />
+    </GetFileHash>
+    <WriteLinesToFile File="$(ApiCompatibilityPackageInputManifest)"
+                      Lines="@(_IQToolkitApiComparisonInputs->'%(FileHash)  %(Identity)')"
+                      Overwrite="true" />
+    <ItemGroup>
+      <PackageValidationReferencePath Update="@(PackageValidationReferencePath)"
+                                      Condition="'%(PackageValidationReferencePath.TargetFrameworkMoniker)' == '.NETCoreApp,Version=v10.0'">
+        <ReferencePath>%(PackageValidationReferencePath.ReferencePath),$(ApiCompatibilityReferenceDirectory)/system.drawing.common/10.0.8/lib/net10.0/System.Drawing.Common.dll,$(ApiCompatibilityReferenceDirectory)/microsoft.win32.systemevents/10.0.8/lib/net10.0/Microsoft.Win32.SystemEvents.dll,$(MSBuildToolsPath)/System.Formats.Nrbf.dll</ReferencePath>
+      </PackageValidationReferencePath>
+    </ItemGroup>
+    <Message Importance="high" Text="API reference closure: System.Drawing.Common 10.0.8 and Microsoft.Win32.SystemEvents 10.0.8; SDK references retained." />
+  </Target>
+
+  <!-- Native SDK tasks inspect the actual compared package bytes. Project
+       dependency versions follow PackageVersion; external runtime versions,
+       dependency identities, framework groups and asset filters must stay put. -->
+  <Target Name="VerifyIQToolkitMySqlRuntimeDependencies"
+          BeforeTargets="RunPackageValidation"
+          DependsOnTargets="AddIQToolkitApiCompatibilityReferences"
+          Condition="'$(EnablePackageValidation)' == 'true' and '$(PackageId)' == 'IQToolkit.Data.MySqlClient'">
+    <Error Condition="'$(ApiCompatibilityEvidenceDirectory)' == ''"
+           Text="ApiCompatibilityEvidenceDirectory is required for dependency verification." />
+    <Unzip SourceFiles="@(_IQToolkitApiCurrentPackage)"
+           DestinationFolder="$(ApiCompatibilityEvidenceDirectory)/current" />
+    <Unzip SourceFiles="$(PackageValidationBaselinePath)"
+           DestinationFolder="$(ApiCompatibilityEvidenceDirectory)/baseline" />
+    <PropertyGroup>
+      <_IQToolkitCurrentNuspec>$(ApiCompatibilityEvidenceDirectory)/current/$(PackageId).nuspec</_IQToolkitCurrentNuspec>
+      <_IQToolkitBaselineNuspec>$(ApiCompatibilityEvidenceDirectory)/baseline/$(PackageId).nuspec</_IQToolkitBaselineNuspec>
+      <_IQToolkitCurrentPackagePath>@(_IQToolkitApiCurrentPackage)</_IQToolkitCurrentPackagePath>
+      <_IQToolkitDependencyXPath>//*[local-name()='dependencies']/*[local-name()='group']/*[local-name()='dependency']</_IQToolkitDependencyXPath>
+      <_IQToolkitExternalDependencyXPath>$(_IQToolkitDependencyXPath)[@id!='IQToolkit' and @id!='IQToolkit.Data']</_IQToolkitExternalDependencyXPath>
+    </PropertyGroup>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)" Query="$(_IQToolkitDependencyXPath)/@id">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitCurrentDependencyIds" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="$(_IQToolkitDependencyXPath)/@id">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineDependencyIds" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)" Query="$(_IQToolkitDependencyXPath)/@version">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitCurrentDependencyVersions" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="$(_IQToolkitDependencyXPath)/@version">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineDependencyVersions" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)" Query="$(_IQToolkitExternalDependencyXPath)/@version">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitCurrentExternalVersions" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="$(_IQToolkitExternalDependencyXPath)/@version">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineExternalVersions" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)" Query="$(_IQToolkitDependencyXPath)/@exclude">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitCurrentDependencyExcludes" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="$(_IQToolkitDependencyXPath)/@exclude">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineDependencyExcludes" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)" Query="$(_IQToolkitDependencyXPath)/@include">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitCurrentDependencyIncludes" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="$(_IQToolkitDependencyXPath)/@include">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineDependencyIncludes" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)" Query="//*[local-name()='dependencies']/*[local-name()='group']/@targetFramework">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitCurrentDependencyFrameworks" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="//*[local-name()='dependencies']/*[local-name()='group']/@targetFramework">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineDependencyFrameworks" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitCurrentNuspec)"
+             Query="$(_IQToolkitDependencyXPath)[(@id='IQToolkit' or @id='IQToolkit.Data') and @version!='$(PackageVersion)']/@version">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitUnexpectedProjectVersions" />
+    </XmlPeek>
+    <WriteLinesToFile File="$(ApiCompatibilityEvidenceDirectory)/runtime-dependencies.txt"
+                      Lines="Baseline: $(PackageValidationBaselinePath);Current: $(_IQToolkitCurrentPackagePath);Baseline IDs: $(_IQToolkitBaselineDependencyIds);Current IDs: $(_IQToolkitCurrentDependencyIds);Baseline versions: $(_IQToolkitBaselineDependencyVersions);Current versions: $(_IQToolkitCurrentDependencyVersions);Baseline external versions: $(_IQToolkitBaselineExternalVersions);Current external versions: $(_IQToolkitCurrentExternalVersions);Baseline excludes: $(_IQToolkitBaselineDependencyExcludes);Current excludes: $(_IQToolkitCurrentDependencyExcludes);Baseline includes: $(_IQToolkitBaselineDependencyIncludes);Current includes: $(_IQToolkitCurrentDependencyIncludes);Baseline frameworks: $(_IQToolkitBaselineDependencyFrameworks);Current frameworks: $(_IQToolkitCurrentDependencyFrameworks);Expected project version: $(PackageVersion)"
+                      Overwrite="true" />
+    <Error Condition="'$(_IQToolkitCurrentDependencyIds)' != '$(_IQToolkitBaselineDependencyIds)' or '$(_IQToolkitCurrentExternalVersions)' != '$(_IQToolkitBaselineExternalVersions)' or '$(_IQToolkitCurrentDependencyExcludes)' != '$(_IQToolkitBaselineDependencyExcludes)' or '$(_IQToolkitCurrentDependencyIncludes)' != '$(_IQToolkitBaselineDependencyIncludes)' or '$(_IQToolkitCurrentDependencyFrameworks)' != '$(_IQToolkitBaselineDependencyFrameworks)' or '$(_IQToolkitUnexpectedProjectVersions)' != ''"
+           Text="MySQL runtime dependencies changed beyond the library's own current package versions; see runtime-dependencies.txt." />
+    <!-- Compare complete dependency XML as well, retaining each attribute's
+         association with its dependency/group. Normalize only a separate
+         inspection copy's two approved project versions to the fixed baseline.
+         Original extracted metadata and both package archives remain intact. -->
+    <Copy SourceFiles="$(_IQToolkitCurrentNuspec)"
+          DestinationFiles="$(ApiCompatibilityEvidenceDirectory)/current.normalized.nuspec" />
+    <XmlPoke XmlInputPath="$(ApiCompatibilityEvidenceDirectory)/current.normalized.nuspec"
+             Query="$(_IQToolkitDependencyXPath)[@id='IQToolkit' or @id='IQToolkit.Data']/@version"
+             Value="1.1.1" />
+    <XmlPeek XmlInputPath="$(ApiCompatibilityEvidenceDirectory)/current.normalized.nuspec"
+             Query="//*[local-name()='dependencies']">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitNormalizedCurrentDependencies" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_IQToolkitBaselineNuspec)" Query="//*[local-name()='dependencies']">
+      <Output TaskParameter="Result" PropertyName="_IQToolkitBaselineDependencies" />
+    </XmlPeek>
+    <Error Condition="'$(_IQToolkitNormalizedCurrentDependencies)' != '$(_IQToolkitBaselineDependencies)'"
+           Text="MySQL dependency XML changed beyond its own package version; inspect the extracted nuspec files." />
+    <Message Importance="high" Text="MySQL runtime dependency comparison passed for the actual baseline and current packages." />
+  </Target>
+</Project>

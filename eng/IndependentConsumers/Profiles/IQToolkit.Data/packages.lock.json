@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net10.0": {
+      "IQToolkit.Data": {
+        "type": "Direct",
+        "requested": "[1.1.2-preview.1, 1.1.2-preview.1]",
+        "resolved": "1.1.2-preview.1",
+        "contentHash": "9a1+slz91+51DFJvDFHoVVb2zuIvqQvwOJynKyiQG8aFnefTFxGF2yXsyd0JFrDvwFrSToSKGgymDq7lDoUGlQ==",
+        "dependencies": {
+          "IQToolkit": "1.1.2-preview.1",
+          "System.Configuration.ConfigurationManager": "10.0.12"
+        }
+      },
+      "IQToolkit": {
+        "type": "Transitive",
+        "resolved": "1.1.2-preview.1",
+        "contentHash": "sAP7aQYk2poUJMukG+DSBVljF7hCqJ+LAON4NvnTS3QMJq8z1C+PRo82Wrsj5IQm/pj8+oaLgfLp2TRUz7skOw=="
+      },
+      "System.Configuration.ConfigurationManager": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "6KP/CGB9YymJuhNorm5FS/urQJB40h6t4DIiXN8J1VT/jINZHNgjzcdWRHGYuXGLwO7SCOq5K/OMAnh6oRbeLg==",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "10.0.12",
+          "System.Security.Cryptography.ProtectedData": "10.0.12"
+        }
+      },
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "sOZM+VyRj1pg/ItlHsvrSbjws6oGqZveTzTNBGZ9ziwRDyKsOF3ub6vhvOdxotCIqtlnyHAIwP5sLNvgiZC+pQ=="
+      },
+      "System.Security.Cryptography.ProtectedData": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "wO0W8VDMeRJZakRySOmemAnrBZMwEFRlbfBtATxUiLf2I3IhSRnCp1Vt157NWptdE4IJ7eftd5n8q9LtaKHFTQ=="
+      }
+    }
+  }
+}

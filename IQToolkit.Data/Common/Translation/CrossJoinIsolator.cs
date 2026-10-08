@@ -50,16 +50,6 @@ namespace IQToolkit.Data.Common
             return join;
         }
 
-        private bool IsCrossJoin(Expression expression)
-        {
-            var jex = expression as JoinExpression;
-            if (jex != null)
-            {
-                return jex.Join == JoinType.CrossJoin;
-            }
-            return false;
-        }
-
         private Expression MakeSubquery(Expression expression)
         {
             var newAlias = new TableAlias();

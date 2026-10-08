@@ -22,8 +22,6 @@ namespace IQToolkit.Data.Access
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     public class AccessQueryProvider : OleDb.OleDbQueryProvider
     {
-        Dictionary<QueryCommand, OleDbCommand> commandCache = new Dictionary<QueryCommand, OleDbCommand>();
-
         public AccessQueryProvider(OleDbConnection connection, QueryMapping mapping, QueryPolicy policy)
             : base(connection, AccessLanguage.Default, mapping, policy)
         {

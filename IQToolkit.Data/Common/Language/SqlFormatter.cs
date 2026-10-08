@@ -778,14 +778,14 @@ namespace IQToolkit.Data.Common
                         break;
                     case TypeCode.String:
                         this.Write("'");
-                        this.Write(value);
+                        this.Write(((string)value).Replace("'", "''"));
                         this.Write("'");
                         break;
                     case TypeCode.Object:
                         throw new NotSupportedException(string.Format("The constant for '{0}' is not supported", value));
                     case TypeCode.Single:
                     case TypeCode.Double:
-                        string str = value.ToString();
+                        string str = Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
                         if (!str.Contains('.'))
                         {
                             str += ".0";
@@ -1014,7 +1014,7 @@ namespace IQToolkit.Data.Common
                     this.Write("COUNT");
                     break;
                 default:
-                    this.Write(aggregateName.ToUpper());
+                    this.Write(aggregateName.ToUpperInvariant());
                     break;
             }
         }

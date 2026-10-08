@@ -75,7 +75,7 @@ namespace IQToolkit.Data
             if (!this._tables.TryGetValue(entity, out table))
             {
                 table = this.CreateTable(entity);
-                this._tables.GetOrAdd(entity, table);
+                table = this._tables.GetOrAdd(entity, table);
             }
             return table;
         }

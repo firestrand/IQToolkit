@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.12" />
-  </ItemGroup>
+  <PropertyGroup>
+    <Description>LINQ expression evaluation, query compilation, and caching primitives for IQToolkit database providers.</Description>
+  </PropertyGroup>
 </Project>

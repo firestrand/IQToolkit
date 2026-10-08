@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Windows-only IQToolkit LINQ and entity operations for Microsoft Access using System.Data.OleDb.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../IQToolkit.Data/IQToolkit.Data.csproj" />
     <ProjectReference Include="../IQToolkit/IQToolkit.csproj" />
-    <PackageReference Include="System.Data.OleDb" Version="10.0.12" />
+    <PackageReference Include="System.Data.OleDb" />
   </ItemGroup>
 </Project>
