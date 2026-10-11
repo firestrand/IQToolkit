@@ -1,7 +1,7 @@
 ---
 title: Modernization planning evidence index
-version: 1.2
-last_updated: 2026-10-05
+version: 1.10
+last_updated: 2026-10-11
 status: Planning register; historical results, current final unqualified
 owner: IQToolkit project owner
 tags: [modernization, planning, evidence, verification]
@@ -9,7 +9,7 @@ tags: [modernization, planning, evidence, verification]
 
 # Modernization planning evidence index
 
-This is the separate Evidence Index for the [implementation plan](modernization-implementation-plan.md). It indexes the36 existing EV-IDs and their many-to-many relationships to34 historical facts, plus five separately declared MDB0 support observations with no product-fact activation. Their fact rows, claims, lifecycles and native registration remain byte-identical. This documentation change does not activate a fact, change an oracle, rewrite a result or modify a verification profile.
+This is the separate Evidence Index for the [implementation plan](modernization-implementation-plan.md). It indexes the36 existing EV-IDs and their many-to-many relationships to34 historical facts, plus five previously declared MDB0 support observations and the separate MDB0.1b regression control/result IDs with no product-fact activation. Their fact rows, claims, lifecycles and native registration remain byte-identical. This documentation change does not activate a fact, change an oracle, rewrite a result or modify a verification profile.
 
 ## Source, identity and reliability policy
 
@@ -88,15 +88,17 @@ Use this map for current routing of the four corrected selectors. The archived0.
 
 ## MariaDB package probe support
 
-These five IDs support required LOCAL-RM-DISCOVERY / PROBE.MARIADB.v1 process work; they are separate from historical product evidence. Source/profile/preparation does not qualify archive bytes, ELF closure, startup or SQL compatibility. Only exact accepted packets may advance the real-data stages; originals and stopped budgets remain protected.
+These five base IDs support required LOCAL-RM-DISCOVERY / PROBE.MARIADB.v1 process work; they are separate from historical product evidence. Source/profile/preparation does not qualify archive bytes, ELF closure, startup or SQL compatibility. Only exact accepted packets may advance the real-data stages; originals and stopped budgets remain protected.
 
 | Evidence ID | Facts / purpose | Type | Path / Command | Oracle & Fixture Deps | Data Version | Environment | Last Result |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | EV-MARIADB-PACKAGE-PROFILE | Support for `LOCAL-RM-DISCOVERY`; no Tier-1 activation | Metadata/profile verification | `artifacts/mariadb-package-discovery/acquisition-profile.json`; `/usr/bin/python3.12 -I -B artifacts/mariadb-package-discovery/package_acquisition.py check` | Routing listing and handoff; retained MariaDB Packages/checksum lists; four Ubuntu stanzas and three signed cached releases; entry manifest | MariaDB 12.3.3 / Ubuntu Noble pins; source acceptance 0.5 | Observed Linux ARM64; literal system interpreter | Metadata/routing observations retained; normal/-O profile/preservation readback passes; archive consistency remains Unknown |
-| EV-MARIADB-PACKAGE-CONTROLS | Support only; bounded acquisition controls and independent review | Source/control/packet review | `artifacts/mariadb-package-discovery/package_acquisition.py`; current source/profile/protocol2/helper/packet acceptance receipts | Pinned interpreter/stdlib, clock/terminal helpers and original tool/settlement capture; exact source manifest, planning report and concrete packet | MDB0 frozen source/profile/packet epoch, future | Same host; no SDK | Syntax/import/path-refusal and passive normal/-O checks pass; current independent source/planning/packet acceptance Unknown; no transport observed |
+| EV-MARIADB-PACKAGE-CONTROLS | Support only; bounded acquisition controls and independent review | Source/control/packet review | `artifacts/mariadb-package-discovery/package_acquisition.py`; current source/profile/protocol2/helper/packet acceptance receipts | Pinned interpreter/stdlib, clock/terminal helpers and original tool/settlement capture; exact source manifest, planning report and concrete packet | MDB0 frozen source/profile/packet epoch, future | Same host; no SDK | Round84 plan PASS; corrected normal/-O six-test suites and static normal/-O eight-check runs pass. Round85 source review returned CLEAR for its exact 27-input manifest (report SHA256 `67787a099ec58400b7616db24690972a5de75b6756b229096f4cd5778b53b4ab`); no transport observed |
+| EV-MDB0.1B-LATE-RED | Support only; isolated descriptor-leak reproduction, no product-fact activation | Private refusal regression test | `artifacts/mariadb-package-discovery/verify_mdb0_stale_lockout.py`; `mdb0.1b-late-failure-red-normal.json` | Exact detached valid journal bytes; private attempt fixture; descriptor-close assertion; no-live-attempt proof | MDB0.1b correction epoch | Pinned Python 3.12.3; local private fixture | Round84-authorized RED: six tests, only descriptor-close assertion fails; exit 1, zero errors; result SHA256 `6953768723922cf8972cd9dd9f1047927fddbf9e0df5ec0809ecb2f7e83d50ef` |
+| EV-MDB0.1B-LATE-GREEN | Support only; same regression after descriptor cleanup, no product-fact activation | Corrected private regression result | `artifacts/mariadb-package-discovery/verify_mdb0_stale_lockout.py`; `mdb0.1b-round78-green-normal.json` | EV-MDB0.1B-LATE-RED; exact controller/verifier hashes; private fixture snapshots; source review | MDB0.1b corrected epoch | Pinned Python 3.12.3; local private fixture | Six tests pass in normal/-O, including late-stage descriptor closure; normal result SHA256 `083dbb3d55c78c825098bec8f7c7f7ac5c4ad17fccb41d7e70e449b6ea0df12a`; optimized identity is in ATLAS; Round85 source CLEAR closed finding MDB0.1b-SRC-001 for this epoch |
 | EV-MARIADB-PACKAGE-ARCHIVES | Support only; actual raw archive consistency | Observed archive/hash verification | Root-created run packet and observed manifest from MDB0.3–4 | Ten profile size/SHA256 pins; MariaDB SHA512 pins; actual response and preservation receipts; independent reviewer | Actual acquisition epoch, future | Exact public origins; inactive private regular files | Unknown; expected ten archives / 14,237,418 bytes are not observed downloads |
 | EV-MARIADB-PACKAGE-STATIC | Support only; archive/static prerequisite observations | Bounded static probe | Separately expanded MDB0.5 static packet, member/ELF/script/license manifests | Reviewed raw archives/framing, installed parser/readelf identities, exact bounds and source/packet reviews | Actual static epoch, future | Linux ARM64 only; downloaded programs remain inert | Unknown; proposed readiness contract is not an accepted static controller |
-| EV-MARIADB-PACKAGE-DOC | Support only; truthful outcome and future gates | Document/integrated review | `docs/modernization-mariadb-package-probe.md`; proposed `docs/modernization-mariadb-package-hardness.md`; root outcome checkpoint | Exact historical/source/raw/static epochs, failed outcomes, counters, settled sessions, preservation and reviews | MDB0 actual outcome, future | Documentation only | Preparation GOTCHA exists; ATLAS and final integrated outcome Unknown |
+| EV-MARIADB-PACKAGE-DOC | Support only; truthful outcome and future gates | Document/integrated review | `docs/modernization-mariadb-package-probe.md`; `docs/modernization-mariadb-lockout-hardness.md`; root outcome checkpoint | Exact historical/source/raw/static epochs, failed outcomes, counters, settled sessions, preservation and reviews | MDB0 actual outcome, future | Documentation only | Round84-authorized MDB0.1b RED/GREEN/static outcomes and ATLAS are recorded; Round85 source CLEAR is recorded, while package outcome remains pending |
 
 ## Future Proposed evidence
 
@@ -106,6 +108,12 @@ The [future obligation ledger](modernization-future-facts.md) contains 111 Propo
 
 | Version | Date | Change |
 | :--- | :--- | :--- |
+| 1.10 | 2026-10-11 | Records Round85 source CLEAR and closure of MDB0.1b-SRC-001 for the reviewed source/evidence epoch; no product-fact activation. |
+| 1.9 | 2026-10-11 | Binds the exact Round85 source-review candidate and updates the successor handoff; product facts and lifecycle status are unchanged. |
+| 1.8 | 2026-10-11 | Records final MDB0.1b test/static outcomes and points to the completed ATLAS; source CLEAR remains pending. |
+| 1.7 | 2026-10-11 | Records Round84-authorized MDB0.1b RED/GREEN/static control outcomes and fresh source-review gate. |
+| 1.6 | 2026-10-11 | Assigned fresh MDB0.1b corrected evidence output path after Round77 found earlier-epoch GREEN paths are immutable; no fact binding or product status changed. |
+| 1.5 | 2026-10-11 | Added explicit MDB0.1b late-stage RED/GREEN support evidence IDs; no historical fact binding or product status changed. |
 | 1.4 | 2026-10-05 | Corrected the owner-selected .NET standard locator to 1.1.0-draft.1 and recorded round-13 planning/source outcomes; seven-row arithmetic and integrated acceptance tests remain exact, with current catalog at 719 paths and 87 classified removals. |
 | 1.3 | 2026-10-05 | Excluded the derived self-referential check report from operation inputs, corrected the seven-row reconciliation arithmetic and required integrated preflight and packet-acceptance tests; current catalog is 719 paths, with 87 classified removals and seven shared identity updates. |
 | 1.1 | 2026-10-05 | Enforced exact manifest exclusions, zero input additions and current-operation-input manifest coverage after round10; corrected the exact 806-to-720 delta. |
